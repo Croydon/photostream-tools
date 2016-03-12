@@ -1,0 +1,112 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'hochschuledarmstadt.photostream_tools'
+version = '0.0.1'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+def siteUrl = 'https://github.com/aschattney/photostream-tools'
+def gitUrl = 'https://github.com/aschattney/photostream-tools.git'
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    configurations = ['archives'] //When uploading configuration files
+    pkg {
+        repo = 'maven'
+        name = 'photostream-tools'
+        desc = 'Classes and utility functions which encapsulate application logic of the PhotoStream Android App'
+        websiteUrl = siteUrl
+        issueTrackerUrl = 'https://github.com/aschattney/photostream-tools/issues'
+        vcsUrl = gitUrl
+        licenses = ['MIT']
+        labels = ['aar', 'photostream', 'photostream-tools']
+        publish = true
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'photostream-tools'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'MIT'
+                        url 'https://opensource.org/licenses/MIT'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'aschattney'
+                        name 'Andreas Schattney'
+                        email 'a.schattney@jfrog.com'
+                    }
+                }
+                scm {
+                    connection 'https://github.com/aschattney/photostream-tools.git'
+                    developerConnection 'https://github.com/aschattney/photostream-tools.git'
+                    url siteUrl
+
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+task findConventions << {
+    println project.getConvention()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.mockito:mockito-core:2.0.43-beta'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'io.socket:socket.io-client:0.6.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+}
