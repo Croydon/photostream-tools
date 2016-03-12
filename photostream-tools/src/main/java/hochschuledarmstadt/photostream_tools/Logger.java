@@ -1,8 +1,8 @@
-package hochschuledarmstadt.photostream_tools.log;
+package hochschuledarmstadt.photostream_tools;
 
 import android.util.Log;
 
-public class Logger {
+class Logger {
 
     public static final boolean DEBUG = true;
 

@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.database;
+package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by Andreas Schattney on 07.03.2016.
  */
-public class DbConnection extends SQLiteOpenHelper{
+class DbConnection extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "photostream";
     private static final int DATABASE_VERSION = 1;

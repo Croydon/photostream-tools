@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.AsyncTask;
 
@@ -14,14 +14,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
  * Created by Andreas Schattney on 19.02.2016.
  */
-public class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
+class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
 
     private static final String TAG = StorePhotoAsyncTask.class.getName();
     public static final int CONNECT_TIMEOUT_IN_MILLIS = 6000;

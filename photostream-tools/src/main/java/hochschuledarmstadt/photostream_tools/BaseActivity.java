@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.activity;
+package hochschuledarmstadt.photostream_tools;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,11 +7,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
-import hochschuledarmstadt.photostream_tools.service.PhotoStreamClient;
-import hochschuledarmstadt.photostream_tools.service.PhotoStreamService;
 
 /**
  * Created by Andreas Schattney on 09.03.2016.

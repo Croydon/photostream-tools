@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.AsyncTask;
 
@@ -6,25 +6,21 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
-
 /**
  * Created by Andreas Schattney on 23.02.2016.
  */
-public class DeleteCommentAsyncTask extends AsyncTask<Void,Void,Boolean> {
+class DeletePhotoAsyncTask extends AsyncTask<Void,Void,Boolean> {
 
-    private static final String TAG = DeleteCommentAsyncTask.class.getName();
-    private final OnDeleteCommentResultListener callback;
+    private static final String TAG = DeletePhotoAsyncTask.class.getName();
+    private final OnDeletePhotoResultListener callback;
     private final String installationId;
-
-    private final int commentId;
     private final String uri;
+    private final int photoId;
 
-    public DeleteCommentAsyncTask(String installationId, String uri, int commentId, OnDeleteCommentResultListener callback){
+    public DeletePhotoAsyncTask(String installationId, String uri, int photoId, OnDeletePhotoResultListener callback){
         this.installationId = installationId;
         this.uri = uri;
-        this.commentId = commentId;
+        this.photoId = photoId;
         this.callback = callback;
     }
 
@@ -39,7 +35,7 @@ public class DeleteCommentAsyncTask extends AsyncTask<Void,Void,Boolean> {
     }
 
     private Boolean deleteComment() throws IOException {
-        final String url = String.format("%s/photostream/comment/%s", uri, commentId);
+        final String url = String.format("%s/photostream/image/%s", uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("DELETE");
         urlConnection.setConnectTimeout(6000);
@@ -51,14 +47,14 @@ public class DeleteCommentAsyncTask extends AsyncTask<Void,Void,Boolean> {
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
         if (result)
-            callback.onCommentDeleted(commentId);
+            callback.onPhotoDeleted(photoId);
         else
-            callback.onCommentDeleteFailed(commentId);
+            callback.onPhotoDeleteFailed(photoId);
     }
 
-    public interface OnDeleteCommentResultListener {
-        void onCommentDeleted(int commentId);
-        void onCommentDeleteFailed(int commentId);
+    public interface OnDeletePhotoResultListener {
+        void onPhotoDeleted(int commentId);
+        void onPhotoDeleteFailed(int commentId);
     }
 
 }

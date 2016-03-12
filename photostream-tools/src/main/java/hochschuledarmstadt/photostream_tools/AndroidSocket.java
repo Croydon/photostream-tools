@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -19,8 +19,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import io.socket.client.IO;
@@ -30,7 +28,7 @@ import io.socket.emitter.Emitter;
 /**
  * Created by Andreas Schattney on 18.02.2016.
  */
-public class AndroidSocket {
+class AndroidSocket {
 
     public static final String NEW_PHOTO = "new_photo";
     private static final String TAG = AndroidSocket.class.getName();

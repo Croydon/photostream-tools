@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,14 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.database.DbConnection;
-import hochschuledarmstadt.photostream_tools.database.VoteTable;
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
-import hochschuledarmstadt.photostream_tools.model.StoreCommentQuery;
 import io.socket.client.IO;
 import io.socket.engineio.client.transports.WebSocket;
 

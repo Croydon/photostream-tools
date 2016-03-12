@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.AsyncTask;
 
@@ -11,14 +11,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import hochschuledarmstadt.photostream_tools.database.VoteTable;
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
-
 /**
  * Created by Andreas Schattney on 23.02.2016.
  */
-public abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
+abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
 
     private static final String TAG = VotePhotoAsyncTask.class.getName();
     private final OnVotePhotoResultListener callback;

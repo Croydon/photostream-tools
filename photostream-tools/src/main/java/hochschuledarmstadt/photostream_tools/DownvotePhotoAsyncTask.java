@@ -1,11 +1,9 @@
-package hochschuledarmstadt.photostream_tools.service;
-
-import hochschuledarmstadt.photostream_tools.database.VoteTable;
+package hochschuledarmstadt.photostream_tools;
 
 /**
  * Created by Andreas Schattney on 08.03.2016.
  */
-public class DownvotePhotoAsyncTask extends VotePhotoAsyncTask {
+class DownvotePhotoAsyncTask extends VotePhotoAsyncTask {
 
     public DownvotePhotoAsyncTask(VoteTable voteTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback) {
         super(voteTable, installationId, uri, photoId, callback);

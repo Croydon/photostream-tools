@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.database;
+package hochschuledarmstadt.photostream_tools;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 /**
  * Created by Andreas Schattney on 07.03.2016.
  */
-public class VoteTable {
+class VoteTable {
 
     public static final String TABLE_NAME = "vote";
 

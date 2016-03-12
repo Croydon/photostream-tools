@@ -15,9 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
-
 public class Photo implements Parcelable, Id{
 
     private static final String TAG = Photo.class.getName();
@@ -126,7 +123,7 @@ public class Photo implements Parcelable, Id{
                 bitmap.recycle();
                 image = filename;
             } catch (Exception e) {
-                Logger.log(TAG, LogLevel.ERROR, e.toString());
+
             } finally {
                 if (outputStream != null)
                     outputStream.close();

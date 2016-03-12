@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.AsyncTask;
 
@@ -12,15 +12,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.CommentQueryResult;
 
 /**
  * Created by Andreas Schattney on 23.02.2016.
  */
-public class GetCommentsAsyncTask extends AsyncTask<Void, Void, CommentQueryResult> {
+class GetCommentsAsyncTask extends AsyncTask<Void, Void, CommentQueryResult> {
 
     private final OnCommentsResultListener callback;
     private final String installationId;

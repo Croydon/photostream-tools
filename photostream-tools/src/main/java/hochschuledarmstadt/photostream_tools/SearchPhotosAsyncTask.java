@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -12,15 +12,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 /**
  * Created by Andreas Schattney on 10.03.2016.
  */
-public class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
+class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
 
     private static final String TAG = GetStreamAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;

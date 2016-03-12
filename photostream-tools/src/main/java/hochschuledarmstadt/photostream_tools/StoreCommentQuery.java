@@ -1,9 +1,9 @@
-package hochschuledarmstadt.photostream_tools.model;
+package hochschuledarmstadt.photostream_tools;
 
 /**
  * Created by Andreas Schattney on 24.02.2016.
  */
-public class StoreCommentQuery {
+class StoreCommentQuery {
 
     private final String comment;
     private final int photoId;

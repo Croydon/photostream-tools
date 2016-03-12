@@ -1,10 +1,8 @@
-package hochschuledarmstadt.photostream_tools.activity;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.Bundle;
 
 import java.util.ArrayList;
-
-import hochschuledarmstadt.photostream_tools.service.PhotoStreamClient;
 
 /**
  * Created by Andreas Schattney on 11.03.2016.

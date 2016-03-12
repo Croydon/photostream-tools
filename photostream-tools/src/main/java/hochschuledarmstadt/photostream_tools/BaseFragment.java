@@ -1,12 +1,8 @@
-package hochschuledarmstadt.photostream_tools.fragment;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-
-import hochschuledarmstadt.photostream_tools.activity.OnServiceStateChangedListener;
-import hochschuledarmstadt.photostream_tools.activity.ServiceStateChangedNotifier;
-import hochschuledarmstadt.photostream_tools.service.PhotoStreamClient;
 
 /**
  * Created by Andreas Schattney on 18.02.2016.

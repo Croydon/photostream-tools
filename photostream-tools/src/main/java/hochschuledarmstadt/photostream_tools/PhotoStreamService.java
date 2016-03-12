@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.app.Service;
 import android.content.Context;
@@ -10,9 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import java.util.UUID;
-
-import hochschuledarmstadt.photostream_tools.R;
-import hochschuledarmstadt.photostream_tools.database.DbConnection;
 
 /**
  * Created by Andreas Schattney on 18.02.2016.

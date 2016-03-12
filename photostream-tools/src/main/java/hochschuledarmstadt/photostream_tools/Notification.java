@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.notification;
+package hochschuledarmstadt.photostream_tools;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;

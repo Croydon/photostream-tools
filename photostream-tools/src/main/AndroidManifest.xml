@@ -8,6 +8,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <service android:name=".PhotoStreamService" android:enabled="true"/>
+
     </application>
 
 </manifest>

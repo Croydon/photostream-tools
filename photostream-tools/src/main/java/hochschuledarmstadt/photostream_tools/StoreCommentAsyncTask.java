@@ -1,4 +1,4 @@
-package hochschuledarmstadt.photostream_tools.service;
+package hochschuledarmstadt.photostream_tools;
 
 import android.os.AsyncTask;
 
@@ -15,15 +15,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import hochschuledarmstadt.photostream_tools.log.LogLevel;
-import hochschuledarmstadt.photostream_tools.log.Logger;
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.StoreCommentQuery;
 
 /**
  * Created by Andreas Schattney on 24.02.2016.
  */
-public class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> {
+class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> {
 
     private static final int CONNECT_TIMEOUT_IN_MILLIS = 6000;
     private static final String UTF_8 = "UTF-8";

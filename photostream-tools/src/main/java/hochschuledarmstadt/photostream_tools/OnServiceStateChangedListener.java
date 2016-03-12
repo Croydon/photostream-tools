@@ -1,6 +1,4 @@
-package hochschuledarmstadt.photostream_tools.activity;
-
-import hochschuledarmstadt.photostream_tools.service.PhotoStreamClient;
+package hochschuledarmstadt.photostream_tools;
 
 /**
  * Created by Andreas Schattney on 18.02.2016.
