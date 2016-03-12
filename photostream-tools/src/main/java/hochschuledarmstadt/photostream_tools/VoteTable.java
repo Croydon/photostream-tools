@@ -48,7 +48,7 @@ class VoteTable {
         return database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE) > 0;
     }
 
-    public boolean userAlreadyVotedForPhoto(int photoId){
+    public boolean hasUserAlreadyVotedForPhoto(int photoId){
         Cursor cursor = database.query(
                 TABLE_NAME,
                 new String[]{COLUMN_ALREADY_VOTED},

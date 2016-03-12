@@ -121,7 +121,7 @@ public class Photo implements Parcelable, Id{
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
-                image = filename;
+                image = new File(context.getFilesDir(), filename).getAbsolutePath();
             } catch (Exception e) {
 
             } finally {

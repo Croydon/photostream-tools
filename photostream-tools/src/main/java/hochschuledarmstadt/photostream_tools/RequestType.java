@@ -8,5 +8,6 @@ public enum RequestType {
     PHOTOS,
     POPULAR_PHOTOS,
     VOTE,
-    SEARCH, COMMENT
+    SEARCH,
+    COMMENT
 }

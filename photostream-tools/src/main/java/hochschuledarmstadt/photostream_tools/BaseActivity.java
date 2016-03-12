@@ -22,7 +22,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ServiceC
     protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient);
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.refSavedInstanceState = savedInstanceState;
         if (savedInstanceState == null){
@@ -35,6 +35,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ServiceC
         super.onResume();
         if (!bound)
             bindService(new Intent(this, PhotoStreamService.class), this, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override

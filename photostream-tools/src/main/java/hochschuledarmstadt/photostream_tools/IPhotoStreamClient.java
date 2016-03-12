@@ -13,9 +13,6 @@ import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListen
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-/**
- * Created by Andreas Schattney on 12.03.2016.
- */
 public interface IPhotoStreamClient {
     void addOnPhotoVotedResultListener(OnPhotoVotedResultListener onPhotoVotedResultListener);
     void removeOnPhotoVotedResultListener(OnPhotoVotedResultListener onPhotoVotedResultListener);
@@ -25,22 +22,23 @@ public interface IPhotoStreamClient {
     void removeOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener);
     void addOnPopularPhotosResultListener(OnPopularPhotosResultListener onPopularPhotosResultListener);
     void removeOnPopularPhotosResultListener(OnPopularPhotosResultListener onPopularPhotosResultListener);
-    void addOnSearchPhotosResultListener(OnSearchPhotosResultListener listener);
-    void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener listener);
+    void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener);
+    void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener);
     void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener);
     void removeOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener);
+    boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException;
     void getPhotos(int page);
+    void getPhotos();
     void getPopularPhotos(int page);
-    void upvotePhoto(int photoId);
-    boolean hasUserAlreadyVotedForPhoto(int photoId);
-    void getComments(int photoId);
-    void downvotePhoto(int photoId);
-    void deleteComment(Comment comment);
-    void deletePhoto(Photo photo);
-    void sendComment(int photoId, String comment);
-    boolean hasOpenRequestsOfType(RequestType requestType);
     void searchPhotos(String query);
     void searchPhotos(String query, int page);
-    void searchNextPage(int page);
-    boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException;
+    void searchPhotosNextPage(int page);
+    void deletePhoto(Photo photo);
+    void upvotePhoto(int photoId);
+    void downvotePhoto(int photoId);
+    boolean hasUserAlreadyVotedForPhoto(int photoId);
+    void getComments(int photoId);
+    void sendComment(int photoId, String comment);
+    void deleteComment(Comment comment);
+    boolean hasOpenRequestsOfType(RequestType requestType);
 }

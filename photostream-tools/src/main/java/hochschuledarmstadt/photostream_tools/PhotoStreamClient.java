@@ -122,20 +122,25 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     }
 
     @Override
-    public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener listener){
-        if (!onSearchPhotosListeners.contains(listener))
-            onSearchPhotosListeners.add(listener);
+    public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener){
+        if (!onSearchPhotosListeners.contains(onSearchPhotosResultListener))
+            onSearchPhotosListeners.add(onSearchPhotosResultListener);
     }
 
     @Override
-    public void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener listener){
-        if (onSearchPhotosListeners.contains(listener))
-            onSearchPhotosListeners.remove(listener);
+    public void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener){
+        if (onSearchPhotosListeners.contains(onSearchPhotosResultListener))
+            onSearchPhotosListeners.remove(onSearchPhotosResultListener);
     }
 
     void bootstrap(){
         webSocketClient = new WebSocketClient(EXTERNAL_URI, installationId, this);
         webSocketClient.connect();
+    }
+
+    @Override
+    public void getPhotos() {
+        getPhotos(1);
     }
 
     @Override
@@ -209,6 +214,25 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     }
 
     private void notifyShowProgressDialog(RequestType requestType) {
+        ArrayList<? extends OnRequestListener> onRequestListeners = getCallbacksForRequestType(requestType);
+        for (OnRequestListener onRequestListener : onRequestListeners){
+            onRequestListener.onShowProgressDialog();
+        }
+    }
+
+    private void notifyDismissProgressDialog(final RequestType requestType) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<? extends OnRequestListener> onRequestListeners = getCallbacksForRequestType(requestType);
+                for (OnRequestListener onRequestListener : onRequestListeners){
+                    onRequestListener.onDismissProgressDialog();
+                }
+            }
+        }, 200);
+    }
+
+    private ArrayList<? extends OnRequestListener> getCallbacksForRequestType(RequestType requestType) {
         ArrayList<? extends OnRequestListener> onRequestListeners = null;
         switch(requestType){
             case PHOTOS:
@@ -228,42 +252,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
                 break;
             case SEARCH:
                 onRequestListeners = onSearchPhotosListeners;
-                break;
         }
-        for (OnRequestListener onRequestListener : onRequestListeners){
-            onRequestListener.onShowProgressDialog();
-        }
-    }
-
-    private void notifyDismissProgressDialog(final RequestType requestType) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<? extends OnRequestListener> onRequestListeners = null;
-                switch(requestType){
-                    case PHOTOS:
-                        onRequestListeners = onPhotosResultListeners;
-                        break;
-                    case COMMENT:
-                        onRequestListeners = onCommentsResultListeners;
-                        break;
-                    case VOTE:
-                        onRequestListeners = onPhotoVotedResultListeners;
-                        break;
-                    case POPULAR_PHOTOS:
-                        onRequestListeners = onPopularPhotosResultListeners;
-                        break;
-                    case UPLOAD:
-                        onRequestListeners = onPhotoUploadListeners;
-                        break;
-                    case SEARCH:
-                        onRequestListeners = onSearchPhotosListeners;
-                }
-                for (OnRequestListener onRequestListener : onRequestListeners){
-                    onRequestListener.onDismissProgressDialog();
-                }
-            }
-        }, 500);
+        return onRequestListeners;
     }
 
     private void notifyOnPhotosFailed() {
@@ -388,7 +378,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public boolean hasUserAlreadyVotedForPhoto(int photoId){
         VoteTable voteTable = new VoteTable(dbConnection);
         voteTable.openDatabase();
-        boolean alreadyVoted = voteTable.userAlreadyVotedForPhoto(photoId);
+        boolean alreadyVoted = voteTable.hasUserAlreadyVotedForPhoto(photoId);
         voteTable.closeDatabase();
         return alreadyVoted;
     }
@@ -613,7 +603,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     }
 
     @Override
-    public void searchNextPage(int page) {
+    public void searchPhotosNextPage(int page) {
         searchPhotos(lastQuery, page);
     }
 

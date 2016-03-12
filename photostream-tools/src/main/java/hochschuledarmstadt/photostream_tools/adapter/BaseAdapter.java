@@ -26,38 +26,41 @@ public abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends P
         return items.get(position);
     }
 
-    public int prepend(H item){
+    public void prepend(H item){
         this.items.add(0, item);
-        return 0;
+        notifyItemInserted(0);
     }
 
-    public int append(H item){
+    public void append(H item){
         this.items.add(item);
-        return items.indexOf(item);
+        notifyItemInserted(items.size() - 1);
     }
 
-    public int[] append(Collection<? extends H> items){
-        int[] range = new int[2];
-        range[0] = getItemCount();
+    public void append(Collection<? extends H> items){
+        final int itemCountBefore = getItemCount();
         this.items.addAll(items);
-        range[1] = getItemCount()-1;
-        return range;
+        final int lastItemIndex = getItemCount()-1;
+        notifyItemRangeInserted(itemCountBefore, lastItemIndex);
     }
 
     public void set(Collection<? extends H> items){
         this.items.clear();
         this.items.addAll(items);
+        notifyDataSetChanged();
     }
 
-    public int remove(int id) {
+    public void remove(int id) {
+        int removedAt = -1;
         for (int position = 0; position < items.size(); position++){
             H photo = getItemAtPosition(position);
-            if (itemHasId(id, photo)) {
+            if (itemHasEqualId(id, photo)) {
                 items.remove(position);
-                return position;
+                removedAt = position;
+                break;
             }
         }
-        return -1;
+        if (removedAt != -1)
+            notifyItemRemoved(removedAt);
     }
 
     @Override
@@ -65,7 +68,9 @@ public abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends P
         return items.size();
     }
 
-    protected abstract boolean itemHasId(int id, H item);
+    protected boolean itemHasEqualId(int id, H item){
+        return item.getId() == id;
+    }
 
     public Bundle onSaveInstanceState(){
         Bundle bundle = new Bundle();

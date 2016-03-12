@@ -18,9 +18,9 @@ import java.io.InputStream;
 /**
  * Created by Andreas Schattney on 07.03.2016.
  */
-public class Utils {
+public class BitmapUtils {
 
-    private static final String TAG = Utils.class.getName();
+    private static final String TAG = BitmapUtils.class.getName();
 
     public static Bitmap decodeBitmapFromUri(Context context, Uri uri) throws FileNotFoundException {
         final ContentResolver contentResolver = context.getContentResolver();

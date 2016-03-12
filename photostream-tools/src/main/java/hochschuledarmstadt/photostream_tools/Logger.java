@@ -1,6 +1,11 @@
 package hochschuledarmstadt.photostream_tools;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ViewGroup;
+
+import hochschuledarmstadt.photostream_tools.adapter.BaseAdapter;
+import hochschuledarmstadt.photostream_tools.model.Photo;
 
 class Logger {
 
@@ -19,7 +24,6 @@ class Logger {
     }
 
     public static void log(String TAG, LogLevel logLevel, String logMessage) {
-
         if (DEBUG) {
             logToLogcat(TAG, logLevel, logMessage);
         }

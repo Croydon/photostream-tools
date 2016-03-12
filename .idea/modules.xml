@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Photostream-Tools-Android.iml" filepath="$PROJECT_DIR$/Photostream-Tools-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/examples/examples.iml" filepath="$PROJECT_DIR$/examples/examples.iml" />
       <module fileurl="file://$PROJECT_DIR$/photostream-tools/photostream-tools.iml" filepath="$PROJECT_DIR$/photostream-tools/photostream-tools.iml" />
     </modules>
   </component>

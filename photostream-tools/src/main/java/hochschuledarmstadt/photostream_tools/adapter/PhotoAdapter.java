@@ -13,7 +13,10 @@ public abstract class PhotoAdapter<T extends RecyclerView.ViewHolder, H extends 
 
     public PhotoAdapter(ArrayList<H> photos){
         super(photos);
-        this.items = photos;
+    }
+
+    public PhotoAdapter(){
+        super(new ArrayList<H>());
     }
 
     public void updateVoteCountForPhoto(int photoId, int newVoteCount) {
