@@ -20,7 +20,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
  */
 class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
 
-    private static final String TAG = GetStreamAsyncTask.class.getName();
+    private static final String TAG = GetPhotosAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;
     private final Context context;
     private final String installationId;

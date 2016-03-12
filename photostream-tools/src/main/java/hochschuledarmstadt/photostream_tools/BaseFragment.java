@@ -12,10 +12,10 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
     private boolean serviceDisconnectCalled;
     private Bundle refSavedInstanceState;
 
-    protected abstract void onPhotoStreamServiceConnected(PhotoStreamClient service, Bundle savedInstanceState);
-    protected abstract void onPhotoStreamServiceDisconnected(PhotoStreamClient service);
+    protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient service, Bundle savedInstanceState);
+    protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient service);
 
-    private PhotoStreamClient photoStreamClient;
+    private IPhotoStreamClient photoStreamClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,13 +40,13 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
     }
 
     @Override
-    public void onServiceConnected(PhotoStreamClient client) {
+    public void onServiceConnected(IPhotoStreamClient client) {
         photoStreamClient = client;
         onPhotoStreamServiceConnected(client, refSavedInstanceState);
     }
 
     @Override
-    public void onServiceDisconnected(PhotoStreamClient client) {
+    public void onServiceDisconnected(IPhotoStreamClient client) {
         if (!serviceDisconnectCalled) {
             serviceDisconnectCalled = true;
             onPhotoStreamServiceDisconnected(photoStreamClient);
@@ -64,7 +64,7 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
         super.onDestroyView();
     }
 
-    public PhotoStreamClient getPhotoStreamClient() {
+    public IPhotoStreamClient getPhotoStreamClient() {
         return photoStreamClient;
     }
 }

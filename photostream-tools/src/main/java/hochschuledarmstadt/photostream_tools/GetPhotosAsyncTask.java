@@ -18,16 +18,16 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 /**
  * Created by Andreas Schattney on 19.02.2016.
  */
-class GetStreamAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
+class GetPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
 
-    private static final String TAG = GetStreamAsyncTask.class.getName();
-    private final StreamCallback callback;
+    private static final String TAG = GetPhotosAsyncTask.class.getName();
+    private final GetPhotosCallback callback;
     private final Context context;
     private final String installationId;
     private final String uri;
     private final int page;
 
-    public GetStreamAsyncTask(Context context, String installationId, String uri, int page, StreamCallback callback){
+    public GetPhotosAsyncTask(Context context, String installationId, String uri, int page, GetPhotosCallback callback){
         this.context = context;
         this.installationId = installationId;
         this.uri = uri;
@@ -81,14 +81,14 @@ class GetStreamAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
     protected void onPostExecute(PhotoQueryResult result) {
         super.onPostExecute(result);
         if (result != null) {
-            callback.onStreamQueryResult(result);
+            callback.OnPhotosResult(result);
         }else{
             callback.onError();
         }
     }
 
-    public interface StreamCallback {
-        void onStreamQueryResult(PhotoQueryResult photoQueryResult);
+    public interface GetPhotosCallback {
+        void OnPhotosResult(PhotoQueryResult photoQueryResult);
         void onError();
     }
 

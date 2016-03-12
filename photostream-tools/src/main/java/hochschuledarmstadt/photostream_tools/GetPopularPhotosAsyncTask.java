@@ -5,9 +5,9 @@ import android.content.Context;
 /**
  * Created by Andreas Schattney on 08.03.2016.
  */
-class GetPopularPhotosAsyncTask extends GetStreamAsyncTask {
+class GetPopularPhotosAsyncTask extends GetPhotosAsyncTask {
 
-    public GetPopularPhotosAsyncTask(Context context, String installationId, String uri, int page, StreamCallback callback) {
+    public GetPopularPhotosAsyncTask(Context context, String installationId, String uri, int page, GetPhotosCallback callback) {
         super(context, installationId, uri, page, callback);
     }
 

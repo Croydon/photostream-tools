@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import hochschuledarmstadt.photostream_tools.callback.OnCommentsResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoVotedResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotosResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPopularPhotosResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
+import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
@@ -28,7 +36,7 @@ import io.socket.engineio.client.transports.WebSocket;
 /**
  * Created by Andreas Schattney on 08.03.2016.
  */
-public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
+public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStreamClient {
 
     public static final String INTENT_NEW_PHOTO = "hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO";
     private final String installationId;
@@ -49,7 +57,6 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
     private static final int NOTIFICATION_ID_NEW_PHOTO = 23798;
 
     private ArrayList<OnPhotosResultListener> onPhotosResultListeners = new ArrayList<>();
-    private ArrayList<ServiceApiConnectionListener> serviceApiConnectionListeners = new ArrayList<>();
     private ArrayList<OnPopularPhotosResultListener> onPopularPhotosResultListeners = new ArrayList<>();
     private ArrayList<OnPhotoVotedResultListener> onPhotoVotedResultListeners = new ArrayList<>();
     private ArrayList<OnCommentsResultListener> onCommentsResultListeners = new ArrayList<>();
@@ -58,7 +65,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
 
     private WebSocketClient webSocketClient;
 
-    public void destroy() {
+    void destroy() {
         openRequests.clear();
         if (webSocketClient != null)
             webSocketClient.disconnect();
@@ -66,76 +73,77 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
 
+    @Override
     public void addOnPhotoVotedResultListener(OnPhotoVotedResultListener onPhotoVotedResultListener) {
         if (!onPhotoVotedResultListeners.contains(onPhotoVotedResultListener))
             onPhotoVotedResultListeners.add(onPhotoVotedResultListener);
     }
 
+    @Override
     public void removeOnPhotoVotedResultListener(OnPhotoVotedResultListener onPhotoVotedResultListener) {
         if (onPhotoVotedResultListeners.contains(onPhotoVotedResultListener))
             onPhotoVotedResultListeners.remove(onPhotoVotedResultListener);
     }
 
+    @Override
     public void addOnGetCommentsResultListener(OnCommentsResultListener onCommentsResultListener){
         if (!onCommentsResultListeners.contains(onCommentsResultListener))
             onCommentsResultListeners.add(onCommentsResultListener);
     }
 
+    @Override
     public void removeOnGetCommentsResultListener(OnCommentsResultListener onCommentsResultListener){
         if (onCommentsResultListeners.contains(onCommentsResultListener))
             onCommentsResultListeners.remove(onCommentsResultListener);
     }
 
+    @Override
     public void addOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener) {
         if (!onPhotosResultListeners.contains(onPhotosResultListener))
             onPhotosResultListeners.add(onPhotosResultListener);
     }
 
+    @Override
     public void removeOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener){
         if (onPhotosResultListeners.contains(onPhotosResultListener))
             onPhotosResultListeners.remove(onPhotosResultListener);
     }
 
+    @Override
     public void addOnPopularPhotosResultListener(OnPopularPhotosResultListener onPopularPhotosResultListener) {
         if (!onPopularPhotosResultListeners.contains(onPopularPhotosResultListener))
             onPopularPhotosResultListeners.add(onPopularPhotosResultListener);
     }
 
+    @Override
     public void removeOnPopularPhotosResultListener(OnPopularPhotosResultListener onPopularPhotosResultListener){
         if (onPopularPhotosResultListeners.contains(onPopularPhotosResultListener))
             onPopularPhotosResultListeners.remove(onPopularPhotosResultListener);
     }
 
-    public void addServiceApiConnectionListener(ServiceApiConnectionListener listener){
-        if (!serviceApiConnectionListeners.contains(listener))
-            serviceApiConnectionListeners.add(listener);
-    }
-
-    public void removeServiceApiConnectionListener(ServiceApiConnectionListener listener){
-        if (serviceApiConnectionListeners.contains(listener))
-            serviceApiConnectionListeners.remove(listener);
-    }
-
+    @Override
     public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener listener){
         if (!onSearchPhotosListeners.contains(listener))
             onSearchPhotosListeners.add(listener);
     }
 
+    @Override
     public void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener listener){
         if (onSearchPhotosListeners.contains(listener))
             onSearchPhotosListeners.remove(listener);
     }
 
-    public void bootstrap(){
+    void bootstrap(){
         webSocketClient = new WebSocketClient(EXTERNAL_URI, installationId, this);
         webSocketClient.connect();
     }
 
+    @Override
     public void getPhotos(int page) {
         final RequestType requestType = RequestType.PHOTOS;
-        GetStreamAsyncTask task = new GetStreamAsyncTask(context, installationId, EXTERNAL_URI, page, new GetStreamAsyncTask.StreamCallback() {
+        GetPhotosAsyncTask task = new GetPhotosAsyncTask(context, installationId, EXTERNAL_URI, page, new GetPhotosAsyncTask.GetPhotosCallback() {
             @Override
-            public void onStreamQueryResult(PhotoQueryResult queryResult) {
+            public void OnPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPhotos(queryResult);
@@ -263,11 +271,12 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             resultListener.onReceivePhotosFailed();
     }
 
+    @Override
     public void getPopularPhotos(int page){
         final RequestType requestType = RequestType.POPULAR_PHOTOS;
-        GetPopularPhotosAsyncTask task = new GetPopularPhotosAsyncTask(context, installationId, EXTERNAL_URI, page, new GetPopularPhotosAsyncTask.StreamCallback() {
+        GetPopularPhotosAsyncTask task = new GetPopularPhotosAsyncTask(context, installationId, EXTERNAL_URI, page, new GetPhotosAsyncTask.GetPhotosCallback() {
             @Override
-            public void onStreamQueryResult(PhotoQueryResult queryResult) {
+            public void OnPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPopularPhotos(queryResult);
@@ -328,6 +337,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
         }
     }
 
+    @Override
     public void upvotePhoto(int photoId) {
         final RequestType requestType = RequestType.VOTE;
         VoteTable voteTable = new VoteTable(DbConnection.getInstance(context));
@@ -374,7 +384,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onPhotoVoted(photo_id, votecount);
     }
 
-    public boolean userAlreadyVotedForPhoto(int photoId){
+    @Override
+    public boolean hasUserAlreadyVotedForPhoto(int photoId){
         VoteTable voteTable = new VoteTable(dbConnection);
         voteTable.openDatabase();
         boolean alreadyVoted = voteTable.userAlreadyVotedForPhoto(photoId);
@@ -382,6 +393,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
         return alreadyVoted;
     }
 
+    @Override
     public void getComments(int photoId){
         final RequestType requestType = RequestType.COMMENT;
         GetCommentsAsyncTask task = new GetCommentsAsyncTask(installationId, EXTERNAL_URI, photoId, new GetCommentsAsyncTask.OnCommentsResultListener() {
@@ -409,6 +421,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onGetComments(photoId, comments);
     }
 
+    @Override
     public void downvotePhoto(int photoId) {
         final RequestType requestType = RequestType.VOTE;
         VoteTable voteTable = new VoteTable(DbConnection.getInstance(context));
@@ -445,6 +458,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
         task.execute();
     }
 
+    @Override
     public void deleteComment(Comment comment) {
         final RequestType requestType = RequestType.COMMENT;
         DeleteCommentAsyncTask task = new DeleteCommentAsyncTask(installationId, EXTERNAL_URI, comment.getId(), new DeleteCommentAsyncTask.OnDeleteCommentResultListener() {
@@ -467,6 +481,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
         task.execute();
     }
 
+    @Override
     public void deletePhoto(final Photo photo){
         final RequestType requestType = RequestType.PHOTOS;
         final int photoId = photo.getId();
@@ -505,6 +520,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onCommentDeleteFailed(commentId);
     }
 
+    @Override
     public void sendComment(int photoId, String comment) {
         final RequestType requestType = RequestType.COMMENT;
         StoreCommentAsyncTask task = new StoreCommentAsyncTask(installationId, new StoreCommentAsyncTask.OnCommentSentListener() {
@@ -537,26 +553,31 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onNewComment(comment);
     }
 
+    @Override
     public void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
         if (!onPhotoUploadListeners.contains(onPhotoUploadListener))
             onPhotoUploadListeners.add(onPhotoUploadListener);
     }
 
+    @Override
     public void removeOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
         if (onPhotoUploadListeners.contains(onPhotoUploadListener))
             onPhotoUploadListeners.remove(onPhotoUploadListener);
     }
 
+    @Override
     public boolean hasOpenRequestsOfType(RequestType requestType) {
         if (openRequests.containsKey(requestType))
             return openRequests.get(requestType) > 0;
         return false;
     }
 
+    @Override
     public void searchPhotos(String query){
         searchPhotos(query, 1);
     }
 
+    @Override
     public void searchPhotos(final String query, int page) {
         final RequestType requestType = RequestType.SEARCH;
         SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(context, installationId, EXTERNAL_URI, query, page, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
@@ -591,6 +612,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onSearchedPhotosReceived(photoQueryResult);
     }
 
+    @Override
     public void searchNextPage(int page) {
         searchPhotos(lastQuery, page);
     }
@@ -644,6 +666,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
             listener.onPhotoDeleted(photoId);
     }
 
+    @Override
     public boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException {
         final RequestType requestType = RequestType.UPLOAD;
         final JSONObject jsonObject = createJsonObject(imageBytes, comment);
@@ -699,26 +722,6 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
     }
 
     @Override
-    public void onDisconnect() {
-
-    }
-
-    @Override
-    public void onConnect() {
-
-    }
-
-    @Override
-    public void onError() {
-
-    }
-
-    @Override
-    public void onConnectError(URI uri) {
-
-    }
-
-    @Override
     public void onNewComment(Comment comment) {
         notifyOnNewComment(comment);
     }
@@ -738,54 +741,4 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener{
         notifyOnPhotoVoted(photoId, voteCount);
     }
 
-    public interface ServiceApiConnectionListener {
-        void onConnected();
-        void onDisconnected();
-        void onConnectError();
-    }
-
-    public interface OnRequestListener {
-        void onShowProgressDialog();
-        void onDismissProgressDialog();
-    }
-
-    public interface OnPhotoListener extends OnRequestListener {
-        void onNewPhoto(Photo photo);
-        void onPhotoDeleted(int photoId);
-        void onPhotoDeleteFailed(int photoId);
-    }
-
-    public interface OnPhotosResultListener extends OnPhotoListener {
-        void onPhotosReceived(PhotoQueryResult result);
-        void onReceivePhotosFailed();
-    }
-
-    public interface OnSearchPhotosResultListener extends OnPhotoListener {
-        void onSearchedPhotosReceived(PhotoQueryResult result);
-        void onReceiveSearchedPhotosFailed();
-    }
-
-    public interface OnPopularPhotosResultListener extends OnPhotoListener {
-        void onPopularPhotosReceived(PhotoQueryResult result);
-        void onReceivePopularPhotosFailed();
-    }
-
-    public interface OnPhotoVotedResultListener extends OnRequestListener{
-        void onPhotoVoted(int photoId, int newVoteCount);
-        void onPhotoAlreadyVoted(int photoId, int voteCount);
-        void onPhotoVoteFailed(int photoId);
-    }
-
-    public interface OnCommentsResultListener extends OnRequestListener{
-        void onGetComments(int photoId, List<Comment> comments);
-        void onCommentDeleted(int commentId);
-        void onCommentDeleteFailed(int commentId);
-        void onNewComment(Comment comment);
-        void onSendCommentFailed();
-    }
-
-    public interface OnPhotoUploadListener extends OnRequestListener{
-        void onPhotoUploaded();
-        void onPhotoUploadFailed();
-    }
 }

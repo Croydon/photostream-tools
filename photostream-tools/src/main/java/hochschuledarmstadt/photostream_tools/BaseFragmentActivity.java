@@ -24,21 +24,21 @@ public abstract class BaseFragmentActivity extends BaseActivity implements Servi
     }
 
     @Override
-    protected void onPhotoStreamServiceConnected(PhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
+    protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         notifyOnServiceConnected(photoStreamClient);
     }
 
     @Override
-    protected void onPhotoStreamServiceDisconnected(PhotoStreamClient photoStreamClient) {
+    protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         notifyOnServiceDisconnected(photoStreamClient);
     }
 
-    private void notifyOnServiceConnected(PhotoStreamClient photoStreamClient){
+    private void notifyOnServiceConnected(IPhotoStreamClient photoStreamClient){
         for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
             onServiceStateChangedListener.onServiceConnected(photoStreamClient);
     }
 
-    private void notifyOnServiceDisconnected(PhotoStreamClient photoStreamClient){
+    private void notifyOnServiceDisconnected(IPhotoStreamClient photoStreamClient){
         for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
             onServiceStateChangedListener.onServiceDisconnected(photoStreamClient);
     }

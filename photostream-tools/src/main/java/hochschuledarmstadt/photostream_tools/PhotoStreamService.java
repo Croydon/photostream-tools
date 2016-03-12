@@ -21,7 +21,7 @@ public class PhotoStreamService extends Service {
 
     public class PhotoStreamServiceBinder extends Binder {
 
-        public PhotoStreamClient getClient() {
+        public IPhotoStreamClient getClient() {
             return photoStreamClient;
         }
     }

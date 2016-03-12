@@ -95,35 +95,35 @@ class AndroidSocket {
         socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                onMessageListener.onError();
+                // onMessageListener.onError();
             }
         });
 
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                onMessageListener.onConnect();
+               // onMessageListener.onConnect();
             }
         });
 
         socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                onMessageListener.onConnectError(uri);
+               // onMessageListener.onConnectError(uri);
             }
         });
 
         socket.on(Socket.EVENT_RECONNECT_FAILED, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                onMessageListener.onConnectError(uri);
+               // onMessageListener.onConnectError(uri);
             }
         });
 
         socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                onMessageListener.onDisconnect();
+              //  onMessageListener.onDisconnect();
             }
         });
 
@@ -208,10 +208,6 @@ class AndroidSocket {
 
     public interface OnMessageListener{
         void onNewPhoto(Photo photo);
-        void onDisconnect();
-        void onConnect();
-        void onError();
-        void onConnectError(URI uri);
         void onNewComment(Comment comment);
         void onCommentDeleted(int commentId);
         void onPhotoDeleted(int photoId);

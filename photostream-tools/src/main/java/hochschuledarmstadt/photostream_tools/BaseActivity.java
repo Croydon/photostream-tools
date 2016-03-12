@@ -14,12 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 public abstract class BaseActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = BaseActivity.class.getName();
-    private PhotoStreamClient photoStreamClient;
+    private IPhotoStreamClient photoStreamClient;
     private boolean bound;
     private Bundle refSavedInstanceState;
 
-    protected abstract void onPhotoStreamServiceConnected(PhotoStreamClient photoStreamClient, Bundle savedInstanceState);
-    protected abstract void onPhotoStreamServiceDisconnected(PhotoStreamClient photoStreamClient);
+    protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState);
+    protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ServiceC
         return photoStreamClient != null && bound;
     }
 
-    protected PhotoStreamClient getPhotoStreamClient() {
+    protected IPhotoStreamClient getPhotoStreamClient() {
         return photoStreamClient;
     }
 
