@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     tools:context="hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:textSize="17sp"
+        android:text="@string/header_comments"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/recyclerView"

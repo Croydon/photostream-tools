@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Examples</string>
     <string name="action_refresh">Aktualisieren</string>
+    <string name="header_comments">Comments for Photo With ID = 3</string>
 </resources>

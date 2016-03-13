@@ -19,12 +19,11 @@ abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> 
     private final String installationId;
     private final int photoId;
     private final VoteTable voteTable;
-    private final String uri;
 
     public VotePhotoAsyncTask(VoteTable voteTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback){
+        super(uri);
         this.voteTable = voteTable;
         this.installationId = installationId;
-        this.uri = uri;
         this.photoId = photoId;
         this.callback = callback;
     }
@@ -46,7 +45,7 @@ abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> 
     }
 
     private JSONObject votePhoto() throws IOException, JSONException, HttpPhotoStreamException {
-        final String url = buildUrl(uri, photoId);
+        final String url = buildUri(uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("PUT");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
@@ -59,7 +58,7 @@ abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> 
         }
     }
 
-    protected abstract String buildUrl(String uri, int photoId);
+    protected abstract String buildUri(String uri, int photoId);
 
     @Override
     protected void onPostExecute(JSONObject result) {

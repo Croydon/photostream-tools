@@ -23,12 +23,12 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
 
     private static final String TAG = StorePhotoAsyncTask.class.getName();
-    public static final int CONNECT_TIMEOUT_IN_MILLIS = 6000;
     public static final String UTF_8 = "UTF-8";
     private final OnPhotoStoredCallback callback;
     private final String installationId;
 
-    public StorePhotoAsyncTask(String installationId, OnPhotoStoredCallback callback){
+    public StorePhotoAsyncTask(String installationId, String uri, OnPhotoStoredCallback callback){
+        super(uri);
         this.callback = callback;
         this.installationId = installationId;
     }
@@ -53,10 +53,10 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     }
 
     private Photo uploadPhoto(JSONObject jsonObject) throws IOException, HttpPhotoStreamException {
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://5.45.97.155:8081/photostream/image").openConnection();
+        HttpURLConnection urlConnection = (HttpURLConnection) new URL(buildUri()).openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setDoOutput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT_IN_MILLIS);
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", installationId);
         urlConnection.addRequestProperty("Content-Type", "application/json");
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), Charset.forName(UTF_8)));
@@ -72,6 +72,10 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
         }else{
             throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
+    }
+
+    private String buildUri() {
+        return String.format("%s/photostream/image", uri);
     }
 
     @Override

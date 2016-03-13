@@ -20,6 +20,11 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
     public static final int CONNECT_TIMEOUT = 6000;
+    protected final String uri;
+
+    public BaseAsyncTask(String uri){
+        this.uri = uri;
+    }
 
     @NonNull
     protected String convertStreamToString(InputStream is) throws IOException {

@@ -9,7 +9,7 @@ class DownvotePhotoAsyncTask extends VotePhotoAsyncTask {
         super(voteTable, installationId, uri, photoId, callback);
     }
 
-    protected String buildUrl(String uri, int photoId) {
+    protected String buildUri(String uri, int photoId) {
         return String.format("%s/photostream/image/%s/downvote", uri, photoId);
     }
 

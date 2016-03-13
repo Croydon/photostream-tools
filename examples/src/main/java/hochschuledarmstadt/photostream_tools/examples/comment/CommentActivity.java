@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
 
-    private final int photoId = 1;
+    private final int photoId = 3;
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
@@ -49,7 +50,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
     @Override
     public void onGetComments(int photoId, List<Comment> comments) {
         if (this.photoId == photoId)
-            adapter.append(comments);
+            adapter.set(comments);
     }
 
     @Override
@@ -79,11 +80,11 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
 
     @Override
     public void onShowProgressDialog() {
-
+        findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
     public void onDismissProgressDialog() {
-
+        findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
     }
 }

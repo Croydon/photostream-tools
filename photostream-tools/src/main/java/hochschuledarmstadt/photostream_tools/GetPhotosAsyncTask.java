@@ -23,13 +23,12 @@ class GetPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     private final GetPhotosCallback callback;
     private final Context context;
     private final String installationId;
-    private final String uri;
     private final int page;
 
     public GetPhotosAsyncTask(Context context, String installationId, String uri, int page, GetPhotosCallback callback){
+        super(uri);
         this.context = context;
         this.installationId = installationId;
-        this.uri = uri;
         this.page = page;
         this.callback = callback;
     }

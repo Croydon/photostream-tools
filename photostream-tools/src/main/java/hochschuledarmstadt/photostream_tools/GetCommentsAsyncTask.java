@@ -24,11 +24,10 @@ class GetCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult>
     private final OnCommentsResultListener callback;
     private final String installationId;
     private final int photoId;
-    private final String uri;
 
     public GetCommentsAsyncTask(String installationId, String uri, int photoId, OnCommentsResultListener callback){
+        super(uri);
         this.installationId = installationId;
-        this.uri = uri;
         this.photoId = photoId;
         this.callback = callback;
     }

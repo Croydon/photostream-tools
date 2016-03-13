@@ -14,12 +14,11 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
     private static final String TAG = DeletePhotoAsyncTask.class.getName();
     private final OnDeletePhotoResultListener callback;
     private final String installationId;
-    private final String uri;
     private final int photoId;
 
     public DeletePhotoAsyncTask(String installationId, String uri, int photoId, OnDeletePhotoResultListener callback){
+        super(uri);
         this.installationId = installationId;
-        this.uri = uri;
         this.photoId = photoId;
         this.callback = callback;
     }

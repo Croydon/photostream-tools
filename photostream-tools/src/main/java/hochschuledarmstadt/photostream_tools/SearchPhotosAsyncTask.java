@@ -25,17 +25,14 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
     private final OnSearchPhotosResultCallback callback;
     private final Context context;
     private final String installationId;
-    private final String uri;
     private final int page;
     private final String query;
 
-    private static final PhotoQueryResult EMPTY = new PhotoQueryResult();
-
     public SearchPhotosAsyncTask(Context context, String installationId, String uri, String query, int page, OnSearchPhotosResultCallback callback){
+        super(uri);
         this.context = context;
         this.installationId = installationId;
         this.query = query;
-        this.uri = uri;
         this.page = page;
         this.callback = callback;
     }
@@ -56,7 +53,7 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
             Logger.log(TAG, LogLevel.ERROR, e.toString());
             postError(e.getHttpResult());
         }
-        return EMPTY;
+        return null;
     }
 
     protected String buildUrl(String uri, int page){
@@ -67,7 +64,7 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
         final String url = buildUrl(uri, page);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(6000);
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", installationId);
         final int responseCode = urlConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK){
@@ -86,7 +83,7 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
     @Override
     protected void onPostExecute(PhotoQueryResult result) {
         super.onPostExecute(result);
-        if (result != EMPTY) {
+        if (result != null) {
             callback.onSearchPhotosResult(result);
         }
     }

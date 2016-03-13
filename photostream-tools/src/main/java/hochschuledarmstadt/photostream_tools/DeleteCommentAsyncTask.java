@@ -18,11 +18,10 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
     private final String installationId;
 
     private final int commentId;
-    private final String uri;
 
     public DeleteCommentAsyncTask(String installationId, String uri, int commentId, OnDeleteCommentResultListener callback){
+        super(uri);
         this.installationId = installationId;
-        this.uri = uri;
         this.commentId = commentId;
         this.callback = callback;
     }
