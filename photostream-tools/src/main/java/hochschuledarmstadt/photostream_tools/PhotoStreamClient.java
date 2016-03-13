@@ -28,6 +28,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPopularPhotosResultListe
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 import io.socket.client.IO;
@@ -148,18 +149,19 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         final RequestType requestType = RequestType.PHOTOS;
         GetPhotosAsyncTask task = new GetPhotosAsyncTask(context, installationId, EXTERNAL_URI, page, new GetPhotosAsyncTask.GetPhotosCallback() {
             @Override
-            public void OnPhotosResult(PhotoQueryResult queryResult) {
+            public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPhotos(queryResult);
             }
 
             @Override
-            public void onError() {
+            public void onPhotosError(HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnPhotosFailed();
+                notifyOnPhotosFailed(httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
@@ -256,9 +258,9 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         return onRequestListeners;
     }
 
-    private void notifyOnPhotosFailed() {
+    private void notifyOnPhotosFailed(HttpResult httpResult) {
         for (OnPhotosResultListener resultListener : onPhotosResultListeners)
-            resultListener.onReceivePhotosFailed();
+            resultListener.onReceivePhotosFailed(httpResult);
     }
 
     @Override
@@ -266,27 +268,28 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         final RequestType requestType = RequestType.POPULAR_PHOTOS;
         GetPopularPhotosAsyncTask task = new GetPopularPhotosAsyncTask(context, installationId, EXTERNAL_URI, page, new GetPhotosAsyncTask.GetPhotosCallback() {
             @Override
-            public void OnPhotosResult(PhotoQueryResult queryResult) {
+            public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPopularPhotos(queryResult);
             }
 
             @Override
-            public void onError() {
+            public void onPhotosError(HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnPopularPhotosFailed();
+                notifyOnPopularPhotosFailed(httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
         task.execute();
     }
 
-    private void notifyOnPopularPhotosFailed() {
+    private void notifyOnPopularPhotosFailed(HttpResult httpResult) {
         for (OnPopularPhotosResultListener onPopularPhotosResultListener : onPopularPhotosResultListeners){
-            onPopularPhotosResultListener.onReceivePopularPhotosFailed();
+            onPopularPhotosResultListener.onReceivePopularPhotosFailed(httpResult);
         }
     }
 
@@ -340,14 +343,14 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onPhotoVoteFailed(int photoId) {
+            public void onPhotoVoteFailed(int photoId, HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnPhotoVoteFailed(photoId);
+                notifyOnPhotoVoteFailed(photoId, httpResult);
             }
 
             @Override
-            public void onError(int photoId, Exception e) {
+            public void onPhotoVoteError(int photoId, Exception e) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
             }
@@ -364,14 +367,14 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         task.execute();
     }
 
-    private void notifyOnPhotoVoteFailed(int photoId) {
+    private void notifyOnPhotoAlreadyVoted(int photoId, int votecount) {
         for (OnPhotoVotedResultListener listener : onPhotoVotedResultListeners)
-            listener.onPhotoVoteFailed(photoId);
+            listener.onPhotoAlreadyVoted(photoId, votecount);
     }
 
-    private void notifyOnPhotoAlreadyVoted(int photo_id, int votecount) {
+    private void notifyOnPhotoVoteFailed(int photoId, HttpResult httpResult) {
         for (OnPhotoVotedResultListener listener : onPhotoVotedResultListeners)
-            listener.onPhotoVoted(photo_id, votecount);
+            listener.onPhotoVoteFailed(photoId, httpResult);
     }
 
     @Override
@@ -396,14 +399,21 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onGetCommentsFailed() {
+            public void onGetCommentsFailed(int photoId, HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
+                notifyOnCommentsFailed(photoId, httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
         task.execute();
+    }
+
+    private void notifyOnCommentsFailed(int photoId, HttpResult httpResult) {
+        for (OnCommentsResultListener listener : onCommentsResultListeners)
+            listener.onGetCommentsFailed(photoId, httpResult);
     }
 
     private void notifyOnComments(int photoId, List<Comment> comments) {
@@ -424,14 +434,14 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onPhotoVoteFailed(int photoId) {
+            public void onPhotoVoteFailed(int photoId, HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnPhotoVoteFailed(photoId);
+                notifyOnPhotoVoteFailed(photoId, httpResult);
             }
 
             @Override
-            public void onError(int photoId, Exception e) {
+            public void onPhotoVoteError(int photoId, Exception e) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
             }
@@ -460,11 +470,12 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onCommentDeleteFailed(int commentId) {
+            public void onCommentDeleteFailed(int commentId, HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnCommentDeleteFailed(commentId);
+                notifyOnCommentDeleteFailed(commentId, httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
@@ -484,20 +495,21 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onPhotoDeleteFailed(int photoId) {
+            public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnDeletePhotoFailed(photoId);
+                notifyOnDeletePhotoFailed(photoId, httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
         task.execute();
     }
 
-    private void notifyOnDeletePhotoFailed(int photoId) {
+    private void notifyOnDeletePhotoFailed(int photoId, HttpResult httpResult) {
         for (OnPhotoListener listener : onPhotosResultListeners)
-            listener.onPhotoDeleteFailed(photoId);
+            listener.onPhotoDeleteFailed(photoId, httpResult);
     }
 
     private void notifyOnCommentDeleted(int commentId) {
@@ -505,9 +517,9 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             listener.onCommentDeleted(commentId);
     }
 
-    private void notifyOnCommentDeleteFailed(int commentId) {
+    private void notifyOnCommentDeleteFailed(int commentId, HttpResult httpResult) {
         for (OnCommentsResultListener listener : onCommentsResultListeners)
-            listener.onCommentDeleteFailed(commentId);
+            listener.onDeleteCommentFailed(commentId, httpResult);
     }
 
     @Override
@@ -522,10 +534,10 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onSendCommentFailed() {
+            public void onSendCommentFailed(HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnCommentSentFailed();
+                notifyOnCommentSentFailed(httpResult);
             }
         });
         addOpenRequest(requestType);
@@ -533,9 +545,9 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         task.execute(new StoreCommentQuery(photoId, comment));
     }
 
-    private void notifyOnCommentSentFailed() {
+    private void notifyOnCommentSentFailed(HttpResult httpResult) {
         for (OnCommentsResultListener listener : onCommentsResultListeners)
-            listener.onSendCommentFailed();
+            listener.onSendCommentFailed(httpResult);
     }
 
     private void notifyOnNewComment(Comment comment) {
@@ -580,11 +592,11 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             }
 
             @Override
-            public void onSearchPhotosError() {
+            public void onSearchPhotosError(HttpResult httpResult) {
                 lastQuery = query;
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnSearchPhotosError();
+                notifyOnSearchPhotosError(query, httpResult);
             }
         });
         addOpenRequest(requestType);
@@ -592,9 +604,9 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         searchPhotosAsyncTask.execute();
     }
 
-    private void notifyOnSearchPhotosError() {
+    private void notifyOnSearchPhotosError(String query, HttpResult httpResult) {
         for (OnSearchPhotosResultListener listener : onSearchPhotosListeners)
-            listener.onReceiveSearchedPhotosFailed();
+            listener.onReceiveSearchedPhotosFailed(query, httpResult);
     }
 
     private void notifyOnSearchPhotosResult(PhotoQueryResult photoQueryResult) {
@@ -666,17 +678,18 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 Logger.log(TAG, LogLevel.INFO, "onPhotoStoreSuccess()");
-                notifyPhotoUploadSucceded();
+                notifyPhotoUploadSucceded(photo);
                 onNewPhoto(photo);
             }
 
             @Override
-            public void onPhotoStoreError() {
+            public void onPhotoStoreError(HttpResult httpResult) {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 Logger.log(TAG, LogLevel.INFO, "onPhotoStoreError()");
-                notifyPhotoUploadFailed();
+                notifyPhotoUploadFailed(httpResult);
             }
+
         });
         addOpenRequest(requestType);
         determineShouldShowProgressDialog(requestType);
@@ -684,14 +697,14 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         return true;
     }
 
-    private void notifyPhotoUploadFailed() {
+    private void notifyPhotoUploadFailed(HttpResult httpResult) {
         for (OnPhotoUploadListener onPhotoUploadListener : onPhotoUploadListeners)
-            onPhotoUploadListener.onPhotoUploadFailed();
+            onPhotoUploadListener.onPhotoUploadFailed(httpResult);
     }
 
-    private void notifyPhotoUploadSucceded() {
+    private void notifyPhotoUploadSucceded(Photo photo) {
         for (OnPhotoUploadListener onPhotoUploadListener : onPhotoUploadListeners)
-            onPhotoUploadListener.onPhotoUploaded();
+            onPhotoUploadListener.onPhotoUploaded(photo);
     }
 
     private JSONObject createJsonObject(byte[] imageBytes, String comment) throws JSONException {

@@ -16,11 +16,12 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
  * Created by Andreas Schattney on 24.02.2016.
  */
-class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> {
+class StoreCommentAsyncTask extends BaseAsyncTask<StoreCommentQuery, Void, Comment> {
 
     private static final int CONNECT_TIMEOUT_IN_MILLIS = 6000;
     private static final String UTF_8 = "UTF-8";
@@ -39,11 +40,15 @@ class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> 
             return sendComment(params[0]);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(new HttpResult(-1, e.toString()));
+        } catch (HttpPhotoStreamException e) {
+            Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(e.getHttpResult());
         }
         return null;
     }
 
-    private Comment sendComment(StoreCommentQuery commentObj) throws IOException {
+    private Comment sendComment(StoreCommentQuery commentObj) throws IOException, HttpPhotoStreamException {
         final String url = String.format("http://5.45.97.155:8081/photostream/image/%s/comment", commentObj.getPhotoId());
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("POST");
@@ -68,20 +73,13 @@ class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> 
 
         int status = urlConnection.getResponseCode();
         boolean success = (status == HttpURLConnection.HTTP_OK);
-        Comment comment = null;
-
         if (success){
-            InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-            char[] buffer = new char[4096];
-            StringBuilder stringBuilder = new StringBuilder();
-            int read;
-            while((read = reader.read(buffer, 0, buffer.length)) != -1){
-                stringBuilder.append(buffer,0,read);
-            }
-            Gson gson = new Gson();
-            comment = gson.fromJson(stringBuilder.toString(), Comment.class);
+            String result = convertStreamToString(urlConnection.getInputStream());
+            Comment comment = new Gson().fromJson(result.toString(), Comment.class);
+            return comment;
+        }else{
+            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
-        return comment;
     }
 
     @Override
@@ -89,12 +87,15 @@ class StoreCommentAsyncTask extends AsyncTask<StoreCommentQuery, Void, Comment> 
         super.onPostExecute(comment);
         if (comment != null)
             callback.onCommentSent(comment);
-        else
-            callback.onSendCommentFailed();
+    }
+
+    @Override
+    protected void sendError(HttpResult httpResult) {
+        callback.onSendCommentFailed(httpResult);
     }
 
     public interface OnCommentSentListener {
         void onCommentSent(Comment comment);
-        void onSendCommentFailed();
+        void onSendCommentFailed(HttpResult httpResult);
     }
 }

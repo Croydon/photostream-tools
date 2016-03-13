@@ -1,20 +1,18 @@
 package hochschuledarmstadt.photostream_tools;
 
-import android.os.AsyncTask;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
+
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
  * Created by Andreas Schattney on 23.02.2016.
  */
-abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
+abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> {
 
     private static final String TAG = VotePhotoAsyncTask.class.getName();
     private final OnVotePhotoResultListener callback;
@@ -37,26 +35,28 @@ abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
             return votePhoto();
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(new HttpResult(-1, e.toString()));
         } catch (JSONException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
+        } catch (HttpPhotoStreamException e) {
+            Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(e.getHttpResult());
         }
         return null;
     }
 
-    private JSONObject votePhoto() throws IOException, JSONException {
+    private JSONObject votePhoto() throws IOException, JSONException, HttpPhotoStreamException {
         final String url = buildUrl(uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("PUT");
-        urlConnection.setConnectTimeout(6000);
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", installationId);
-        InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-        char[] buffer = new char[1024];
-        StringBuilder stringBuilder = new StringBuilder();
-        int read;
-        while((read = reader.read(buffer, 0, buffer.length)) != -1){
-            stringBuilder.append(buffer,0,read);
+        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+            String result = convertStreamToString(urlConnection.getInputStream());
+            return new JSONObject(result);
+        }else{
+            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
-        return new JSONObject(stringBuilder.toString());
     }
 
     protected abstract String buildUrl(String uri, int photoId);
@@ -74,12 +74,10 @@ abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
                     callback.onPhotoVoted(photo_id, votecount);
                 }else
                     callback.onPhotoAlreadyVoted(photo_id, votecount);
-            }else{
-                callback.onPhotoVoteFailed(photoId);
             }
         } catch (JSONException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            callback.onError(photoId, e);
+            callback.onPhotoVoteError(photoId, e);
         }
     }
 
@@ -89,10 +87,15 @@ abstract class VotePhotoAsyncTask extends AsyncTask<Void, Void, JSONObject> {
         voteTable.closeDatabase();
     }
 
+    @Override
+    protected void sendError(HttpResult httpResult) {
+        callback.onPhotoVoteFailed(photoId, httpResult);
+    }
+
     public interface OnVotePhotoResultListener {
         void onPhotoVoted(int photoId, int newVoteCount);
-        void onPhotoVoteFailed(int photoId);
-        void onError(int photoId, Exception e);
+        void onPhotoVoteFailed(int photoId, HttpResult httpResult);
+        void onPhotoVoteError(int photoId, Exception e);
         void onPhotoAlreadyVoted(int photoId, int votecount);
     }
 }

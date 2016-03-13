@@ -13,7 +13,6 @@ class GetPopularPhotosAsyncTask extends GetPhotosAsyncTask {
 
     @Override
     protected String buildUrl(String uri, int page) {
-        final String url = String.format("%s/photostream/popular/?page=%s", uri, page);
-        return url;
+        return String.format("%s/photostream/popular/?page=%s", uri, page);
     }
 }

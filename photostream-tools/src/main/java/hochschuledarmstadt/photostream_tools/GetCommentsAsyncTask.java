@@ -14,11 +14,12 @@ import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.CommentQueryResult;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
  * Created by Andreas Schattney on 23.02.2016.
  */
-class GetCommentsAsyncTask extends AsyncTask<Void, Void, CommentQueryResult> {
+class GetCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult> {
 
     private final OnCommentsResultListener callback;
     private final String installationId;
@@ -39,54 +40,61 @@ class GetCommentsAsyncTask extends AsyncTask<Void, Void, CommentQueryResult> {
         try {
             return getComments();
         } catch (IOException e) {
+            postError(new HttpResult(-1, e.toString()));
+            Logger.log(TAG, LogLevel.ERROR, e.toString());
+        } catch (HttpPhotoStreamException e) {
+            postError(e.getHttpResult());
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         }
         return null;
     }
 
-    private CommentQueryResult getComments() throws IOException {
+    private CommentQueryResult getComments() throws IOException, HttpPhotoStreamException {
         final String url = String.format("%s/photostream/image/%s/comments", uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(6000);
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", installationId);
-        InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-        char[] buffer = new char[4096];
-        StringBuilder stringBuilder = new StringBuilder();
-        int read;
-        while((read = reader.read(buffer, 0, buffer.length)) != -1){
-            stringBuilder.append(buffer,0,read);
-        }
-        Gson gson = new Gson();
-        CommentQueryResult commentQueryResult = gson.fromJson(stringBuilder.toString(), CommentQueryResult.class);
-        final List<Comment> comments = commentQueryResult.getComments();
-        final Integer photoId = commentQueryResult.getPhotoId();
-        for (Comment comment : comments){
-            try {
-                Field field = comment.getClass().getDeclaredField("photoId");
-                field.setAccessible(true);
-                field.set(comment, photoId);
-            } catch (IllegalAccessException e) {
-                Logger.log(TAG, LogLevel.ERROR, e.toString());
-            } catch (NoSuchFieldException e) {
-                Logger.log(TAG, LogLevel.ERROR, e.toString());
+        final int responseCode = urlConnection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            final String result = convertStreamToString(urlConnection.getInputStream());
+            CommentQueryResult commentQueryResult = new Gson().fromJson(result, CommentQueryResult.class);
+            final List<Comment> comments = commentQueryResult.getComments();
+            final Integer photoId = commentQueryResult.getPhotoId();
+            for (Comment comment : comments) {
+                try {
+                    Field field = comment.getClass().getDeclaredField("photoId");
+                    field.setAccessible(true);
+                    field.set(comment, photoId);
+                } catch (IllegalAccessException e) {
+                    Logger.log(TAG, LogLevel.ERROR, e.toString());
+                } catch (NoSuchFieldException e) {
+                    Logger.log(TAG, LogLevel.ERROR, e.toString());
+                }
             }
+            return commentQueryResult;
+        }else{
+            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
-        return commentQueryResult;
     }
 
     @Override
     protected void onPostExecute(CommentQueryResult commentQueryResult) {
         super.onPostExecute(commentQueryResult);
-        if (commentQueryResult != null)
-            callback.onGetComments(commentQueryResult.getPhotoId(), commentQueryResult.getComments());
-        else
-            callback.onGetCommentsFailed();
+        if (commentQueryResult != null) {
+            final int photoId = commentQueryResult.getPhotoId();
+            callback.onGetComments(photoId, commentQueryResult.getComments());
+        }
+    }
+
+    @Override
+    protected void sendError(HttpResult httpResult) {
+        callback.onGetCommentsFailed(photoId, httpResult);
     }
 
     public interface OnCommentsResultListener {
         void onGetComments(int photoId, List<Comment> comments);
-        void onGetCommentsFailed();
+        void onGetCommentsFailed(int photoId, HttpResult httpResult);
     }
 
 }

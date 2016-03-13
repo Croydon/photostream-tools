@@ -14,12 +14,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
  * Created by Andreas Schattney on 19.02.2016.
  */
-class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
+class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
 
     private static final String TAG = StorePhotoAsyncTask.class.getName();
     public static final int CONNECT_TIMEOUT_IN_MILLIS = 6000;
@@ -43,11 +44,15 @@ class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
             return uploadPhoto(params[0]);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(new HttpResult(-1, e.toString()));
+        } catch (HttpPhotoStreamException e) {
+            Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(e.getHttpResult());
         }
         return null;
     }
 
-    private Photo uploadPhoto(JSONObject jsonObject) throws IOException {
+    private Photo uploadPhoto(JSONObject jsonObject) throws IOException, HttpPhotoStreamException {
         HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://5.45.97.155:8081/photostream/image").openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setDoOutput(true);
@@ -59,24 +64,14 @@ class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
         writer.write(s, 0, s.length());
         writer.flush();
         writer.close();
-
-        int status = urlConnection.getResponseCode();
-
-        Photo photo = null;
-
+        final int status = urlConnection.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK){
-            InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-            char[] buffer = new char[4096];
-            StringBuilder stringBuilder = new StringBuilder();
-            int read;
-            while((read = reader.read(buffer, 0, buffer.length)) != -1){
-                stringBuilder.append(buffer,0,read);
-            }
-            Gson gson = new Gson();
-            photo = gson.fromJson(stringBuilder.toString(), Photo.class);
+            String result = convertStreamToString(urlConnection.getInputStream());
+            Photo photo = new Gson().fromJson(result, Photo.class);
+            return photo;
+        }else{
+            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
-
-        return photo;
     }
 
     @Override
@@ -84,13 +79,16 @@ class StorePhotoAsyncTask extends AsyncTask<JSONObject, Void, Photo> {
         super.onPostExecute(photo);
         if (photo != null)
             callback.onPhotoStoreSuccess(photo);
-        else
-            callback.onPhotoStoreError();
+    }
+
+    @Override
+    protected void sendError(HttpResult httpResult) {
+        callback.onPhotoStoreError(httpResult);
     }
 
     public interface OnPhotoStoredCallback {
         void onPhotoStoreSuccess(Photo photo);
-        void onPhotoStoreError();
+        void onPhotoStoreError(HttpResult httpResult);
     }
 
 }

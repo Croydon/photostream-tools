@@ -12,13 +12,14 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 /**
  * Created by Andreas Schattney on 10.03.2016.
  */
-class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
+class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
     private static final String TAG = GetPhotosAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;
@@ -27,6 +28,8 @@ class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
     private final String uri;
     private final int page;
     private final String query;
+
+    private static final PhotoQueryResult EMPTY = new PhotoQueryResult();
 
     public SearchPhotosAsyncTask(Context context, String installationId, String uri, String query, int page, OnSearchPhotosResultCallback callback){
         this.context = context;
@@ -48,50 +51,54 @@ class SearchPhotosAsyncTask extends AsyncTask<Void, Void, PhotoQueryResult> {
             return searchPhotos();
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(new HttpResult(-1, e.toString()));
+        } catch (HttpPhotoStreamException e) {
+            Logger.log(TAG, LogLevel.ERROR, e.toString());
+            postError(e.getHttpResult());
         }
-        return null;
+        return EMPTY;
     }
 
     protected String buildUrl(String uri, int page){
-        final String url = String.format("%s/photostream/search/?q=%s&page=%s", uri, query, page);
-        return url;
+        return String.format("%s/photostream/search/?q=%s&page=%s", uri, query, page);
     }
 
-    private PhotoQueryResult searchPhotos() throws IOException {
+    private PhotoQueryResult searchPhotos() throws IOException, HttpPhotoStreamException {
         final String url = buildUrl(uri, page);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setDoInput(true);
         urlConnection.setConnectTimeout(6000);
         urlConnection.addRequestProperty("installation_id", installationId);
-        InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-        char[] buffer = new char[4096];
-        StringBuilder stringBuilder = new StringBuilder();
-        int read;
-        while((read = reader.read(buffer, 0, buffer.length)) != -1){
-            stringBuilder.append(buffer,0,read);
+        final int responseCode = urlConnection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK){
+            String result = convertStreamToString(urlConnection.getInputStream());
+            PhotoQueryResult photoQueryResult = new Gson().fromJson(result, PhotoQueryResult.class);
+            final List<Photo> photos = photoQueryResult.getPhotos();
+            for (Photo photo : photos){
+                photo.saveToImageToCache(context);
+            }
+            return photoQueryResult;
+        }else{
+            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
-        Gson gson = new Gson();
-        PhotoQueryResult photoQueryResult = gson.fromJson(stringBuilder.toString(), PhotoQueryResult.class);
-        final List<Photo> photos = photoQueryResult.getPhotos();
-        for (Photo photo : photos){
-            photo.saveToImageToCache(context);
-        }
-        return photoQueryResult;
     }
 
     @Override
     protected void onPostExecute(PhotoQueryResult result) {
         super.onPostExecute(result);
-        if (result != null) {
+        if (result != EMPTY) {
             callback.onSearchPhotosResult(result);
-        }else{
-            callback.onSearchPhotosError();
         }
+    }
+
+    @Override
+    protected void sendError(HttpResult httpResult) {
+        callback.onSearchPhotosError(httpResult);
     }
 
     public interface OnSearchPhotosResultCallback {
         void onSearchPhotosResult(PhotoQueryResult photoQueryResult);
-        void onSearchPhotosError();
+        void onSearchPhotosError(HttpResult httpResult);
     }
 
 }
