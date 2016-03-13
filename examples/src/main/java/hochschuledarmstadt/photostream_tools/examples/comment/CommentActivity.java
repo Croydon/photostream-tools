@@ -2,7 +2,6 @@ package hochschuledarmstadt.photostream_tools.examples.comment;
 
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -14,6 +13,7 @@ import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsResultListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Comment;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 public class CommentActivity extends BaseActivity implements OnCommentsResultListener {
 
@@ -53,12 +53,17 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
     }
 
     @Override
+    public void onGetCommentsFailed(int photoId, HttpResult httpResult) {
+
+    }
+
+    @Override
     public void onCommentDeleted(int commentId) {
 
     }
 
     @Override
-    public void onCommentDeleteFailed(int commentId) {
+    public void onDeleteCommentFailed(int commentId, HttpResult httpResult) {
 
     }
 
@@ -68,7 +73,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
     }
 
     @Override
-    public void onSendCommentFailed() {
+    public void onSendCommentFailed(HttpResult httpResult) {
 
     }
 

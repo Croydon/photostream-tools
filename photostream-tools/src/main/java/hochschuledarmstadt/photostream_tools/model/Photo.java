@@ -21,7 +21,7 @@ public class Photo implements Parcelable, Id{
 
     @SerializedName("image")
     @Expose
-    private String image;
+    private String imageFilePath;
     @SerializedName("comment")
     @Expose
     private String comment;
@@ -38,10 +38,10 @@ public class Photo implements Parcelable, Id{
     /**
      *
      * @return
-     * The image
+     * The imageFilePath
      */
-    public String getImage() {
-        return image;
+    public String getImageFilePath() {
+        return imageFilePath;
     }
 
     /**
@@ -72,7 +72,7 @@ public class Photo implements Parcelable, Id{
 
     protected Photo(Parcel in) {
         id = in.readInt();
-        image = in.readString();
+        imageFilePath = in.readString();
         comment = in.readString();
         votecount = in.readInt();
     }
@@ -85,7 +85,7 @@ public class Photo implements Parcelable, Id{
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeString(image);
+        dest.writeString(imageFilePath);
         dest.writeString(comment);
         dest.writeInt(votecount);
     }
@@ -117,11 +117,11 @@ public class Photo implements Parcelable, Id{
             FileOutputStream outputStream = null;
             try {
                 outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-                byte[] data = Base64.decode(image, Base64.DEFAULT);
+                byte[] data = Base64.decode(imageFilePath, Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
-                image = new File(context.getFilesDir(), filename).getAbsolutePath();
+                imageFilePath = new File(context.getFilesDir(), filename).getAbsolutePath();
             } catch (Exception e) {
 
             } finally {
@@ -129,7 +129,7 @@ public class Photo implements Parcelable, Id{
                     outputStream.close();
             }
         }else{
-            image = filename;
+            imageFilePath = filename;
         }
 
     }

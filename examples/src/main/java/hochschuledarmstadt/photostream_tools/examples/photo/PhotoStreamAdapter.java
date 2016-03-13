@@ -28,11 +28,6 @@ public class PhotoStreamAdapter extends PhotoAdapter<PhotoStreamAdapter.PhotoVie
     }
 
     @Override
-    protected boolean itemHasEqualId(int id, Photo item) {
-        return item.getId() == id;
-    }
-
-    @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_item, parent, false));
     }
@@ -41,7 +36,7 @@ public class PhotoStreamAdapter extends PhotoAdapter<PhotoStreamAdapter.PhotoVie
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
         recycleBitmapIfNecessary(holder.imageView);
         Photo photo = getItemAtPosition(position);
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getImage());
+        Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
         holder.imageView.setImageBitmap(bitmap);
         holder.textView.setText(photo.getComment());
     }

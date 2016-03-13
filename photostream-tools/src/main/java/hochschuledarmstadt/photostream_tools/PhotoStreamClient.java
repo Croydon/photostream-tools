@@ -78,6 +78,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public void addOnPhotoVotedResultListener(OnPhotoVotedResultListener onPhotoVotedResultListener) {
         if (!onPhotoVotedResultListeners.contains(onPhotoVotedResultListener))
             onPhotoVotedResultListeners.add(onPhotoVotedResultListener);
+        if (hasOpenRequestsOfType(RequestType.VOTE))
+            onPhotoVotedResultListener.onShowProgressDialog();
     }
 
     @Override
@@ -90,6 +92,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public void addOnGetCommentsResultListener(OnCommentsResultListener onCommentsResultListener){
         if (!onCommentsResultListeners.contains(onCommentsResultListener))
             onCommentsResultListeners.add(onCommentsResultListener);
+        if (hasOpenRequestsOfType(RequestType.COMMENT))
+            onCommentsResultListener.onShowProgressDialog();
     }
 
     @Override
@@ -102,6 +106,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public void addOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener) {
         if (!onPhotosResultListeners.contains(onPhotosResultListener))
             onPhotosResultListeners.add(onPhotosResultListener);
+        if (hasOpenRequestsOfType(RequestType.PHOTOS))
+            onPhotosResultListener.onShowProgressDialog();
     }
 
     @Override
@@ -114,6 +120,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public void addOnPopularPhotosResultListener(OnPopularPhotosResultListener onPopularPhotosResultListener) {
         if (!onPopularPhotosResultListeners.contains(onPopularPhotosResultListener))
             onPopularPhotosResultListeners.add(onPopularPhotosResultListener);
+        if (hasOpenRequestsOfType(RequestType.POPULAR_PHOTOS))
+            onPopularPhotosResultListener.onShowProgressDialog();
     }
 
     @Override
@@ -126,6 +134,8 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
     public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener){
         if (!onSearchPhotosListeners.contains(onSearchPhotosResultListener))
             onSearchPhotosListeners.add(onSearchPhotosResultListener);
+        if (hasOpenRequestsOfType(RequestType.SEARCH))
+            onSearchPhotosResultListener.onShowProgressDialog();
     }
 
     @Override
@@ -557,8 +567,11 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
 
     @Override
     public void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
-        if (!onPhotoUploadListeners.contains(onPhotoUploadListener))
+        if (!onPhotoUploadListeners.contains(onPhotoUploadListener)) {
             onPhotoUploadListeners.add(onPhotoUploadListener);
+            if (hasOpenRequestsOfType(RequestType.UPLOAD))
+                onPhotoUploadListener.onShowProgressDialog();
+        }
     }
 
     @Override

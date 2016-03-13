@@ -28,15 +28,6 @@ public class HttpResult {
 
     /**
      *
-     * @param responseCode
-     * The response_code
-     */
-    public void setResponseCode(Integer responseCode) {
-        this.responseCode = responseCode;
-    }
-
-    /**
-     *
      * @return
      * The message
      */
@@ -44,13 +35,5 @@ public class HttpResult {
         return message;
     }
 
-    /**
-     *
-     * @param message
-     * The message
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
 }

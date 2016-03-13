@@ -49,7 +49,7 @@ abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params,
 
     protected abstract void sendError(HttpResult httpResult);
 
-    protected class HttpPhotoStreamException extends Throwable {
+    protected static class HttpPhotoStreamException extends Throwable {
 
         private final HttpResult httpResult;
 

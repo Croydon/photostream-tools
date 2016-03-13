@@ -39,7 +39,6 @@ public class BitmapUtils {
             if (rotationAngle != 0) {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotationAngle);
-                //matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
                 bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
             }
         } catch (IOException e) {

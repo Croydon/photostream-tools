@@ -5,12 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".photo.PhotoActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/recyclerView"
+        android:orientation="vertical"
         android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:id="@+id/recyclerView"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:id="@+id/button"
+            android:text="Mehr Laden"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <ProgressBar
         android:layout_width="wrap_content"
