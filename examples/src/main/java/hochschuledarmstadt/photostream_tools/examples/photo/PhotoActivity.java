@@ -1,3 +1,27 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2016 Andreas Schattney
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
 import android.os.Bundle;
@@ -12,7 +36,6 @@ import android.widget.Button;
 
 import hochschuledarmstadt.photostream_tools.BaseActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
-import hochschuledarmstadt.photostream_tools.PhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosResultListener;
@@ -28,7 +51,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
 
     private RecyclerView recyclerView;
-    private PhotoStreamAdapter adapter;
+    private SimplePhotoAdapter adapter;
     private Button button;
     private int currentPage = 1;
 
@@ -64,7 +87,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
             }
         });
 
-        adapter = new PhotoStreamAdapter(getApplicationContext());
+        adapter = new SimplePhotoAdapter(getApplicationContext());
         if (savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(KEY_CURRENT_PAGE);
             adapter.onRestoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
