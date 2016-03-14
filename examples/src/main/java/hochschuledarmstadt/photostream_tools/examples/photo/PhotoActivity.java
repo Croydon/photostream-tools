@@ -47,19 +47,19 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 public class PhotoActivity extends BaseActivity implements OnPhotosResultListener {
 
     private static final int COLUMNS_PER_ROW = 2;
-    private static final String KEY_CURRENT_PAGE = "KEY_CURRENT_PAGE";
+    private static final String KEY_NEXT_PAGE = "KEY_NEXT_PAGE";
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
 
     private RecyclerView recyclerView;
     private SimplePhotoAdapter adapter;
     private Button button;
-    private int currentPage = 1;
+    private int nextPage = 1;
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotosResultListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.getPhotos(currentPage);
+            photoStreamClient.getPhotos(nextPage);
     }
 
     @Override
@@ -82,14 +82,14 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
             @Override
             public void onClick(View v) {
                 if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)){
-                    getPhotoStreamClient().getPhotos(currentPage);
+                    getPhotoStreamClient().getPhotos(nextPage);
                 }
             }
         });
 
         adapter = new SimplePhotoAdapter(getApplicationContext());
         if (savedInstanceState != null) {
-            currentPage = savedInstanceState.getInt(KEY_CURRENT_PAGE);
+            nextPage = savedInstanceState.getInt(KEY_NEXT_PAGE);
             adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
         }
         recyclerView.setAdapter(adapter);
@@ -98,7 +98,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(KEY_CURRENT_PAGE, currentPage);
+        outState.putInt(KEY_NEXT_PAGE, nextPage);
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
     }
 
@@ -124,14 +124,15 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     public void onPhotosReceived(PhotoQueryResult result) {
         final int photosCount = result.getPhotos().size();
         if (photosCount > 0) {
-            button.setVisibility(View.VISIBLE);
-            currentPage = result.getPage() + 1;
-            if (result.getPage() == 1){
-                adapter.set(result.getPhotos());
+            button.setVisibility(View.VISIBLE);     // Moeglicherweise sind noch weitere Bilder abrufbar
+            nextPage = result.getPage() + 1;
+            if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
+                adapter.set(result.getPhotos());    // Photos ersetzen
             }else{
-                adapter.append(result.getPhotos());
+                adapter.append(result.getPhotos()); // Photos anhängen
             }
         }else{
+            //Aktueller Request lieferte keine Bilder, also kann der Button verschwinden
             button.setVisibility(View.GONE);
         }
     }
