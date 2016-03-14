@@ -90,6 +90,11 @@ public class Photo implements Parcelable, Id{
         this.votecount = votecount;
     }
 
+    /**
+     * Use this flag to determine if the photo can be deleted by the user
+     * @return
+     * true if the photo can be deleted
+     */
     public boolean isDeleteable() {
         return deleteable;
     }

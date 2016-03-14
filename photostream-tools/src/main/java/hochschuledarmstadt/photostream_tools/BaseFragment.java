@@ -56,7 +56,7 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
         super.onDestroy();
     }
 
-    protected boolean connectedToService(){
+    protected boolean isConnectedToService(){
         return photoStreamClient != null;
     }
 
@@ -68,21 +68,22 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
 
     @Override
     public void onServiceDisconnected(IPhotoStreamClient client) {
-        if (!serviceDisconnectCalled) {
-            serviceDisconnectCalled = true;
-            onPhotoStreamServiceDisconnected(photoStreamClient);
-            photoStreamClient = null;
-        }
+        internalNotifyDisconnectFromService(client);
     }
 
     @Override
     public void onDestroyView() {
-        if (!serviceDisconnectCalled){
-            onServiceDisconnected(photoStreamClient);
-            serviceDisconnectCalled = true;
-        }
+        internalNotifyDisconnectFromService(photoStreamClient);
         refSavedInstanceState = null;
         super.onDestroyView();
+    }
+
+    private void internalNotifyDisconnectFromService(IPhotoStreamClient client) {
+        if (!serviceDisconnectCalled){
+            serviceDisconnectCalled = true;
+            onPhotoStreamServiceDisconnected(client);
+        }
+        photoStreamClient = null;
     }
 
     public IPhotoStreamClient getPhotoStreamClient() {

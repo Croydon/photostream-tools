@@ -60,7 +60,9 @@ import io.socket.engineio.client.transports.WebSocket;
 
 public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStreamClient {
 
+    private static final String TAG = PhotoStreamService.class.getName();
     public static final String INTENT_NEW_PHOTO = "hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO";
+
     private final String installationId;
     private final Context context;
     private final String photoStreamUrl;
@@ -75,9 +77,6 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
         this.dbConnection = dbConnection;
         this.installationId = installationId;
     }
-
-    //private static final String EXTERNAL_URI = "http://5.45.97.155:8081";
-    private static final String TAG = PhotoStreamService.class.getName();
 
     private ArrayList<OnPhotosResultListener> onPhotosResultListeners = new ArrayList<>();
     private ArrayList<OnPopularPhotosResultListener> onPopularPhotosResultListeners = new ArrayList<>();
@@ -344,7 +343,9 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
             for (OnPhotoListener onPhotosResultListener : onPopularPhotosResultListeners)
                 onPhotosResultListener.onNewPhoto(photo);
         }else if(photoIsNotFromThisUser(photo)){
-            context.sendBroadcast(new Intent(INTENT_NEW_PHOTO));
+            Intent newPhotoIntent = new Intent(INTENT_NEW_PHOTO);
+            newPhotoIntent.setPackage(context.getPackageName());
+            context.sendBroadcast(newPhotoIntent);
         }
     }
 
