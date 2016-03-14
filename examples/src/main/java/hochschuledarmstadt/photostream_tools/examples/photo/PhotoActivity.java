@@ -25,7 +25,6 @@
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +39,7 @@ import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosResultListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
@@ -74,7 +74,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         button = (Button) findViewById(R.id.button);
@@ -90,7 +90,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         adapter = new SimplePhotoAdapter(getApplicationContext());
         if (savedInstanceState != null) {
             currentPage = savedInstanceState.getInt(KEY_CURRENT_PAGE);
-            adapter.onRestoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
+            adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
         }
         recyclerView.setAdapter(adapter);
     }
@@ -99,7 +99,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_CURRENT_PAGE, currentPage);
-        outState.putBundle(KEY_ADAPTER, adapter.onSaveInstanceState());
+        outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
     }
 
     @Override
@@ -113,8 +113,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
             if (!client.hasOpenRequestsOfType(RequestType.PHOTOS)){
-                currentPage = 1;
-                getPhotoStreamClient().getPhotos(currentPage);
+                getPhotoStreamClient().getPhotos(1);
             }
             return true;
         }
@@ -140,11 +139,9 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     @Override
     public void onReceivePhotosFailed(HttpResult httpResult) {
         int responseCode = httpResult.getResponseCode();
-        String message = httpResult.getMessage();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Could not receive photos");
-        builder.setMessage(String.format("Response Code: %s\nMessage:%s", responseCode, message));
-        builder.create().show();
+        String title = "Could not load photos";
+        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
+        Utils.showSimpleAlertDialog(this, title, message);
     }
 
 

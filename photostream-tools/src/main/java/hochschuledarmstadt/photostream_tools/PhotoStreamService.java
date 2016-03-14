@@ -57,6 +57,9 @@ public class PhotoStreamService extends Service {
         super.onCreate();
         saveUniqueInstallationIdOnFirstStartIfNotPresent();
         final String photoStreamUrl = readUrlFromManifest();
+        if (photoStreamUrl == null){
+            throw new IllegalStateException(getString(R.string.no_url_provided));
+        }
         final Context context = getApplicationContext();
         final DbConnection dbConnection = DbConnection.getInstance(context);
         photoStreamClient = new PhotoStreamClient(context, photoStreamUrl, dbConnection, getInstallationId(context));

@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.adapter.PhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -45,7 +46,6 @@ public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoVie
     private final Context context;
 
     public SimplePhotoAdapter(Context context){
-        super();
         this.context = context;
     }
 
@@ -56,7 +56,7 @@ public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoVie
 
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
-        recycleBitmapIfNecessary(holder.imageView);
+        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
         Photo photo = getItemAtPosition(position);
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
         holder.imageView.setImageBitmap(bitmap);
@@ -65,16 +65,8 @@ public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoVie
 
     @Override
     public void onViewRecycled(PhotoViewHolder holder) {
-        recycleBitmapIfNecessary(holder.imageView);
+        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
         super.onViewRecycled(holder);
-    }
-
-    private void recycleBitmapIfNecessary(ImageView imageView) {
-        if (imageView.getDrawable() != null && imageView.getDrawable() instanceof BitmapDrawable){
-            final Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-            if (bitmap != null && !bitmap.isRecycled())
-                bitmap.recycle();
-        }
     }
 
     class PhotoViewHolder extends RecyclerView.ViewHolder {

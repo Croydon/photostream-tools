@@ -552,7 +552,7 @@ public class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhot
 
     private void notifyOnCommentDeleteFailed(int commentId, HttpResult httpResult) {
         for (OnCommentsResultListener listener : onCommentsResultListeners)
-            listener.onDeleteCommentFailed(commentId, httpResult);
+            listener.onCommentDeleteFailed(commentId, httpResult);
     }
 
     @Override

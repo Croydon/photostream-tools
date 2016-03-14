@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ The MIT License
   ~
@@ -23,9 +24,5 @@
   -->
 
 <resources>
-    <string name="app_name">PhotoStream Examples</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="header_comments">Comments for Photo With ID = 3</string>
-  <string name="comment_example">CommentExample</string>
-  <string name="photo_example">PhotoExample</string>
+    <string name="no_url_provided">Keine Url angegeben! Bitte geben Sie im Manifest eine Url per "meta-data" tag mit dem Namen PHOTOSTREAM_URL an!</string>
 </resources>

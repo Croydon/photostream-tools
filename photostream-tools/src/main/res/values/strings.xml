@@ -24,5 +24,6 @@
   -->
 
 <resources>
-    <string name="app_name">PhotoStream</string>
+  <string name="app_name">PhotoStream</string>
+  <string name="no_url_provided">no url provided! Please provide an url in the manifest.xml file by declaring a \"meta-data\" tag with name \"PHOTOSTREAM_URL\"</string>
 </resources>

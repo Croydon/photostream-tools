@@ -37,6 +37,7 @@ import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsResultListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
@@ -65,7 +66,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
         setContentView(R.layout.activity_comment);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter(getApplicationContext());
         recyclerView.setAdapter(adapter);
@@ -79,7 +80,9 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
 
     @Override
     public void onGetCommentsFailed(int photoId, HttpResult httpResult) {
-
+        String title = "Could not load comments";
+        String message = String.format("Response Code: %s\nMessage:%s", httpResult.getResponseCode(), httpResult.getMessage());
+        Utils.showSimpleAlertDialog(this, title, message);
     }
 
     @Override
@@ -88,7 +91,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
     }
 
     @Override
-    public void onDeleteCommentFailed(int commentId, HttpResult httpResult) {
+    public void onCommentDeleteFailed(int commentId, HttpResult httpResult) {
 
     }
 

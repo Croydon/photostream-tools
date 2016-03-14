@@ -22,18 +22,21 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.callback;
+package hochschuledarmstadt.photostream_tools.examples;
 
-import java.util.List;
+import android.content.Context;
+import android.support.v7.app.AlertDialog;
 
-import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+/**
+ * Created by Andreas Schattney on 14.03.2016.
+ */
+public class Utils {
 
-public interface OnCommentsResultListener extends OnRequestListener {
-    void onGetComments(int photoId, List<Comment> comments);
-    void onGetCommentsFailed(int photoId, HttpResult httpResult);
-    void onCommentDeleted(int commentId);
-    void onCommentDeleteFailed(int commentId, HttpResult httpResult);
-    void onNewComment(Comment comment);
-    void onSendCommentFailed(HttpResult httpResult);
+    public static void showSimpleAlertDialog(Context context, String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.create().show();
+    }
+
 }

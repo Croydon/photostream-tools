@@ -98,13 +98,13 @@ public abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends P
         return item.getId() == id;
     }
 
-    public Bundle onSaveInstanceState(){
+    public Bundle saveInstanceState(){
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_ITEMS, items);
         return bundle;
     }
 
-    public void onRestoreInstanceState(Bundle bundle){
+    public void restoreInstanceState(Bundle bundle){
         items = bundle.getParcelableArrayList(KEY_ITEMS);
     }
 

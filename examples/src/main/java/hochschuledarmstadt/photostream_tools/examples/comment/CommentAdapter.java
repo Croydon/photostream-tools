@@ -42,7 +42,6 @@ public class CommentAdapter extends BaseAdapter<CommentAdapter.CommentViewHolder
     private final Context context;
 
     public CommentAdapter(Context context) {
-        super();
         this.context = context;
     }
 

@@ -30,9 +30,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -42,6 +44,18 @@ import java.io.InputStream;
 public class BitmapUtils {
 
     private static final String TAG = BitmapUtils.class.getName();
+
+    public static void recycleBitmapFromImageViewIfNecessary(ImageView imageView) {
+        if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof BitmapDrawable){
+            final Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+            recycleBitmap(bitmap);
+        }
+    }
+
+    public static void recycleBitmap(Bitmap bitmap){
+        if (bitmap != null && !bitmap.isRecycled())
+            bitmap.recycle();
+    }
 
     public static Bitmap decodeBitmapFromUri(Context context, Uri uri) throws FileNotFoundException {
         final ContentResolver contentResolver = context.getContentResolver();
