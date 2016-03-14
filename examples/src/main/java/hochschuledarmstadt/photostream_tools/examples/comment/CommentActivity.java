@@ -43,16 +43,17 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 public class CommentActivity extends BaseActivity implements OnCommentsResultListener {
 
+    private static final String KEY_ADAPTER = "KEY_ADAPTER";
+    private static final int PHOTO_ID = 3;
+
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
-
-    private final int photoId = 3;
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnGetCommentsResultListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.getComments(photoId);
+            photoStreamClient.getComments(PHOTO_ID);
     }
 
     @Override
@@ -69,12 +70,22 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter(getApplicationContext());
+        if (savedInstanceState != null) {
+            Bundle bundle = savedInstanceState.getBundle(KEY_ADAPTER);
+            adapter.restoreInstanceState(bundle);
+        }
         recyclerView.setAdapter(adapter);
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
+    }
+
+    @Override
     public void onGetComments(int photoId, List<Comment> comments) {
-        if (this.photoId == photoId)
+        if (PHOTO_ID == photoId)
             adapter.set(comments);
     }
 

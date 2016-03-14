@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ The MIT License
   ~
@@ -22,12 +23,18 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">PhotoStream Examples</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="header_comments">Comments for Photo With ID = 3</string>
-  <string name="comment_example">CommentExample</string>
-  <string name="photo_example">PhotoExample</string>
-    <string name="title_activity_menu">MenuActivity</string>
-  <string name="examples">Examples</string>
-</resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:id="@+id/textView"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:background="#eee"
+        android:textColor="@color/colorPrimary"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

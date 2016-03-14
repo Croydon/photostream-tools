@@ -22,12 +22,12 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">PhotoStream Examples</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="header_comments">Comments for Photo With ID = 3</string>
-  <string name="comment_example">CommentExample</string>
-  <string name="photo_example">PhotoExample</string>
-    <string name="title_activity_menu">MenuActivity</string>
-  <string name="examples">Examples</string>
+<resources>>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
 </resources>

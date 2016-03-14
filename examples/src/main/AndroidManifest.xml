@@ -9,19 +9,33 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".photo.PhotoActivity" android:label="@string/photo_example" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity
+            android:name=".photo.PhotoActivity"
+            android:label="@string/photo_example">
         </activity>
 
-        <activity android:name=".comment.CommentActivity" android:label="@string/comment_example" android:exported="true"/>
+        <activity
+            android:name=".comment.CommentActivity"
+            android:label="@string/comment_example">
+        </activity>
 
-        <service android:name="hochschuledarmstadt.photostream_tools.PhotoStreamService"/>
+        <activity
+            android:name=".MenuActivity"
+            android:label="@string/title_activity_menu"
+            android:theme="@style/AppTheme.NoActionBar">
 
-        <meta-data android:name="PHOTOSTREAM_URL" android:value="http://5.45.97.155:8082" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <service android:name="hochschuledarmstadt.photostream_tools.PhotoStreamService" />
+
+        <meta-data
+            android:name="PHOTOSTREAM_URL"
+            android:value="http://5.45.97.155:8082" />
 
     </application>
 
