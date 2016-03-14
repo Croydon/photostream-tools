@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import hochschuledarmstadt.photostream_tools.BaseActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
@@ -49,10 +50,11 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_NEXT_PAGE = "KEY_NEXT_PAGE";
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
+    private static final String KEY_BUTTON_VISIBILITY = "KEY_BUTTON_VISIBILITY";
 
     private RecyclerView recyclerView;
     private SimplePhotoAdapter adapter;
-    private Button button;
+    private Button loadMoreButton;
     private int nextPage = 1;
 
     @Override
@@ -77,18 +79,27 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        loadMoreButton = (Button) findViewById(R.id.button);
+        loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)){
+                if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)) {
                     getPhotoStreamClient().getPhotos(nextPage);
                 }
             }
         });
 
-        adapter = new SimplePhotoAdapter(getApplicationContext());
+        adapter = new SimplePhotoAdapter(getApplicationContext(), new SimplePhotoAdapter.OnPhotoClickListener() {
+            @Override
+            public void onPhotoClick(int position) {
+                Photo photo = adapter.getItemAtPosition(position);
+                Toast.makeText(PhotoActivity.this, String.format("photo id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         if (savedInstanceState != null) {
+            boolean buttonVisible = savedInstanceState.getInt(KEY_BUTTON_VISIBILITY) == 1;
+            loadMoreButton.setVisibility(buttonVisible ? Button.VISIBLE : Button.GONE);
             nextPage = savedInstanceState.getInt(KEY_NEXT_PAGE);
             adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
         }
@@ -100,6 +111,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_NEXT_PAGE, nextPage);
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
+        outState.putInt(KEY_BUTTON_VISIBILITY, loadMoreButton.getVisibility() == Button.VISIBLE ? 1 : 0);
     }
 
     @Override
@@ -124,7 +136,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     public void onPhotosReceived(PhotoQueryResult result) {
         final int photosCount = result.getPhotos().size();
         if (photosCount > 0) {
-            button.setVisibility(View.VISIBLE);     // Moeglicherweise sind noch weitere Bilder abrufbar
+            loadMoreButton.setVisibility(View.VISIBLE);     // Möglicherweise sind noch weitere Bilder abrufbar
             nextPage = result.getPage() + 1;
             if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
                 adapter.set(result.getPhotos());    // Photos ersetzen
@@ -133,7 +145,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
             }
         }else{
             //Aktueller Request lieferte keine Bilder, also kann der Button verschwinden
-            button.setVisibility(View.GONE);
+            loadMoreButton.setVisibility(View.GONE);
         }
     }
 

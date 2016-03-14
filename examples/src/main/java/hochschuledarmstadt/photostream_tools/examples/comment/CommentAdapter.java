@@ -45,7 +45,7 @@ public class CommentAdapter extends BaseAdapter<CommentAdapter.CommentViewHolder
         this.context = context;
     }
 
-    class CommentViewHolder extends RecyclerView.ViewHolder {
+    static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;
         public CommentViewHolder(View itemView) {
             super(itemView);

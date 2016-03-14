@@ -44,14 +44,16 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoViewHolder, Photo> {
 
     private final Context context;
+    private final OnPhotoClickListener photoClickListener;
 
-    public SimplePhotoAdapter(Context context){
+    public SimplePhotoAdapter(Context context, OnPhotoClickListener photoClickListener){
         this.context = context;
+        this.photoClickListener = photoClickListener;
     }
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_item, parent, false));
+        return new PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_item, parent, false), photoClickListener);
     }
 
     @Override
@@ -69,16 +71,26 @@ public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoVie
         super.onViewRecycled(holder);
     }
 
-    class PhotoViewHolder extends RecyclerView.ViewHolder {
+    static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
         public final ImageView imageView;
 
-        public PhotoViewHolder(View itemView) {
+        public PhotoViewHolder(View itemView, final OnPhotoClickListener photoClickListener) {
             super(itemView);
-            imageView = (ImageView) itemView.findViewById(R.id.imageView);
             textView = (TextView) itemView.findViewById(R.id.textView);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    photoClickListener.onPhotoClick(getAdapterPosition());
+                }
+            });
         }
+    }
+
+    public interface OnPhotoClickListener {
+        void onPhotoClick(int position);
     }
 
 }

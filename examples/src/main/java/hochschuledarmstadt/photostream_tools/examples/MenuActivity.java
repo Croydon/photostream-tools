@@ -49,16 +49,13 @@ import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 
 public class MenuActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-
     public static final String MENU_PHOTOS = "Photos";
     public static final String MENU_COMMENTS = "Comments";
+
     private static final String[] menu = new String[]{
             MENU_PHOTOS,
             MENU_COMMENTS
     };
-
-    private MenuAdapter menuAdapter;
 
     private static final HashMap<String, Class<?>> menuToClassMap = new HashMap<>();
 
@@ -67,13 +64,15 @@ public class MenuActivity extends AppCompatActivity {
         menuToClassMap.put(MENU_COMMENTS, CommentActivity.class);
     }
 
+    private MenuAdapter menuAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
