@@ -56,7 +56,6 @@ class AndroidSocket {
     private static final String NEW_COMMENT = "new_comment";
     private static final String COMMENT_DELETED = "comment_deleted";
     private static final String PHOTO_DELETED = "photo_deleted";
-    private static final String NEW_VOTE = "new_vote";
 
     private IO.Options options;
     private Socket socket;
@@ -202,25 +201,6 @@ class AndroidSocket {
             }
         });
 
-        socket.on(NEW_VOTE, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                JSONObject jsonObject = (JSONObject) args[0];
-                try {
-                    final int photoId = jsonObject.getInt("photo_id");
-                    final int voteCount = jsonObject.getInt("votecount");
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onMessageListener.onNewVote(photoId, voteCount);
-                        }
-                    });
-                } catch (JSONException e) {
-                    Logger.log(TAG, LogLevel.ERROR, e.toString());
-                }
-            }
-        });
-
     }
 
     public boolean isConnected() {
@@ -232,6 +212,5 @@ class AndroidSocket {
         void onNewComment(Comment comment);
         void onCommentDeleted(int commentId);
         void onPhotoDeleted(int photoId);
-        void onNewVote(int photoId, int voteCount);
     }
 }

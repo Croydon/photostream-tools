@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.1'
+version = '0.0.11'
 
 android {
     compileSdkVersion 23
@@ -61,7 +61,7 @@ install {
                     developer {
                         id 'aschattney'
                         name 'Andreas Schattney'
-                        email 'a.schattney@jfrog.com'
+                        email 'a.schattney@gmail.com'
                     }
                 }
                 scm {
@@ -75,29 +75,11 @@ install {
     }
 }
 
-task sourcesJar(type: Jar) {
+task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    classifier "source"
 }
 
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-task findConventions << {
-    println project.getConvention()
-}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

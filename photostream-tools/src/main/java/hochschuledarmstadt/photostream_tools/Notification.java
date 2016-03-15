@@ -31,7 +31,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.NotificationCompat;
 
-public class Notification {
+class Notification {
 
     public static void send(Context context,int notificationId, Class<?> activityClass, String title, String message, final int iconResource ){
         // Use NotificationCompat.Builder to set up our notification.

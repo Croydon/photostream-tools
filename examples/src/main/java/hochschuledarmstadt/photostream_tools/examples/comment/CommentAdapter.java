@@ -34,15 +34,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import hochschuledarmstadt.photostream_tools.adapter.BaseAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 
-public class CommentAdapter extends BaseAdapter<CommentAdapter.CommentViewHolder, Comment>{
+public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentViewHolder>{
 
-    private final Context context;
+    public CommentAdapter() {
 
-    public CommentAdapter(Context context) {
-        this.context = context;
     }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -55,7 +54,7 @@ public class CommentAdapter extends BaseAdapter<CommentAdapter.CommentViewHolder
 
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CommentViewHolder(LayoutInflater.from(context).inflate(R.layout.comment_item, parent, false));
+        return new CommentViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false));
     }
 
     @Override

@@ -34,7 +34,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import hochschuledarmstadt.photostream_tools.BaseActivity;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
@@ -45,23 +45,21 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class PhotoActivity extends BaseActivity implements OnPhotosResultListener {
+public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResultListener {
 
     private static final int COLUMNS_PER_ROW = 2;
-    private static final String KEY_NEXT_PAGE = "KEY_NEXT_PAGE";
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
     private static final String KEY_BUTTON_VISIBILITY = "KEY_BUTTON_VISIBILITY";
 
     private RecyclerView recyclerView;
-    private SimplePhotoAdapter adapter;
+    private PhotoAdapter adapter;
     private Button loadMoreButton;
-    private int nextPage = 1;
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotosResultListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.getPhotos(nextPage);
+            photoStreamClient.getPhotos();
     }
 
     @Override
@@ -84,12 +82,12 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
             @Override
             public void onClick(View v) {
                 if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)) {
-                    getPhotoStreamClient().getPhotos(nextPage);
+                    getPhotoStreamClient().getMorePhotos();
                 }
             }
         });
 
-        adapter = new SimplePhotoAdapter(getApplicationContext(), new SimplePhotoAdapter.OnPhotoClickListener() {
+        adapter = new PhotoAdapter(new PhotoAdapter.OnPhotoClickListener() {
             @Override
             public void onPhotoClick(int position) {
                 Photo photo = adapter.getItemAtPosition(position);
@@ -100,7 +98,6 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         if (savedInstanceState != null) {
             boolean buttonVisible = savedInstanceState.getInt(KEY_BUTTON_VISIBILITY) == 1;
             loadMoreButton.setVisibility(buttonVisible ? Button.VISIBLE : Button.GONE);
-            nextPage = savedInstanceState.getInt(KEY_NEXT_PAGE);
             adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
         }
         recyclerView.setAdapter(adapter);
@@ -109,7 +106,6 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(KEY_NEXT_PAGE, nextPage);
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
         outState.putInt(KEY_BUTTON_VISIBILITY, loadMoreButton.getVisibility() == Button.VISIBLE ? 1 : 0);
     }
@@ -125,7 +121,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
             if (!client.hasOpenRequestsOfType(RequestType.PHOTOS)){
-                getPhotoStreamClient().getPhotos(1);
+                getPhotoStreamClient().getPhotos();
             }
             return true;
         }
@@ -137,7 +133,6 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
         final int photosCount = result.getPhotos().size();
         if (photosCount > 0) {
             loadMoreButton.setVisibility(View.VISIBLE);     // Möglicherweise sind noch weitere Bilder abrufbar
-            nextPage = result.getPage() + 1;
             if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
                 adapter.set(result.getPhotos());    // Photos ersetzen
             }else{
@@ -159,7 +154,7 @@ public class PhotoActivity extends BaseActivity implements OnPhotosResultListene
 
 
     @Override
-    public void onNewPhoto(Photo photo) {
+    public void onNewPhotoReceived(Photo photo) {
 
     }
 

@@ -32,9 +32,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 
-public abstract class BaseActivity extends AppCompatActivity implements ServiceConnection {
+public abstract class PhotoStreamActivity extends AppCompatActivity implements ServiceConnection {
 
-    private static final String TAG = BaseActivity.class.getName();
+    private static final String TAG = PhotoStreamActivity.class.getName();
     private IPhotoStreamClient photoStreamClient;
     private boolean bound;
     private Bundle refSavedInstanceState;

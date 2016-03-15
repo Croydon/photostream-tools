@@ -52,7 +52,7 @@ public class BitmapUtils {
         }
     }
 
-    public static void recycleBitmap(Bitmap bitmap){
+    private static void recycleBitmap(Bitmap bitmap){
         if (bitmap != null && !bitmap.isRecycled())
             bitmap.recycle();
     }

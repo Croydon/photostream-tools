@@ -25,9 +25,9 @@
 package hochschuledarmstadt.photostream_tools.callback;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
-import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public interface OnPopularPhotosResultListener extends OnPhotoListener {
-    void onPopularPhotosReceived(PhotoQueryResult result);
-    void onReceivePopularPhotosFailed(HttpResult httpResult);
+public interface OnPhotoLikeListener extends OnRequestListener {
+    void onPhotoLiked(int photoId);
+    void onPhotoDisliked(int photoId);
+    void onPhotoLikeFailed(int photoId, HttpResult httpResult);
 }

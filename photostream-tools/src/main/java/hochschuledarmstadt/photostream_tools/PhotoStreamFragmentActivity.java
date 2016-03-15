@@ -28,7 +28,7 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-public abstract class BaseFragmentActivity extends BaseActivity implements ServiceStateChangedNotifier {
+public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity implements ServiceStateChangedNotifier {
 
     private ArrayList<OnServiceStateChangedListener> serviceStateChangedListeners = new ArrayList<>();
 
@@ -42,6 +42,8 @@ public abstract class BaseFragmentActivity extends BaseActivity implements Servi
     public void addOnServiceStateChangedListener(OnServiceStateChangedListener onServiceStateChangedListener) {
         if (!serviceStateChangedListeners.contains(onServiceStateChangedListener))
             serviceStateChangedListeners.add(onServiceStateChangedListener);
+        if (getPhotoStreamClient() != null)
+            notifyOnServiceConnected(getPhotoStreamClient());
     }
 
     @Override

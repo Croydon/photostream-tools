@@ -31,7 +31,6 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import hochschuledarmstadt.photostream_tools.BaseActivity;
 import hochschuledarmstadt.photostream_tools.model.Id;
 
 public abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends Parcelable & Id> extends RecyclerView.Adapter<T>{

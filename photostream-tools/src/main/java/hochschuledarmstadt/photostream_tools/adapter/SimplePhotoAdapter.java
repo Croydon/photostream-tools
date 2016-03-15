@@ -30,25 +30,38 @@ import java.util.ArrayList;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-public abstract class PhotoAdapter<T extends RecyclerView.ViewHolder, H extends Photo> extends BaseAdapter<T, H> {
+public abstract class SimplePhotoAdapter<T extends RecyclerView.ViewHolder> extends BaseAdapter<T, Photo> {
 
-    public PhotoAdapter(ArrayList<H> photos){
+    private static final int LIKE = -10;
+    private static final int DISLIKE = -10;
+
+    public SimplePhotoAdapter(ArrayList<Photo> photos){
         super(photos);
     }
 
-    public PhotoAdapter(){
-        super(new ArrayList<H>());
+    public SimplePhotoAdapter(){
+        super(new ArrayList<Photo>());
     }
 
-    public void updateVoteCountForPhoto(int photoId, int newVoteCount) {
-        final int photoCount = getItemCount();
-        for (int position = 0; position < photoCount; position++){
-            H photo = getItemAtPosition(position);
-            if (photo.getId() == photoId) {
-                photo.updateVotecount(newVoteCount);
-                break;
+    public boolean setLikeForPhoto(int photoId) {
+        return internalSetLikeOrDislike(photoId, LIKE);
+    }
+
+    public boolean setDislikeForPhoto(int photoId) {
+        return internalSetLikeOrDislike(photoId, DISLIKE);
+    }
+
+    private boolean internalSetLikeOrDislike(int photoId, int likeConstant) {
+        int itemCount = getItemCount();
+        for (int position = 0; position < itemCount; position++) {
+            Photo photo = getItemAtPosition(position);
+            if (itemHasEqualId(photoId, photo)) {
+                photo.setLiked(likeConstant == LIKE);
+                notifyItemChanged(position);
+                return true;
             }
         }
+        return false;
     }
 
 }

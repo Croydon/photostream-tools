@@ -9,26 +9,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".photo.PhotoActivity"
-            android:label="@string/photo_example">
-        </activity>
+        <activity android:name=".photo.PhotoActivity" android:label="@string/photo_example"></activity>
 
-        <activity
-            android:name=".comment.CommentActivity"
-            android:label="@string/comment_example">
-        </activity>
+        <activity android:name=".comment.CommentActivity" android:label="@string/comment_example"/>
 
         <activity
             android:name=".MenuActivity"
             android:label="@string/title_activity_menu"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <service android:name="hochschuledarmstadt.photostream_tools.PhotoStreamService" />

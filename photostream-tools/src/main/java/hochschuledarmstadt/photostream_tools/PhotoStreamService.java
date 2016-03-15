@@ -42,6 +42,7 @@ public class PhotoStreamService extends Service {
 
     private static final String TAG = PhotoStreamService.class.getName();
     public static final String INSTALLATION_ID = "INSTALLATION_ID";
+    public static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";
 
     private IBinder photoStreamServiceBinder = new PhotoStreamServiceBinder();
     private PhotoStreamClient photoStreamClient;
@@ -62,7 +63,7 @@ public class PhotoStreamService extends Service {
         }
         final Context context = getApplicationContext();
         final DbConnection dbConnection = DbConnection.getInstance(context);
-        photoStreamClient = new PhotoStreamClient(context, photoStreamUrl, dbConnection, getInstallationId(context));
+        photoStreamClient = new PhotoStreamClient(context, photoStreamUrl, dbConnection, getInstallationId());
         photoStreamClient.bootstrap();
     }
 
@@ -70,7 +71,7 @@ public class PhotoStreamService extends Service {
         try {
             ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
-            String url = bundle.getString("PHOTOSTREAM_URL");
+            String url = bundle.getString(PHOTOSTREAM_URL_MANIFEST_KEY);
             return url;
         } catch (PackageManager.NameNotFoundException e) {
             Logger.log(TAG, LogLevel.ERROR, "Failed to load meta-data, NameNotFound: " + e.getMessage());
@@ -93,8 +94,8 @@ public class PhotoStreamService extends Service {
         }
     }
 
-    public static String getInstallationId(Context context){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    private String getInstallationId(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String installationId = sharedPreferences.getString(INSTALLATION_ID, null);
         return installationId;
     }

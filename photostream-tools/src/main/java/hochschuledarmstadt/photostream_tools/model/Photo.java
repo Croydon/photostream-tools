@@ -49,9 +49,9 @@ public class Photo implements Parcelable, Id{
     @SerializedName("comment")
     @Expose
     private String comment;
-    @SerializedName("votecount")
+    @SerializedName("favorite")
     @Expose
-    private Integer votecount;
+    private int liked;
     @SerializedName("photo_id")
     @Expose
     private int id;
@@ -80,14 +80,14 @@ public class Photo implements Parcelable, Id{
     /**
      *
      * @return
-     * The votecount
+     * The liked
      */
-    public Integer getVotecount() {
-        return votecount;
+    public boolean isLiked() {
+        return liked == 1;
     }
 
-    public void updateVotecount(Integer votecount) {
-        this.votecount = votecount;
+    public void setLiked(boolean liked) {
+        this.liked = liked ? 1 : 0;
     }
 
     /**
@@ -103,7 +103,7 @@ public class Photo implements Parcelable, Id{
         id = in.readInt();
         imageFilePath = in.readString();
         comment = in.readString();
-        votecount = in.readInt();
+        liked = in.readInt();
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Photo implements Parcelable, Id{
         dest.writeInt(id);
         dest.writeString(imageFilePath);
         dest.writeString(comment);
-        dest.writeInt(votecount);
+        dest.writeInt(liked);
     }
 
     public static final Creator<Photo> CREATOR = new Creator<Photo>() {
@@ -158,7 +158,7 @@ public class Photo implements Parcelable, Id{
                     outputStream.close();
             }
         }else{
-            imageFilePath = filename;
+            imageFilePath = new File(context.getFilesDir(), filename).getAbsolutePath();
         }
 
     }
@@ -168,6 +168,6 @@ public class Photo implements Parcelable, Id{
         if(file == null || !file.exists()) {
             return false;
         }
-        return false;
+        return true;
     }
 }

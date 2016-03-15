@@ -24,16 +24,26 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
+class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
 
-class GetPopularPhotosAsyncTask extends GetPhotosAsyncTask {
+    public LikePhotoAsyncTask(LikeTable likeTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback) {
+        super(likeTable, installationId, uri, photoId, callback);
+    }
 
-    public GetPopularPhotosAsyncTask(Context context, String installationId, String uri, int page, GetPhotosCallback callback) {
-        super(context, installationId, uri, page, callback);
+    protected String buildUri(String uri, int photoId) {
+        return String.format("%s/photostream/image/%s/like", uri, photoId);
     }
 
     @Override
-    protected String buildUrl(String uri, int page) {
-        return String.format("%s/photostream/popular/?page=%s", uri, page);
+    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
+        likeTable.openDatabase();
+        likeTable.insertLike(photoId);
+        likeTable.closeDatabase();
     }
+
+    @Override
+    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
+        callback.onPhotoLiked(photoId);
+    }
+
 }

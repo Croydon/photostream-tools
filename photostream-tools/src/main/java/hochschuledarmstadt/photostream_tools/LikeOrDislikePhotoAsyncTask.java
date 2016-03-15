@@ -25,7 +25,6 @@
 package hochschuledarmstadt.photostream_tools;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -33,26 +32,27 @@ import java.net.URL;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> {
+abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
 
-    private static final String TAG = VotePhotoAsyncTask.class.getName();
+    private static final String TAG = LikeOrDislikePhotoAsyncTask.class.getName();
     private final OnVotePhotoResultListener callback;
     private final String installationId;
     private final int photoId;
-    private final VoteTable voteTable;
+    private final LikeTable likeTable;
 
-    public VotePhotoAsyncTask(VoteTable voteTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback){
+    public LikeOrDislikePhotoAsyncTask(LikeTable likeTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback){
         super(uri);
-        this.voteTable = voteTable;
+        this.likeTable = likeTable;
         this.installationId = installationId;
         this.photoId = photoId;
         this.callback = callback;
     }
 
     @Override
-    protected JSONObject doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
         try {
-            return votePhoto();
+            likeOrDislikePhoto();
+            return true;
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
             postError(new HttpResult(-1, e.toString()));
@@ -62,60 +62,47 @@ abstract class VotePhotoAsyncTask extends BaseAsyncTask<Void, Void, JSONObject> 
             Logger.log(TAG, LogLevel.ERROR, e.toString());
             postError(e.getHttpResult());
         }
-        return null;
+        return false;
     }
 
-    private JSONObject votePhoto() throws IOException, JSONException, HttpPhotoStreamException {
+    private void likeOrDislikePhoto() throws IOException, JSONException, HttpPhotoStreamException {
         final String url = buildUri(uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("PUT");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", installationId);
-        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
-            String result = convertStreamToString(urlConnection.getInputStream());
-            return new JSONObject(result);
-        }else{
+        if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK){
             throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
     }
 
     protected abstract String buildUri(String uri, int photoId);
+    protected abstract void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId);
+    protected abstract void sendResult(OnVotePhotoResultListener callback, int photoId);
 
     @Override
-    protected void onPostExecute(JSONObject result) {
+    protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
-        try {
-            if (result != null) {
-                saveUserVotedPhoto(photoId);
-                int photo_id = result.getInt("photo_id");
-                int votecount = result.getInt("votecount");
-                saveUserVotedPhoto(photo_id);
-                if (!result.has("already_upvoted")) {
-                    callback.onPhotoVoted(photo_id, votecount);
-                }else
-                    callback.onPhotoAlreadyVoted(photo_id, votecount);
-            }
-        } catch (JSONException e) {
-            Logger.log(TAG, LogLevel.ERROR, e.toString());
-            callback.onPhotoVoteError(photoId, e);
+        if(result){
+            saveUserLikedOrDislikedPhoto(likeTable, photoId);
+            sendResult(callback, photoId);
         }
     }
 
     private void saveUserVotedPhoto(int photoId) {
-        voteTable.openDatabase();
-        voteTable.insertVote(photoId);
-        voteTable.closeDatabase();
+        likeTable.openDatabase();
+        likeTable.insertLike(photoId);
+        likeTable.closeDatabase();
     }
 
     @Override
     protected void sendError(HttpResult httpResult) {
-        callback.onPhotoVoteFailed(photoId, httpResult);
+        callback.onPhotoLikeFailed(photoId, httpResult);
     }
 
     public interface OnVotePhotoResultListener {
-        void onPhotoVoted(int photoId, int newVoteCount);
-        void onPhotoVoteFailed(int photoId, HttpResult httpResult);
-        void onPhotoVoteError(int photoId, Exception e);
-        void onPhotoAlreadyVoted(int photoId, int votecount);
+        void onPhotoLiked(int photoId);
+        void onPhotoDisliked(int photoId);
+        void onPhotoLikeFailed(int photoId, HttpResult httpResult);
     }
 }

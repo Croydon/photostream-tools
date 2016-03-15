@@ -24,10 +24,18 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-public enum RequestType {
-    UPLOAD,
-    PHOTOS,
-    LIKE,
-    SEARCH,
-    COMMENT
+import android.content.Context;
+
+/**
+ * Created by Andreas Schattney on 15.03.2016.
+ */
+class SearchMorePhotosAsyncTask extends SearchPhotosAsyncTask {
+    public SearchMorePhotosAsyncTask(Context context, String installationId, String uri, OnSearchPhotosResultCallback callback) {
+        super(context, installationId, uri, null, -1, callback);
+    }
+
+    @Override
+    protected String buildUrl(String uri, int page) {
+        return String.format("%s/photostream/search/more", uri);
+    }
 }

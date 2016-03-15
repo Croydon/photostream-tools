@@ -22,12 +22,20 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.callback;
+package hochschuledarmstadt.photostream_tools;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import android.content.Context;
 
-public interface OnPhotoVotedResultListener extends OnRequestListener {
-    void onPhotoVoted(int photoId, int newVoteCount);
-    void onPhotoAlreadyVoted(int photoId, int voteCount);
-    void onPhotoVoteFailed(int photoId, HttpResult httpResult);
+/**
+ * Created by Andreas Schattney on 15.03.2016.
+ */
+class GetMorePhotosAsyncTask extends GetPhotosAsyncTask {
+    public GetMorePhotosAsyncTask(Context context, String installationId, String uri, GetPhotosCallback callback) {
+        super(context, installationId, uri, -1, callback);
+    }
+
+    @Override
+    protected String buildUrl(String uri, int page) {
+        return String.format("%s/photostream/stream/more", uri);
+    }
 }

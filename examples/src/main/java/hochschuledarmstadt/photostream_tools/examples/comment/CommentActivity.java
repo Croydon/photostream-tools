@@ -32,7 +32,7 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.BaseActivity;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsResultListener;
@@ -41,7 +41,7 @@ import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-public class CommentActivity extends BaseActivity implements OnCommentsResultListener {
+public class CommentActivity extends PhotoStreamActivity implements OnCommentsResultListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
     private static final int PHOTO_ID = 3;
@@ -69,7 +69,7 @@ public class CommentActivity extends BaseActivity implements OnCommentsResultLis
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new CommentAdapter(getApplicationContext());
+        adapter = new CommentAdapter();
         if (savedInstanceState != null) {
             Bundle bundle = savedInstanceState.getBundle(KEY_ADAPTER);
             adapter.restoreInstanceState(bundle);

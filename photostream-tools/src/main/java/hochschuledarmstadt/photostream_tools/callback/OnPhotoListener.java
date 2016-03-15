@@ -28,7 +28,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public interface OnPhotoListener extends OnRequestListener {
-    void onNewPhoto(Photo photo);
+    void onNewPhotoReceived(Photo photo);
     void onPhotoDeleted(int photoId);
     void onPhotoDeleteFailed(int photoId, HttpResult httpResult);
 }

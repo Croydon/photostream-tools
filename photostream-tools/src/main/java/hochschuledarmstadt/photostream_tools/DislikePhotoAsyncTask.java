@@ -24,14 +24,26 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class UpvotePhotoAsyncTask extends VotePhotoAsyncTask {
+class DislikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
 
-    public UpvotePhotoAsyncTask(VoteTable voteTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback) {
-        super(voteTable, installationId, uri, photoId, callback);
+    public DislikePhotoAsyncTask(LikeTable likeTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback) {
+        super(likeTable, installationId, uri, photoId, callback);
     }
 
     protected String buildUri(String uri, int photoId) {
-        return String.format("%s/photostream/image/%s/upvote", uri, photoId);
+        return String.format("%s/photostream/image/%s/dislike", uri, photoId);
+    }
+
+    @Override
+    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
+        likeTable.openDatabase();
+        likeTable.deleteLike(photoId);
+        likeTable.closeDatabase();
+    }
+
+    @Override
+    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
+        callback.onPhotoDisliked(photoId);
     }
 
 }

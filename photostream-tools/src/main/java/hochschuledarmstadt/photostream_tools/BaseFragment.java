@@ -79,7 +79,7 @@ public abstract class BaseFragment extends Fragment implements OnServiceStateCha
     }
 
     private void internalNotifyDisconnectFromService(IPhotoStreamClient client) {
-        if (!serviceDisconnectCalled){
+        if (client != null && !serviceDisconnectCalled){
             serviceDisconnectCalled = true;
             onPhotoStreamServiceDisconnected(client);
         }

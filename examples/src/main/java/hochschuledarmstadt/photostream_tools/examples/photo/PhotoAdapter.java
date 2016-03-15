@@ -27,7 +27,6 @@ package hochschuledarmstadt.photostream_tools.examples.photo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,24 +35,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
-import hochschuledarmstadt.photostream_tools.adapter.PhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 
-public class SimplePhotoAdapter extends PhotoAdapter<SimplePhotoAdapter.PhotoViewHolder, Photo> {
+public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
 
-    private final Context context;
     private final OnPhotoClickListener photoClickListener;
 
-    public SimplePhotoAdapter(Context context, OnPhotoClickListener photoClickListener){
-        this.context = context;
+    public PhotoAdapter(OnPhotoClickListener photoClickListener){
         this.photoClickListener = photoClickListener;
     }
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_item, parent, false), photoClickListener);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        return new PhotoViewHolder(layoutInflater.inflate(R.layout.photo_item, parent, false), photoClickListener);
     }
 
     @Override
