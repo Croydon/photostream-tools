@@ -1,4 +1,26 @@
-# photostream-tools
+# photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
+
+## IPhotoStreamClient
+
+Über dieses Interface kann mit dem Server oder der lokalen Datenbank kommuniziert werden.
+* Hochladen von Photos
+* Abrufen von Photos
+* Liken von Photos
+* Photos kommentieren
+* Kommentare zu einem Photo abrufen
+* Senden von Kommentaren
+* Suchen von Photos
+
+## Callbacks
+
+Interface | Verwendung
+--------- | ------------
+OnPhotosResultListener   | Abrufen des Photostreams
+OnPhotoLikeListener      | Liken oder Disliken eines Photos
+OnCommentsResultListener | Abrufen von Kommentaren zu einem Photo, Senden von Kommentaren
+OnPhotoUploadListener    | Veröffentlichen eines Photos
+OnSearchPhotosListener   | Suchen im Stream nach Photos
+
 
 ## License
 
