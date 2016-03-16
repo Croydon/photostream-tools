@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.11'
+version = '0.0.16'
 
 android {
     compileSdkVersion 23
@@ -44,7 +44,7 @@ bintray {
         issueTrackerUrl = 'https://github.com/aschattney/photostream-tools/issues'
         vcsUrl = gitUrl
         licenses = ['MIT']
-        labels = ['aar', 'photostream', 'photostream-tools']
+        labels = ['aar', 'photostream', 'photostream-tools', 'hda', 'praktikum', 'nzse', 'hochschule darmstadt']
         publish = true
     }
 }
@@ -80,9 +80,24 @@ install {
     }
 }
 
-task sourceJar(type: Jar) {
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
-    classifier "source"
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
 }
 
 

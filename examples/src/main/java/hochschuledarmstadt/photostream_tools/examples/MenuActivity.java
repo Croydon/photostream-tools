@@ -27,8 +27,6 @@ package hochschuledarmstadt.photostream_tools.examples;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,29 +38,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity;
+import hochschuledarmstadt.photostream_tools.examples.like.LikeActivity;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 
 public class MenuActivity extends AppCompatActivity {
 
     public static final String MENU_PHOTOS = "Photos";
     public static final String MENU_COMMENTS = "Comments";
+    private static final String MENU_LIKE = "Like";
 
-    private static final String[] menu = new String[]{
-            MENU_PHOTOS,
-            MENU_COMMENTS
+    private static final MenuItemWrapper[] menu = new MenuItemWrapper[]{
+            new MenuItemWrapper(MENU_PHOTOS, PhotoActivity.class),
+            new MenuItemWrapper(MENU_COMMENTS, CommentActivity.class),
+            new MenuItemWrapper(MENU_LIKE, LikeActivity.class)
     };
-
-    private static final HashMap<String, Class<?>> menuToClassMap = new HashMap<>();
-
-    static {
-        menuToClassMap.put(MENU_PHOTOS, PhotoActivity.class);
-        menuToClassMap.put(MENU_COMMENTS, CommentActivity.class);
-    }
 
     private MenuAdapter menuAdapter;
 
@@ -79,21 +73,40 @@ public class MenuActivity extends AppCompatActivity {
         menuAdapter = new MenuAdapter(this, Arrays.asList(menu), new MenuAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                final String menuItem = menuAdapter.getItemAtPosition(position);
-                Intent intent = new Intent(MenuActivity.this, menuToClassMap.get(menuItem));
+                final MenuItemWrapper menuItem = menuAdapter.getItemAtPosition(position);
+                Intent intent = new Intent(MenuActivity.this, menuItem.getActivityClass());
                 startActivity(intent);
             }
         });
         recyclerView.setAdapter(menuAdapter);
     }
 
+    static class MenuItemWrapper {
+
+        private final Class<? extends PhotoStreamActivity> activityClass;
+        private final String menuTitle;
+
+        MenuItemWrapper(String menuTitle, Class<? extends PhotoStreamActivity> activityClass){
+            this.menuTitle = menuTitle;
+            this.activityClass = activityClass;
+        }
+
+        public String getMenuTitle() {
+            return menuTitle;
+        }
+
+        public Class<? extends PhotoStreamActivity> getActivityClass() {
+            return activityClass;
+        }
+    }
+
     private static class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder>{
 
-        private final List<String> menu;
+        private final List<MenuItemWrapper> menu;
         private final Context context;
         private final OnItemClickListener itemClickListener;
 
-        public MenuAdapter(Context context, List<String> menu, OnItemClickListener itemClickListener){
+        public MenuAdapter(Context context, List<MenuItemWrapper> menu, OnItemClickListener itemClickListener){
             this.context = context;
             this.menu = menu;
             this.itemClickListener = itemClickListener;
@@ -106,7 +119,7 @@ public class MenuActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MenuViewHolder holder, int position) {
-            holder.textView.setText(menu.get(position));
+            holder.textView.setText(menu.get(position).getMenuTitle());
         }
 
         @Override
@@ -114,7 +127,7 @@ public class MenuActivity extends AppCompatActivity {
             return menu.size();
         }
 
-        public String getItemAtPosition(int position) {
+        public MenuItemWrapper getItemAtPosition(int position) {
             return menu.get(position);
         }
 

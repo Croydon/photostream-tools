@@ -8,11 +8,12 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".photo.PhotoActivity" android:label="@string/photo_example"></activity>
-
-        <activity android:name=".comment.CommentActivity" android:label="@string/comment_example"/>
-
+        <activity
+            android:name=".photo.PhotoActivity"
+            android:label="@string/photo_example" />
+        <activity
+            android:name=".comment.CommentActivity"
+            android:label="@string/comment_example" />
         <activity
             android:name=".MenuActivity"
             android:label="@string/title_activity_menu"
@@ -30,6 +31,7 @@
             android:name="PHOTOSTREAM_URL"
             android:value="http://5.45.97.155:8082" />
 
+        <activity android:name=".like.LikeActivity"></activity>
     </application>
 
 </manifest>

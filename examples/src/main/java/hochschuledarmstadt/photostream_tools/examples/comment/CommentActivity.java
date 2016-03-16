@@ -44,7 +44,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 public class CommentActivity extends PhotoStreamActivity implements OnCommentsResultListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
-    private static final int PHOTO_ID = 3;
+    private static final int PHOTO_ID = 1;
 
     private RecyclerView recyclerView;
     private CommentAdapter adapter;

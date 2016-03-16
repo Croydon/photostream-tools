@@ -23,36 +23,34 @@
   ~ THE SOFTWARE.
   -->
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="hochschuledarmstadt.photostream_tools.examples.TestActivity">
+    tools:context="hochschuledarmstadt.photostream_tools.examples.like.LikeActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:orientation="horizontal"
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/statusTextView"
+            android:text="@string/status_not_liked"
+            android:gravity="center"
+            android:layout_height="wrap_content" />
 
-    </android.support.design.widget.AppBarLayout>
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/likeButton"
+            android:text="@string/like"
+            android:layout_height="wrap_content" />
 
-    <include layout="@layout/content_test" />
+    </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+    <include layout="@layout/progress_circle"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

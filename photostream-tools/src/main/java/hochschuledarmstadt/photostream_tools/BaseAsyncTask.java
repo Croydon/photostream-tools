@@ -61,7 +61,11 @@ abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params,
 
     protected HttpResult getHttpErrorResult(InputStream errorStream) throws IOException {
         final String result = convertStreamToString(errorStream);
-        return new Gson().fromJson(result, HttpResult.class);
+        try{
+            return new Gson().fromJson(result, HttpResult.class);
+        }catch(Exception e){
+            return new HttpResult(500, "Internal Server Error");
+        }
     }
 
     protected void postError(final HttpResult httpResult) {

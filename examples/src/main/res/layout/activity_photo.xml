@@ -48,12 +48,6 @@
 
     </LinearLayout>
 
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true"
-        android:id="@+id/progressCircle"
-        android:visibility="gone"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_height="wrap_content" />
+    <include layout="@layout/progress_circle"/>
 
 </RelativeLayout>

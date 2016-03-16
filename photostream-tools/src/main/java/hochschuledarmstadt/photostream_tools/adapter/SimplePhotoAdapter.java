@@ -33,7 +33,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 public abstract class SimplePhotoAdapter<T extends RecyclerView.ViewHolder> extends BaseAdapter<T, Photo> {
 
     private static final int LIKE = -10;
-    private static final int DISLIKE = -10;
+    private static final int DISLIKE = -11;
 
     public SimplePhotoAdapter(ArrayList<Photo> photos){
         super(photos);

@@ -46,6 +46,11 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
             notifyOnServiceConnected(getPhotoStreamClient());
     }
 
+    /**
+     * Called when PhotoStreamService is available
+     * @param photoStreamClient class for communication to the server
+     * @param savedInstanceState from onCreate() method
+     */
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         notifyOnServiceConnected(photoStreamClient);

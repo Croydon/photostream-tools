@@ -31,4 +31,8 @@
     <string name="title_activity_menu">MenuActivity</string>
     <string name="examples">Examples</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="like">Like</string>
+    <string name="status_liked">Status: Liked</string>
+    <string name="status_not_liked">Status: Not Liked</string>
+    <string name="dislike">Dislike</string>
 </resources>

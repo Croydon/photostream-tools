@@ -37,10 +37,24 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public interface IPhotoStreamClient {
+    /**
+     * Registriert einen Listener der aufgerufen wird, wenn ein Photo geliked oder disliked wird
+     * @param onPhotoLikeListener
+     */
     void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
     void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
+
+    /**
+     * Registriert einen Listener der aufgerufen wird, wenn Kommentare zu einem Photo geladen wurden
+     * @param onCommentsResultListener listener
+     */
     void addOnGetCommentsResultListener(OnCommentsResultListener onCommentsResultListener);
     void removeOnGetCommentsResultListener(OnCommentsResultListener onCommentsResultListener);
+
+    /**
+     * Registriert einen Listener der aufgerufen wird, wenn Photos aus dem Stream geladen wurden
+     * @param onPhotosResultListener listener
+     */
     void addOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener);
     void removeOnPhotosResultListener(OnPhotosResultListener onPhotosResultListener);
     void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener);
