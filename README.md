@@ -2,7 +2,7 @@
 
 # Gradle
 
-```
+```gradle
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 ```
 
