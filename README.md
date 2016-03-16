@@ -1,6 +1,6 @@
 # photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
 
-# Gradle
+## Gradle
 
 ```gradle
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
