@@ -69,7 +69,7 @@ Interface | Verwendung
 <a href="#OnPhotoUploadListener">OnPhotoUploadListener</div>    | Veröffentlichen eines Photos
 <a href="#OnSearchPhotosResultListener">OnSearchPhotosResultListener</div>   | Suchen im Stream nach Photos
 
-<div id="#OnPhotosResultListener"></div>
+<div id="OnPhotosResultListener"></div>
 #### OnPhotosResultListener
 Methode | Beschreibung
 --------- | ------------
@@ -79,7 +79,7 @@ Methode | Beschreibung
   `void onPhotoDeleted(int photoId)` | Wird aufgerufen wenn eigenes Photo erfolgreich gelöscht worden ist oder ein anderer Nutzer sein Photo gelöscht hat
   `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
 
-<div id="#OnPhotoLikeListener"></div>
+<div id="OnPhotoLikeListener"></div>
 #### OnPhotoLikeListener
 Methode | Beschreibung
 --------- | ------------
@@ -87,7 +87,7 @@ Methode | Beschreibung
   `void onPhotoDisliked(int photoId)` | Wird aufgerufen wenn ein Photo erfolgreich disliked wurde
   `void onPhotoLikeFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn ein like bzw dislike fehlschlägt
 
-<div id="#OnCommentsResultListener"></div>
+<div id="OnCommentsResultListener"></div>
 ### OnCommentsResultListener
 Methode | Beschreibung
 --------- | ------------
@@ -98,7 +98,7 @@ Methode | Beschreibung
   `void onNewComment(Comment comment)` | Wird aufgerufen wenn ein eigener Kommentar erfolgreich gesendet wurde, oder ein anderer Nutzer einen neuen Kommentar gesendet hat
   `void onSendCommentFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Kommentars ein Fehler aufgetreten ist
 
-<div id="#OnPhotoUploadListener"></div>
+<div id="OnPhotoUploadListener"></div>
 #### OnPhotoUploadListener
 
 Methode | Beschreibung
@@ -106,7 +106,7 @@ Methode | Beschreibung
   `void onPhotoUploaded(Photo photo)` | Wird aufgerufen wenn ein Photo erfolgreich an den Server gesendet wurde
   `void onPhotoUploadFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Photos an den Server ein Fehler aufgetreten ist
   
-<div id="#OnSearchPhotosResultListener"></div>
+<div id="OnSearchPhotosResultListener"></div>
 #### OnSearchPhotosResultListener
 Methode | Beschreibung
 --------- | ------------
