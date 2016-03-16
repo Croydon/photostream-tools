@@ -132,6 +132,8 @@ Beispiel:
 ```
 public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
 
+    public PhotoAdapter() { }
+
     static final class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView imageView;
@@ -139,22 +141,14 @@ public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolde
         public PhotoViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    itemClickListener.onItemClick(imageView, getAdapterPosition());
-                }
-            });
-
         }
     }
 
-    public PhotoAdapter() { }
-
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_stream_item, parent, false);
-        return new PhotoViewHolder(itemView, itemClickListener, deleteClickListener);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        View itemView = layoutInflater.inflate(R.layout.photo_stream_item, parent, false);
+        return new PhotoViewHolder(itemView);
     }
 
     @Override
@@ -177,6 +171,42 @@ public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolde
 
 }
 
+```
+
+#### SimpleCommentAdapter
+
+Dieser Adapter kann verwendet werden um Kommentare in einer RecyclerView anzuzeigen.
+Um diese Klasse verwenden zu können, müssen Sie von dieser Klasse erben.
+
+Beispiel:
+
+```
+public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentViewHolder> {
+
+    public CommentAdapter() { }
+	
+    @Override
+    public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        return new CommentViewHolder(layoutInflater.inflate(R.layout.comment_item, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(CommentViewHolder holder, int position) {
+        Comment comment = getItemAtPosition(position);
+        holder.commentTextView.setText(comment.getMessage());
+    }
+
+    public static final class CommentViewHolder extends RecyclerView.ViewHolder{
+
+        public TextView commentTextView;
+
+        public CommentViewHolder(View itemView) {
+            super(itemView);
+            commentTextView = (TextView) itemView.findViewById(R.id.textView);
+        }
+    }
+}
 ```
 
 ## License
