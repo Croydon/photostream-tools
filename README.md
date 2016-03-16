@@ -102,7 +102,7 @@ Methode | Beschreibung
   `void onPhotoUploaded(Photo photo)` | Wird aufgerufen wenn ein Photo erfolgreich an den Server gesendet wurde
   `void onPhotoUploadFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Photos an den Server ein Fehler aufgetreten ist
   
-<div id="OnSearchPhotosResultListener">  
+<div markdown=1 id="OnSearchPhotosResultListener">  
 #### OnSearchPhotosResultListener
 Methode | Beschreibung
 --------- | ------------
