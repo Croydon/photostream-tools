@@ -6,6 +6,10 @@
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 ```
 
+## Architektur
+
+<a href="https://github.com/aschattney/photostream-tools/blob/master/architecture.png"><img src="https://github.com/aschattney/photostream-tools/blob/master/architecture.png" align="center" height="500" ></a>
+
 ## Datenmodell
 
 ### Photo
