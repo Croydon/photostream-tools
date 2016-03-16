@@ -1,8 +1,6 @@
 # photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
 
-## Installation
-
-### Gradle
+## Gradle
 
 Als Dependency in der build.gradle deklarieren:
 
@@ -10,7 +8,7 @@ Als Dependency in der build.gradle deklarieren:
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 ```
 
-### Verwendung
+## Verwendung
 
 <a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-tools/tree/master/examples">Beispielprojekt</a> ansehen
 
