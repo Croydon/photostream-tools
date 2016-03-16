@@ -90,7 +90,7 @@ Methode | Beschreibung
 <div id="OnCommentsResultListener"></div>
 ### OnCommentsResultListener
 Methode | Beschreibung
---------- | ------------
+------- | ------------
   `void onGetComments(int photoId, List<Comment> comments)` | Wird aufgerufen wenn Kommentare zu einem Photo geladen wurden
   `void onGetCommentsFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn dabei ein Fehler aufgetreten ist
   `void onCommentDeleted(int commentId)` | Wird aufgerufen wenn eigener Kommentar erfolgreich gelöscht worden ist oder ein anderer Nutzer seinen Kommentar gelöscht hat
