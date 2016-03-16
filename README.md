@@ -10,7 +10,7 @@ Als Dependency in der build.gradle deklarieren:
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 ```
 
-### Usage
+### Verwendung
 
 <a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-tools/tree/master/examples">Beispielprojekt</a> ansehen
 
