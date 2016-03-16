@@ -1,5 +1,41 @@
 # photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
 
+## Gradle
+
+```gradle
+compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
+```
+
+## Datenmodell
+
+### Photo
+
+Methode | Beschreibung
+--------- | ------------
+`String getId()`   | Eindeutige Id des Photos
+`String getDescription()` | Beschreibung zu dem Photo
+`boolean isLiked()` | Liefert zurück ob das Photo vom Nutzer geliked wurde
+`boolean isDeletable()` | Wenn der Nutzer der Urheber des Photos ist, dann kann er das Photo löschen
+`String getImageFilePath()`| Liefert den absoluten Dateipfad zurück unter dem das Photo auf dem Gerät abgespeichert ist
+
+### Comment
+
+Methode | Beschreibung
+--------- | ------------
+`String getId()` | Eindeutige Id des Kommentars
+`String getPhotoId()` | Liefert die zum Kommentar zugehörige Photo Id
+`String getMessage()` | Liefert den Inhalt des Kommentars
+`boolean isDeletable()` | Wenn der Nutzer der Urheber des Kommentars ist, dann kann er diesen Kommentar löschen
+
+## QueryResult
+
+### PhotoQueryResult
+
+Methode | Beschreibung
+--------- | ------------
+`int getPage()` | Gibt die aktuelle Seite des Streams zurück
+`List<Photo> getPhotos()` | Gibt die eine List von Photos zurück, die in der Seite des Streams enthalten sind
+
 ## IPhotoStreamClient
 
 Über dieses Interface kann mit dem Server oder der lokalen Datenbank kommuniziert werden.
