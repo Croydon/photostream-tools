@@ -70,7 +70,7 @@ Interface | Verwendung
 <a href="#OnSearchPhotosResultListener">OnSearchPhotosResultListener</div>   | Suchen im Stream nach Photos
 
 <div id="OnPhotosResultListener"></div>
-#### OnPhotosResultListener
+##### OnPhotosResultListener
 Methode | Beschreibung
 --------- | ------------
   `void onPhotosReceived(PhotoQueryResult result)` | Wird aufgerufen wenn das Ergebnis zu dem Funktionsaufruf von `IPhotoStreamClient.getPhotos()` geladen wurde
@@ -80,7 +80,7 @@ Methode | Beschreibung
   `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
 
 <div id="OnPhotoLikeListener"></div>
-#### OnPhotoLikeListener
+##### OnPhotoLikeListener
 Methode | Beschreibung
 --------- | ------------
   `void onPhotoLiked(int photoId)` | Wird aufgerufen wenn ein Photo erfolgreich geliked wurde
@@ -88,7 +88,7 @@ Methode | Beschreibung
   `void onPhotoLikeFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn ein like bzw dislike fehlschlägt
 
 <div id="OnCommentsResultListener"></div>
-### OnCommentsResultListener
+#### OnCommentsResultListener
 Methode | Beschreibung
 ------- | ------------
   `void onGetComments(int photoId, List<Comment> comments)` | Wird aufgerufen wenn Kommentare zu einem Photo geladen wurden
