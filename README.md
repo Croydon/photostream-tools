@@ -120,6 +120,65 @@ Methode | Beschreibung
   `void onPhotoDeleted(int photoId)` | Wird aufgerufen wenn eigenes Photo erfolgreich gelöscht worden ist oder ein anderer Nutzer sein Photo gelöscht hat
   `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
 
+### Adapter
+
+#### SimplePhotoAdapter
+
+Dieser Adapter kann verwendet werden um Photos in einer RecyclerView anzuzeigen.
+Um diese Klasse verwenden zu können, müssen Sie von dieser Klasse erben.
+
+Beispiel:
+
+```
+public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
+
+    static final class PhotoViewHolder extends RecyclerView.ViewHolder {
+
+        public ImageView imageView;
+
+        public PhotoViewHolder(View itemView) {
+            super(itemView);
+            imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    itemClickListener.onItemClick(imageView, getAdapterPosition());
+                }
+            });
+
+        }
+    }
+
+    public PhotoAdapter() { }
+
+    @Override
+    public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_stream_item, parent, false);
+        return new PhotoViewHolder(itemView, itemClickListener, deleteClickListener);
+    }
+
+    @Override
+    public void onBindViewHolder(PhotoViewHolder holder, int position) {
+        Photo photo = getItemAtPosition(position);
+        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
+        try {
+            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(photo.getImageFilePath()));
+            holder.imageView.setImageBitmap(bitmap);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onViewRecycled(PhotoViewHolder holder) {
+        super.onViewRecycled(holder);
+        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
+    }
+
+}
+
+```
+
 ## License
 
 The MIT License (MIT)
