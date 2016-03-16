@@ -67,7 +67,7 @@ OnPhotosResultListener   | Abrufen des Photostreams
 OnPhotoLikeListener      | Liken oder Disliken eines Photos
 OnCommentsResultListener | Abrufen von Kommentaren zu einem Photo, Senden von Kommentaren
 OnPhotoUploadListener    | Veröffentlichen eines Photos
-OnSearchPhotosListener   | Suchen im Stream nach Photos
+<a href="#OnSearchPhotosResultListener">OnSearchPhotosListener</div>   | Suchen im Stream nach Photos
 
 #### OnPhotosResultListener
 Methode | Beschreibung
@@ -102,6 +102,7 @@ Methode | Beschreibung
   `void onPhotoUploaded(Photo photo)` | Wird aufgerufen wenn ein Photo erfolgreich an den Server gesendet wurde
   `void onPhotoUploadFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Photos an den Server ein Fehler aufgetreten ist
   
+<div id="OnSearchPhotosResultListener">  
 #### OnSearchPhotosResultListener
 Methode | Beschreibung
 --------- | ------------
@@ -110,6 +111,7 @@ Methode | Beschreibung
   `void onNewPhotoReceived(Photo photo)` | Wird aufgerufen wenn ein eigenes Photo erfolgreich gesendet wurde, oder ein anderer Nutzer ein neues Photo gesendet hat
   `void onPhotoDeleted(int photoId)` | Wird aufgerufen wenn eigenes Photo erfolgreich gelöscht worden ist oder ein anderer Nutzer sein Photo gelöscht hat
   `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
+></div>
 
 ## License
 
