@@ -384,7 +384,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public boolean hasUserAlreadyLikedPhoto(int photoId){
+    public boolean hasUserLikedPhoto(int photoId){
         LikeTable likeTable = new LikeTable(dbConnection);
         likeTable.openDatabase();
         boolean alreadyVoted = likeTable.hasUserLikedPhoto(photoId);

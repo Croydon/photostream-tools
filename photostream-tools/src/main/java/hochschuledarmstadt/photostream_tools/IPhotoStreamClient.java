@@ -69,7 +69,7 @@ public interface IPhotoStreamClient {
     void deletePhoto(Photo photo);
     void likePhoto(int photoId);
     void dislikePhoto(int photoId);
-    boolean hasUserAlreadyLikedPhoto(int photoId);
+    boolean hasUserLikedPhoto(int photoId);
     void getComments(int photoId);
     void sendComment(int photoId, String comment);
     void deleteComment(Comment comment);

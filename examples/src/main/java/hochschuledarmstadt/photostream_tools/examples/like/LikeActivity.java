@@ -49,7 +49,7 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotoLikeListener(this);
         if (savedInstanceState == null){
-            if (!photoStreamClient.hasUserAlreadyLikedPhoto(PHOTO_ID)){
+            if (!photoStreamClient.hasUserLikedPhoto(PHOTO_ID)){
                 likeButton.setText(R.string.like);
                 textView.setText(R.string.status_not_liked);
             }else{
@@ -74,7 +74,7 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
             @Override
             public void onClick(View v) {
                 IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
-                if (!photoStreamClient.hasUserAlreadyLikedPhoto(PHOTO_ID))
+                if (!photoStreamClient.hasUserLikedPhoto(PHOTO_ID))
                     photoStreamClient.likePhoto(PHOTO_ID);
                 else
                     photoStreamClient.dislikePhoto(PHOTO_ID);
