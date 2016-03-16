@@ -103,6 +103,7 @@ Methode | Beschreibung
   `void onPhotoUploadFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Photos an den Server ein Fehler aufgetreten ist
   
 <div id="OnSearchPhotosResultListener">
+<div></div>
 
 #### OnSearchPhotosResultListener
 Methode | Beschreibung
