@@ -74,7 +74,7 @@ Methode | Beschreibung
 --------- | ------------
   `void onPhotosReceived(PhotoQueryResult result)` | Wird aufgerufen wenn das Ergebnis zu dem Funktionsaufruf von `IPhotoStreamClient.getPhotos()` geladen wurde
   `void onReceivePhotosFailed(HttpResult httpResult)` | Wird aufgerufen wenn ein Fehler aufgetreten ist
-  `void onNewPhotoReceived(Photo photo)` | Wird aufgerufen wenn ein eigener Kommentar erfolgreich gesendet wurde, oder ein anderer Nutzer ein neues Photo gesendet hat
+  `void onNewPhotoReceived(Photo photo)` | Wird aufgerufen wenn ein eigenes Photo erfolgreich gesendet wurde, oder ein anderer Nutzer ein neues Photo gesendet hat
   `void onPhotoDeleted(int photoId)` | Wird aufgerufen wenn eigenes Photo erfolgreich gelöscht worden ist oder ein anderer Nutzer sein Photo gelöscht hat
   `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
 
@@ -94,6 +94,22 @@ Methode | Beschreibung
   `void onCommentDeleteFailed(int commentId, HttpResult httpResult)` | Wird aufgerufen wenn ein eigener Kommentar nicht gelöscht werden konnte
   `void onNewComment(Comment comment)` | Wird aufgerufen wenn ein eigener Kommentar erfolgreich gesendet wurde, oder ein anderer Nutzer einen neuen Kommentar gesendet hat
   `void onSendCommentFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Kommentars ein Fehler aufgetreten ist
+
+#### OnPhotoUploadListener
+
+Methode | Beschreibung
+--------- | ------------
+  `void onPhotoUploaded(Photo photo)` | Wird aufgerufen wenn ein Photo erfolgreich an den Server gesendet wurde
+  `void onPhotoUploadFailed(HttpResult httpResult)` | Wird aufgerufen wenn beim Senden eines Photos an den Server ein Fehler aufgetreten ist
+  
+#### OnSearchPhotosResultListener
+Methode | Beschreibung
+--------- | ------------
+  `void onSearchedPhotosReceived(PhotoQueryResult result)` | Wird aufgerufen wenn das Ergebnis zu dem Funktionsaufruf von `IPhotoStreamClient.searchPhotos(String query)` geladen wurde
+  `void onReceiveSearchedPhotosFailed(String query, HttpResult httpResult)` | Wird aufgerufen wenn dabei ein Fehler aufgetreten ist
+  `void onNewPhotoReceived(Photo photo)` | Wird aufgerufen wenn ein eigenes Photo erfolgreich gesendet wurde, oder ein anderer Nutzer ein neues Photo gesendet hat
+  `void onPhotoDeleted(int photoId)` | Wird aufgerufen wenn eigenes Photo erfolgreich gelöscht worden ist oder ein anderer Nutzer sein Photo gelöscht hat
+  `void onPhotoDeleteFailed(int photoId, HttpResult httpResult)` | Wird aufgerufen wenn beim Löschen eines Photos ein Fehler aufgetreten ist
 
 ## License
 
