@@ -12,7 +12,7 @@ compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 
 ## Architektur
 
-<a href="https://raw.githubusercontent.com/aschattney/photostream-tools/master/architecture.png"><img src="https://raw.githubusercontent.com/aschattney/photostream-tools/master/architecture.png" align="center" height="500" ></a>
+<a href="https://raw.githubusercontent.com/aschattney/photostream-tools/master/architecture.png"><img src="https://raw.githubusercontent.com/aschattney/photostream-tools/master/architecture.png" align="center" height="650" ></a>
 
 ## Datenmodell
 
