@@ -51,17 +51,17 @@ public abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends P
         return items.get(position);
     }
 
-    public void prepend(H item){
+    public void addAtFront(H item){
         this.items.add(0, item);
         notifyItemInserted(0);
     }
 
-    public void append(H item){
+    public void add(H item){
         this.items.add(item);
         notifyItemInserted(items.size() - 1);
     }
 
-    public void append(Collection<? extends H> items){
+    public void addAll(Collection<? extends H> items){
         final int itemCountBefore = getItemCount();
         this.items.addAll(items);
         final int lastItemIndex = getItemCount()-1;

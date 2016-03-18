@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ The MIT License
   ~
@@ -22,19 +23,31 @@
   ~ THE SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">PhotoStream Examples</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="header_comments">Comments for Photo With ID = 3</string>
-    <string name="comment_example">CommentExample</string>
-    <string name="photo_example">PhotoExample</string>
-    <string name="title_activity_menu">MenuActivity</string>
-    <string name="examples">Examples</string>
-    <string name="title_activity_test">TestActivity</string>
-    <string name="like">Like</string>
-    <string name="status_liked">Status: Liked</string>
-    <string name="status_not_liked">Status: Not Liked</string>
-    <string name="dislike">Dislike</string>
-    <string name="upload">Photo senden</string>
-    <string name="the_comment">Der Kommentar zu dem Photo</string>
-</resources>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="hochschuledarmstadt.photostream_tools.examples.search.SearchActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:id="@+id/recyclerView"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:id="@+id/button"
+            android:text="Mehr Laden"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <include layout="@layout/progress_circle"/>
+
+</RelativeLayout>

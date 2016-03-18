@@ -35,13 +35,13 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentsResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentsListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-public class CommentActivity extends PhotoStreamActivity implements OnCommentsResultListener {
+public class CommentActivity extends PhotoStreamActivity implements OnCommentsListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
     private static final int PHOTO_ID = 1;
@@ -51,14 +51,14 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-        photoStreamClient.addOnGetCommentsResultListener(this);
+        photoStreamClient.addOnCommentsListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.getComments(PHOTO_ID);
+            photoStreamClient.loadComments(PHOTO_ID);
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-        photoStreamClient.removeOnGetCommentsResultListener(this);
+        photoStreamClient.removeOnCommentsListener(this);
     }
 
     @Override

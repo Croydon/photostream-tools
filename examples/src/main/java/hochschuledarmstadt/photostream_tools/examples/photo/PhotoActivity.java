@@ -38,14 +38,14 @@ import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotosResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotosListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResultListener {
+public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListener {
 
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
@@ -57,14 +57,14 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResult
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-        photoStreamClient.addOnPhotosResultListener(this);
+        photoStreamClient.addOnPhotosListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.getPhotos();
+            photoStreamClient.loadPhotos();
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-        photoStreamClient.removeOnPhotosResultListener(this);
+        photoStreamClient.removeOnPhotosListener(this);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResult
             @Override
             public void onClick(View v) {
                 if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)) {
-                    getPhotoStreamClient().getMorePhotos();
+                    getPhotoStreamClient().loadMorePhotos();
                 }
             }
         });
@@ -121,7 +121,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResult
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
             if (!client.hasOpenRequestsOfType(RequestType.PHOTOS)){
-                getPhotoStreamClient().getPhotos();
+                getPhotoStreamClient().loadPhotos();
             }
             return true;
         }
@@ -136,7 +136,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosResult
             if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
                 adapter.set(result.getPhotos());    // Photos ersetzen
             }else{
-                adapter.append(result.getPhotos()); // Photos anhängen
+                adapter.addAll(result.getPhotos()); // Photos anhängen
             }
         }else{
             //Aktueller Request lieferte keine Bilder, also kann der Button verschwinden

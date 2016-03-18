@@ -37,6 +37,8 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +47,10 @@ public class BitmapUtils {
 
     private static final String TAG = BitmapUtils.class.getName();
 
+    /**
+     * Entfernt ein zur ImageView zugeordnetes Bitmap aus dem Speicher
+     * @param imageView ImageView welches das Bitmap anzeigt
+     */
     public static void recycleBitmapFromImageViewIfNecessary(ImageView imageView) {
         if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof BitmapDrawable){
             final Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
@@ -52,16 +58,56 @@ public class BitmapUtils {
         }
     }
 
-    private static void recycleBitmap(Bitmap bitmap){
+    /**
+     * Entfernt ein Bitmap aus dem Speicher
+     * @param bitmap das Bitmap
+     */
+    public static void recycleBitmap(Bitmap bitmap){
         if (bitmap != null && !bitmap.isRecycled())
             bitmap.recycle();
     }
 
+    private static final int TYPE_ASSET = -1;
+    private static final int TYPE_FILE = -2;
+    private static final int TYPE_OTHER = -3;
+
+    public static Bitmap decodeBitmapFromAssetFile(Context context, String assetFileName) throws FileNotFoundException {
+        return internalDecodeBitmap(context, Uri.parse(String.format("assets://%s", assetFileName)), TYPE_ASSET);
+    }
+
+    public static Bitmap decodeBitmapFromFile(Context context, File file) throws FileNotFoundException {
+        return internalDecodeBitmap(context, Uri.fromFile(file), TYPE_FILE);
+    }
+
+    /**
+     * Lädt ein Bitmap anhand einer Uri
+     * @param context Android Context
+     * @param uri bitmap source
+     * @return Bitmap
+     * @throws FileNotFoundException wird geworfen, wenn der Uri nicht aufgelöst werden konnte
+     */
     public static Bitmap decodeBitmapFromUri(Context context, Uri uri) throws FileNotFoundException {
-        final ContentResolver contentResolver = context.getContentResolver();
-        BitmapFactory.Options options = lessResolution(contentResolver.openInputStream(uri), 400, 400);
-        Bitmap bm = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options);
+        return internalDecodeBitmap(context, uri, TYPE_OTHER);
+    }
+
+
+    private static InputStream getInputStream(Context context, Uri uri, int type) throws IOException {
+        switch(type){
+            case TYPE_ASSET:
+                return context.getAssets().open(uri.toString().replace("assets://", ""));
+            case TYPE_FILE:
+                return new FileInputStream(uri.toString());
+            case TYPE_OTHER:
+                return context.getContentResolver().openInputStream(uri);
+        }
+        return null;
+    }
+
+    private static Bitmap internalDecodeBitmap(Context context, Uri uri, int type) throws FileNotFoundException {
+        Bitmap bm = null;
         try {
+            BitmapFactory.Options options = lessResolution(getInputStream(context, uri, type), 400, 400);
+            bm = BitmapFactory.decodeStream(getInputStream(context, uri, type), null, options);
             ExifInterface exif = new ExifInterface(getRealPathFromURI(context, uri));
             String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
             int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;
@@ -130,6 +176,11 @@ public class BitmapUtils {
         return result;
     }
 
+    /**
+     * Konvertiert ein Bitmap {@code bitmap} in ein Byte Array
+     * @param bitmap das zu konvertierende Bitmap
+     * @return Byte Array
+     */
     public static byte[] bitmapToBytes(Bitmap bitmap) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bos);

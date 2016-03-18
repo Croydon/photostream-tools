@@ -72,6 +72,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         }catch(Exception e){
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         }
+        bound = false;
         refSavedInstanceState = null;
         super.onDestroy();
     }

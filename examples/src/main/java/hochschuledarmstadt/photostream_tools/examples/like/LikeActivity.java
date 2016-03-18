@@ -77,7 +77,7 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
                 if (!photoStreamClient.hasUserLikedPhoto(PHOTO_ID))
                     photoStreamClient.likePhoto(PHOTO_ID);
                 else
-                    photoStreamClient.dislikePhoto(PHOTO_ID);
+                    photoStreamClient.resetLikeForPhoto(PHOTO_ID);
             }
         });
 

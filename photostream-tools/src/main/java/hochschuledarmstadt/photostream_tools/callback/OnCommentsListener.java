@@ -29,7 +29,7 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-public interface OnCommentsResultListener extends OnRequestListener {
+public interface OnCommentsListener extends OnRequestListener {
     void onGetComments(int photoId, List<Comment> comments);
     void onGetCommentsFailed(int photoId, HttpResult httpResult);
     void onCommentDeleted(int commentId);
