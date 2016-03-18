@@ -8,6 +8,21 @@ Als Dependency in der build.gradle deklarieren:
 compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
 ```
 
+## Server Adresse
+
+Im Android Manifest:
+
+```xml
+...
+<application>
+  ...
+    <meta-data
+        android:name="PHOTOSTREAM_URL"
+        android:value="http://ip:port" />
+  ...
+</application>
+```
+
 ## Verwendung
 
 <a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-tools/tree/master/examples">Beispielprojekt</a> ansehen
