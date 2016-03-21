@@ -29,9 +29,9 @@ import android.content.Context;
 /**
  * Created by Andreas Schattney on 15.03.2016.
  */
-class GetMorePhotosAsyncTask extends GetPhotosAsyncTask {
-    public GetMorePhotosAsyncTask(Context context, String installationId, String uri, GetPhotosCallback callback) {
-        super(context, installationId, uri, -1, callback);
+class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
+    public LoadMorePhotosAsyncTask(Context context, String installationId, String uri, GetPhotosCallback callback) {
+        super(context, installationId, uri, null, -1, callback);
     }
 
     @Override

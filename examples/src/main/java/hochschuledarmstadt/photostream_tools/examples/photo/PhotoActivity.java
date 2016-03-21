@@ -59,7 +59,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotosListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.loadPhotos();
+            photoStreamClient.loadPhotos(adapter.getItemCount() > 0);
     }
 
     @Override
@@ -95,7 +95,9 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
             }
         });
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null){
+            loadMoreButton.setVisibility(Button.GONE);
+        }else{
             boolean buttonVisible = savedInstanceState.getInt(KEY_BUTTON_VISIBILITY) == 1;
             loadMoreButton.setVisibility(buttonVisible ? Button.VISIBLE : Button.GONE);
             adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
@@ -121,7 +123,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
             if (!client.hasOpenRequestsOfType(RequestType.PHOTOS)){
-                getPhotoStreamClient().loadPhotos();
+                getPhotoStreamClient().loadPhotos(adapter.getItemCount() > 0);
             }
             return true;
         }
@@ -130,18 +132,12 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
 
     @Override
     public void onPhotosReceived(PhotoQueryResult result) {
-        final int photosCount = result.getPhotos().size();
-        if (photosCount > 0) {
-            loadMoreButton.setVisibility(View.VISIBLE);     // Möglicherweise sind noch weitere Bilder abrufbar
-            if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
-                adapter.set(result.getPhotos());    // Photos ersetzen
-            }else{
-                adapter.addAll(result.getPhotos()); // Photos anhängen
-            }
+        if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
+            adapter.set(result.getPhotos());    // Photos ersetzen
         }else{
-            //Aktueller Request lieferte keine Bilder, also kann der Button verschwinden
-            loadMoreButton.setVisibility(View.GONE);
+            adapter.addAll(result.getPhotos()); // Photos anhängen
         }
+        loadMoreButton.setVisibility(result.hasNextPage() ? Button.VISIBLE : Button.GONE);
     }
 
     @Override
@@ -150,6 +146,11 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
         String title = "Could not load photos";
         String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
         Utils.showSimpleAlertDialog(this, title, message);
+    }
+
+    @Override
+    public void onNoNewPhotos() {
+
     }
 
 

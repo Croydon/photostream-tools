@@ -85,8 +85,9 @@ public interface IPhotoStreamClient {
 
     /**
      * Lädt die erste Seite von Photos aus dem Stream
+     * @param photosDisplayedInStream {@code true} übergeben, wenn Photos im lokalen Stream vorhanden sind, ansonsten {@code false}
      */
-    void loadPhotos();
+    void loadPhotos(boolean photosDisplayedInStream);
 
     /**
      * Lädt die nächste Seite von Photos aus dem Stream.

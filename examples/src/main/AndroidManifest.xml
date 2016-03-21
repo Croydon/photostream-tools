@@ -25,15 +25,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name="hochschuledarmstadt.photostream_tools.PhotoStreamService" />
-
         <meta-data
             android:name="PHOTOSTREAM_URL"
             android:value="http://5.45.97.155:8082" />
 
         <activity android:name=".like.LikeActivity" />
         <activity android:name=".upload.PhotoUploadActivity" />
-        <activity android:name=".search.SearchActivity"></activity>
+        <activity android:name=".search.SearchActivity"/>
     </application>
 
 </manifest>

@@ -25,15 +25,12 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
@@ -42,7 +39,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
-    private static final String TAG = GetPhotosAsyncTask.class.getName();
+    private static final String TAG = SearchPhotosAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;
     private final Context context;
     private final String installationId;

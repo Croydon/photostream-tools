@@ -87,6 +87,8 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
         writer.close();
         final int status = urlConnection.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK){
+            String newEtag = urlConnection.getHeaderField("ETag");
+            callback.onNewETag(newEtag);
             String result = convertStreamToString(urlConnection.getInputStream());
             Photo photo = new Gson().fromJson(result, Photo.class);
             return photo;
@@ -114,6 +116,7 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     public interface OnPhotoStoredCallback {
         void onPhotoStoreSuccess(Photo photo);
         void onPhotoStoreError(HttpResult httpResult);
+        void onNewETag(String eTag);
     }
 
 }

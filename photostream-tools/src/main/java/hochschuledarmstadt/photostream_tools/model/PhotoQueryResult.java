@@ -32,6 +32,9 @@ import java.util.List;
 
 public class PhotoQueryResult {
 
+    @SerializedName("has_next_page")
+    @Expose
+    private boolean nextPage;
     @SerializedName("page")
     @Expose
     private Integer page;
@@ -58,4 +61,12 @@ public class PhotoQueryResult {
     }
 
 
+    /**
+     *
+     * @return
+     * {@code true} if there is another page with more data, {@code false} otherweise
+     */
+    public boolean hasNextPage() {
+        return nextPage;
+    }
 }

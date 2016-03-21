@@ -42,6 +42,7 @@ import java.io.IOException;
 public class Photo implements Parcelable, Id{
 
     private static final String TAG = Photo.class.getName();
+    public static final String FILENAME_FORMAT = "%s.jpg";
 
     @SerializedName("image")
     @Expose
@@ -58,6 +59,9 @@ public class Photo implements Parcelable, Id{
     @SerializedName("deleteable")
     @Expose
     private boolean deleteable;
+    @SerializedName("comment_count")
+    @Expose
+    private int commentCount;
 
     /**
      *
@@ -97,6 +101,10 @@ public class Photo implements Parcelable, Id{
      */
     public boolean isDeleteable() {
         return deleteable;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
     }
 
     protected Photo(Parcel in) {
@@ -139,9 +147,19 @@ public class Photo implements Parcelable, Id{
         this.id = id;
     }
 
-    public void saveToImageToCache(Context context) throws IOException {
+    private static String getImageFileName(int id){
+        return String.format(FILENAME_FORMAT, id);
+    }
 
-        String filename = String.format("%s.jpg", id);
+    private static File concatImageFilePath(Context context, String imageFileName){
+        return new File(context.getFilesDir(), imageFileName);
+    }
+
+    public boolean saveToImageToCache(Context context) throws IOException {
+
+        boolean inCache = false;
+
+        String filename = getImageFileName(id);
         if (!imageExistsOnFileSystem(context, filename)) {
             FileOutputStream outputStream = null;
             try {
@@ -150,7 +168,8 @@ public class Photo implements Parcelable, Id{
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
-                imageFilePath = new File(context.getFilesDir(), filename).getAbsolutePath();
+                imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
+                inCache = true;
             } catch (Exception e) {
 
             } finally {
@@ -158,8 +177,11 @@ public class Photo implements Parcelable, Id{
                     outputStream.close();
             }
         }else{
-            imageFilePath = new File(context.getFilesDir(), filename).getAbsolutePath();
+            inCache = true;
+            imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
         }
+
+        return inCache;
 
     }
 
@@ -169,5 +191,9 @@ public class Photo implements Parcelable, Id{
             return false;
         }
         return true;
+    }
+
+    public static File getImageFilePathForPhotoId(Context context, int photoId) {
+        return concatImageFilePath(context, getImageFileName(photoId));
     }
 }

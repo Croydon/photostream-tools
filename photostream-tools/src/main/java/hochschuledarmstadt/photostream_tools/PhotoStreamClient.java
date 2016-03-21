@@ -24,8 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
@@ -34,6 +38,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,6 +67,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     private static final String TAG = PhotoStreamService.class.getName();
     public static final String INTENT_NEW_PHOTO = "hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO";
+    public static final String INTENT_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
 
     private final String installationId;
     private final Context context;
@@ -70,6 +76,8 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
     private String lastQuery;
+    private String loadPhotosETag;
+    private BroadcastReceiver internetAvailableBroadcastReceiver;
 
     public PhotoStreamClient(Context context, String photoStreamUrl, DbConnection dbConnection, String installationId){
         this.context = context;
@@ -88,8 +96,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     void destroy() {
         openRequests.clear();
+        unregisterInternetAvailableBroadcastReceiver();
         if (webSocketClient != null)
             webSocketClient.disconnect();
+
     }
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
@@ -151,14 +161,31 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     void bootstrap(){
+        internetAvailableBroadcastReceiver = new BroadcastReceiver(){
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (isOnline() && !webSocketClient.isConnected())
+                    webSocketClient.connect();
+                else if(!isOnline()){
+                    webSocketClient.disconnect();
+                }
+            }
+        };
         webSocketClient = new WebSocketClient(photoStreamUrl, installationId, this);
         webSocketClient.connect();
     }
 
     @Override
-    public void loadPhotos() {
+    public void loadPhotos(boolean photosDisplayedInStream) {
+
+        if (!photosDisplayedInStream){
+            loadPhotosETag = null;
+        }
+
         final RequestType requestType = RequestType.PHOTOS;
-        GetPhotosAsyncTask task = new GetPhotosAsyncTask(context, installationId, photoStreamUrl, 1, new GetPhotosAsyncTask.GetPhotosCallback() {
+
+        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(context, installationId, photoStreamUrl, loadPhotosETag, 1, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -171,6 +198,18 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPhotosFailed(httpResult);
+            }
+
+            @Override
+            public void onNewETag(String eTag) {
+                loadPhotosETag = eTag;
+            }
+
+            @Override
+            public void onNoNewPhotos() {
+                removeOpenRequest(requestType);
+                determineShouldDismissProgressDialog(requestType);
+                notifyOnNoNewPhotos();
             }
 
         });
@@ -179,10 +218,21 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         task.execute();
     }
 
+    private void notifyOnNoNewPhotos() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (OnPhotosListener onPhotosListener : onPhotosListeners) {
+                    onPhotosListener.onNoNewPhotos();
+                }
+            }
+        });
+    }
+
     @Override
     public void loadMorePhotos() {
         final RequestType requestType = RequestType.PHOTOS;
-        GetMorePhotosAsyncTask task = new GetMorePhotosAsyncTask(context, installationId, photoStreamUrl, new GetPhotosAsyncTask.GetPhotosCallback() {
+        LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(context, installationId, photoStreamUrl, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -195,6 +245,16 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
                 notifyOnPhotosFailed(httpResult);
+            }
+
+            @Override
+            public void onNewETag(String eTag) {
+
+            }
+
+            @Override
+            public void onNoNewPhotos() {
+
             }
         });
         addOpenRequest(requestType);
@@ -658,12 +718,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         public boolean connect() {
             IO.Options options = new IO.Options();
             try {
-                //options.sslContext = AndroidSocket.createSslContext();
-                options.reconnectionDelay = 5000;
+                options.reconnectionDelay = 10000;
                 options.reconnection = true;
-                //options.secure = true;
                 options.transports = new String[]{WebSocket.NAME};
-                options.reconnectionAttempts = 12;
+                options.reconnectionAttempts = 10;
 
                 URI uri = URI.create(url + "/?token=" + installationId);
                 if (androidSocket == null)
@@ -682,9 +740,16 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         public void disconnect() {
             androidSocket.disconnect();
         }
+
+        public boolean isConnected() {
+            return androidSocket.isConnected();
+        }
     }
 
     private void notifyOnPhotoDeleted(int photoId) {
+        File file = Photo.getImageFilePathForPhotoId(context, photoId);
+        if (file.exists())
+            file.delete();
         RequestType[] requestTypes = new RequestType[]{RequestType.PHOTOS, RequestType.SEARCH};
         for (RequestType requestType : requestTypes){
             Collection<OnPhotoListener> listeners = getCallbacksForType(requestType, OnPhotoListener.class);
@@ -715,6 +780,11 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
                 determineShouldDismissProgressDialog(requestType);
                 Logger.log(TAG, LogLevel.INFO, "onPhotoStoreError()");
                 notifyPhotoUploadFailed(httpResult);
+            }
+
+            @Override
+            public void onNewETag(String eTag) {
+                loadPhotosETag = eTag;
             }
 
         });
@@ -764,6 +834,42 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void onPhotoDeleted(int photoId) {
         notifyOnPhotoDeleted(photoId);
+    }
+
+    @Override
+    public void onConnect() {
+        registerInternetAvailableBroadcastReceiver();
+    }
+
+    private void registerInternetAvailableBroadcastReceiver() {
+        try{
+            context.unregisterReceiver(internetAvailableBroadcastReceiver);
+        }catch(Exception e){ }
+    }
+
+    @Override
+    public void onDisconnect() {
+        unregisterInternetAvailableBroadcastReceiver();
+    }
+
+    private void unregisterInternetAvailableBroadcastReceiver() {
+        try{
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(INTENT_CONNECTIVITY_CHANGE);
+            context.registerReceiver(internetAvailableBroadcastReceiver, intentFilter);
+        }catch(Exception e){ }
+    }
+
+    private boolean isOnline(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(activeNetworkInfo == null){
+            return false;
+        } else {
+            NetworkInfo.State state = activeNetworkInfo.getState();
+            return state == NetworkInfo.State.CONNECTED;
+        }
     }
 
 }

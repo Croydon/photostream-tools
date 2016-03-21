@@ -107,7 +107,7 @@ class AndroidSocket {
         if (socket != null && socket.connected()){
             socket.disconnect();
         }
-        return !socket.connected();
+        return socket == null || !socket.connected();
     }
 
     private void initializeSocket(){
@@ -122,7 +122,7 @@ class AndroidSocket {
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-               // onMessageListener.onConnect();
+               onMessageListener.onConnect();
             }
         });
 
@@ -143,7 +143,7 @@ class AndroidSocket {
         socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-              //  onMessageListener.onDisconnect();
+              onMessageListener.onDisconnect();
             }
         });
 
@@ -212,5 +212,7 @@ class AndroidSocket {
         void onNewComment(Comment comment);
         void onCommentDeleted(int commentId);
         void onPhotoDeleted(int photoId);
+        void onConnect();
+        void onDisconnect();
     }
 }
