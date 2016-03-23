@@ -4,10 +4,13 @@ Diese Bibliothek ist Teil des Praktikums vom Kurs <i>Nutzerzentrierte Softwareen
 
 ## Gradle
 
-Als Dependency in der build.gradle deklarieren:
+Als Abhängigkeit in der build.gradle deklarieren:
 
 ```gradle
-compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
+dependencies {
+  ...
+  compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
+}
 ```
 
 ## Server Adresse
