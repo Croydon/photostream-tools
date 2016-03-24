@@ -47,11 +47,15 @@ public class BitmapUtils {
 
     private static final String TAG = BitmapUtils.class.getName();
 
+    private static final int TYPE_ASSET = -1;
+    private static final int TYPE_FILE = -2;
+    private static final int TYPE_OTHER = -3;
+
     /**
      * Entfernt ein zur ImageView zugeordnetes Bitmap aus dem Speicher
      * @param imageView ImageView welches das Bitmap anzeigt
      */
-    public static void recycleBitmapFromImageViewIfNecessary(ImageView imageView) {
+    public static void recycleBitmapFromImageView(ImageView imageView) {
         if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof BitmapDrawable){
             final Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
             recycleBitmap(bitmap);
@@ -66,10 +70,6 @@ public class BitmapUtils {
         if (bitmap != null && !bitmap.isRecycled())
             bitmap.recycle();
     }
-
-    private static final int TYPE_ASSET = -1;
-    private static final int TYPE_FILE = -2;
-    private static final int TYPE_OTHER = -3;
 
     public static Bitmap decodeBitmapFromAssetFile(Context context, String assetFileName) throws FileNotFoundException {
         return internalDecodeBitmap(context, Uri.parse(String.format("assets://%s", assetFileName)), TYPE_ASSET);

@@ -149,7 +149,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
     }
 
     @Override
-    public void onNoNewPhotos() {
+    public void onNoNewPhotosAvailable() {
 
     }
 

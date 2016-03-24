@@ -30,5 +30,5 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 public interface OnPhotosListener extends OnPhotoListener {
     void onPhotosReceived(PhotoQueryResult result);
     void onReceivePhotosFailed(HttpResult httpResult);
-    void onNoNewPhotos();
+    void onNoNewPhotosAvailable();
 }

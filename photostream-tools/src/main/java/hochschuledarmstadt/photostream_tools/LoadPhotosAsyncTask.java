@@ -25,10 +25,8 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
-import com.squareup.okhttp.HttpUrl;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -101,7 +99,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             }
             return photoQueryResult;
         }else if(httpResponseCode == HttpURLConnection.HTTP_NOT_MODIFIED){
-            callback.onNoNewPhotos();
+            callback.onNoNewPhotosAvailable();
         }else {
             HttpResult httpResult = getHttpErrorResult(urlConnection.getErrorStream());
             throw new HttpPhotoStreamException(httpResult);
@@ -126,7 +124,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
         void onPhotosError(HttpResult httpResult);
         void onNewETag(String eTag);
-        void onNoNewPhotos();
+        void onNoNewPhotosAvailable();
     }
 
 }

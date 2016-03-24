@@ -24,7 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +54,7 @@ public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.
 
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
-        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
+        BitmapUtils.recycleBitmapFromImageView(holder.imageView);
         Photo photo = getItemAtPosition(position);
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
         holder.imageView.setImageBitmap(bitmap);
@@ -64,7 +63,7 @@ public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.
 
     @Override
     public void onViewRecycled(PhotoViewHolder holder) {
-        BitmapUtils.recycleBitmapFromImageViewIfNecessary(holder.imageView);
+        BitmapUtils.recycleBitmapFromImageView(holder.imageView);
         super.onViewRecycled(holder);
     }
 

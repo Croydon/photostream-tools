@@ -77,7 +77,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         super.onDestroy();
     }
 
-    protected boolean connectedToService() {
+    protected boolean isConnectedToService() {
         return photoStreamClient != null && bound;
     }
 

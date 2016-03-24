@@ -206,10 +206,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onNoNewPhotos() {
+            public void onNoNewPhotosAvailable() {
                 removeOpenRequest(requestType);
                 determineShouldDismissProgressDialog(requestType);
-                notifyOnNoNewPhotos();
+                notifyOnNoNewPhotosAvailable();
             }
 
         });
@@ -218,12 +218,12 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         task.execute();
     }
 
-    private void notifyOnNoNewPhotos() {
+    private void notifyOnNoNewPhotosAvailable() {
         handler.post(new Runnable() {
             @Override
             public void run() {
                 for (OnPhotosListener onPhotosListener : onPhotosListeners) {
-                    onPhotosListener.onNoNewPhotos();
+                    onPhotosListener.onNoNewPhotosAvailable();
                 }
             }
         });
@@ -253,7 +253,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onNoNewPhotos() {
+            public void onNoNewPhotosAvailable() {
 
             }
         });
