@@ -1,11 +1,16 @@
 # photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
 
+Diese Bibliothek ist Teil des Praktikums vom Kurs <i>Nutzerzentrierte Softwareentwicklung</i> der Hochschule Darmstadt für das Wintersemester 16/17
+
 ## Gradle
 
-Als Dependency in der build.gradle deklarieren:
+Als Abhängigkeit in der build.gradle deklarieren:
 
 ```gradle
-compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.15'
+dependencies {
+  ...
+  compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.24'
+}
 ```
 
 ## Server Adresse
