@@ -69,7 +69,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public static final String INTENT_NEW_PHOTO = "hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO";
     public static final String INTENT_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
 
-    private final String installationId;
+    private final String androidId;
     private final Context context;
     private final String photoStreamUrl;
     private DbConnection dbConnection;
@@ -79,11 +79,11 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     private String loadPhotosETag;
     private BroadcastReceiver internetAvailableBroadcastReceiver;
 
-    public PhotoStreamClient(Context context, String photoStreamUrl, DbConnection dbConnection, String installationId){
+    public PhotoStreamClient(Context context, String photoStreamUrl, DbConnection dbConnection, String androidId){
         this.context = context;
         this.photoStreamUrl = photoStreamUrl;
         this.dbConnection = dbConnection;
-        this.installationId = installationId;
+        this.androidId = androidId;
     }
 
     private ArrayList<OnPhotosListener> onPhotosListeners = new ArrayList<>();
@@ -172,7 +172,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
                 }
             }
         };
-        webSocketClient = new WebSocketClient(photoStreamUrl, installationId, this);
+        webSocketClient = new WebSocketClient(photoStreamUrl, androidId, this);
         webSocketClient.connect();
     }
 
@@ -185,7 +185,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
         final RequestType requestType = RequestType.PHOTOS;
 
-        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(context, installationId, photoStreamUrl, loadPhotosETag, 1, new LoadPhotosAsyncTask.GetPhotosCallback() {
+        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(context, androidId, photoStreamUrl, loadPhotosETag, 1, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -232,7 +232,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void loadMorePhotos() {
         final RequestType requestType = RequestType.PHOTOS;
-        LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(context, installationId, photoStreamUrl, new LoadPhotosAsyncTask.GetPhotosCallback() {
+        LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(context, androidId, photoStreamUrl, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -409,7 +409,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public void likePhoto(int photoId) {
         final RequestType requestType = RequestType.LIKE;
         LikeTable likeTable = new LikeTable(DbConnection.getInstance(context));
-        LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(likeTable, installationId, photoStreamUrl, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
+        LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(likeTable, androidId, photoStreamUrl, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
 
             @Override
             public void onPhotoLiked(int photoId) {
@@ -455,7 +455,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void loadComments(int photoId){
         final RequestType requestType = RequestType.COMMENT;
-        GetCommentsAsyncTask task = new GetCommentsAsyncTask(installationId, photoStreamUrl, photoId, new GetCommentsAsyncTask.OnCommentsResultListener() {
+        GetCommentsAsyncTask task = new GetCommentsAsyncTask(androidId, photoStreamUrl, photoId, new GetCommentsAsyncTask.OnCommentsResultListener() {
 
             @Override
             public void onGetComments(int photoId, List<Comment> comments) {
@@ -491,7 +491,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public void resetLikeForPhoto(int photoId) {
         final RequestType requestType = RequestType.LIKE;
         LikeTable likeTable = new LikeTable(DbConnection.getInstance(context));
-        LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(likeTable, installationId, photoStreamUrl, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
+        LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(likeTable, androidId, photoStreamUrl, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
             @Override
             public void onPhotoLiked(int photoId) {
                 removeOpenRequest(requestType);
@@ -521,7 +521,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void deleteComment(Comment comment) {
         final RequestType requestType = RequestType.COMMENT;
-        DeleteCommentAsyncTask task = new DeleteCommentAsyncTask(installationId, photoStreamUrl, comment.getId(), new DeleteCommentAsyncTask.OnDeleteCommentResultListener() {
+        DeleteCommentAsyncTask task = new DeleteCommentAsyncTask(androidId, photoStreamUrl, comment.getId(), new DeleteCommentAsyncTask.OnDeleteCommentResultListener() {
             @Override
             public void onCommentDeleted(int commentId) {
                 removeOpenRequest(requestType);
@@ -546,7 +546,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public void deletePhoto(final Photo photo){
         final RequestType requestType = RequestType.PHOTOS;
         final int photoId = photo.getId();
-        DeletePhotoAsyncTask task = new DeletePhotoAsyncTask(installationId, photoStreamUrl, photoId, new DeletePhotoAsyncTask.OnDeletePhotoResultListener() {
+        DeletePhotoAsyncTask task = new DeletePhotoAsyncTask(androidId, photoStreamUrl, photoId, new DeletePhotoAsyncTask.OnDeletePhotoResultListener() {
 
             @Override
             public void onPhotoDeleted(int photoId) {
@@ -592,7 +592,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void uploadComment(int photoId, String comment) {
         final RequestType requestType = RequestType.COMMENT;
-        StoreCommentAsyncTask task = new StoreCommentAsyncTask(installationId, photoStreamUrl, photoId, comment, new StoreCommentAsyncTask.OnCommentSentListener() {
+        StoreCommentAsyncTask task = new StoreCommentAsyncTask(androidId, photoStreamUrl, photoId, comment, new StoreCommentAsyncTask.OnCommentSentListener() {
             @Override
             public void onCommentSent(Comment comment) {
                 removeOpenRequest(requestType);
@@ -647,7 +647,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void searchMorePhotos(){
         final RequestType requestType = RequestType.SEARCH;
-        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(context, installationId, photoStreamUrl, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(context, androidId, photoStreamUrl, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 removeOpenRequest(requestType);
@@ -670,7 +670,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void searchPhotos(final String query) {
         final RequestType requestType = RequestType.SEARCH;
-        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(context, installationId, photoStreamUrl, query, 1, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(context, androidId, photoStreamUrl, query, 1, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 lastQuery = query;
@@ -764,7 +764,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException {
         final RequestType requestType = RequestType.UPLOAD;
         final JSONObject jsonObject = createJsonObject(imageBytes, comment);
-        StorePhotoAsyncTask task = new StorePhotoAsyncTask(installationId, photoStreamUrl, new StorePhotoAsyncTask.OnPhotoStoredCallback() {
+        StorePhotoAsyncTask task = new StorePhotoAsyncTask(androidId, photoStreamUrl, new StorePhotoAsyncTask.OnPhotoStoredCallback() {
             @Override
             public void onPhotoStoreSuccess(Photo photo) {
                 removeOpenRequest(requestType);
