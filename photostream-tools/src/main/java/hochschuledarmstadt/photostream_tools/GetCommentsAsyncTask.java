@@ -70,7 +70,7 @@ class GetCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult>
     }
 
     private CommentQueryResult getComments() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/image/%s/comments", uri, photoId);
+        final String url = String.format("%s/photostream/api/image/%s/comments", uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setDoInput(true);
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);

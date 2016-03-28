@@ -77,7 +77,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     }
 
     protected String buildUrl(String uri, int page){
-        return String.format("%s/photostream/stream", uri);
+        return String.format("%s/photostream/api/stream", uri);
     }
 
     private PhotoQueryResult getPhotos() throws IOException, HttpPhotoStreamException {

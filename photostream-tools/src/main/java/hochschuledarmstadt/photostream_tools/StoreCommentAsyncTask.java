@@ -108,7 +108,7 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
     }
 
     private String buildUri() {
-        return String.format("%s/photostream/image/%s/comment", uri, photoId);
+        return String.format("%s/photostream/api/image/%s/comment", uri, photoId);
     }
 
     @Override

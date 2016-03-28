@@ -36,6 +36,6 @@ class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
 
     @Override
     protected String buildUrl(String uri, int page) {
-        return String.format("%s/photostream/stream/more", uri);
+        return String.format("%s/photostream/api/stream/more", uri);
     }
 }

@@ -63,7 +63,7 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
     }
 
     private void deleteComment() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/comment/%s", uri, commentId);
+        final String url = String.format("%s/photostream/api/comment/%s", uri, commentId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("DELETE");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);

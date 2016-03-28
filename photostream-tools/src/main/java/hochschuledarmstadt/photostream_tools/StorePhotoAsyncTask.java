@@ -98,7 +98,7 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     }
 
     private String buildUri() {
-        return String.format("%s/photostream/image", uri);
+        return String.format("%s/photostream/api/image", uri);
     }
 
     @Override

@@ -31,7 +31,7 @@ class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
     }
 
     protected String buildUri(String uri, int photoId) {
-        return String.format("%s/photostream/image/%s/like", uri, photoId);
+        return String.format("%s/photostream/api/image/%s/like", uri, photoId);
     }
 
     @Override

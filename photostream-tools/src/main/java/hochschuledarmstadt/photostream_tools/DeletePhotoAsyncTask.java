@@ -60,7 +60,7 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
     }
 
     private void deletePhoto() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/image/%s", uri, photoId);
+        final String url = String.format("%s/photostream/api/image/%s", uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("DELETE");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);

@@ -36,6 +36,6 @@ class SearchMorePhotosAsyncTask extends SearchPhotosAsyncTask {
 
     @Override
     protected String buildUrl(String uri, int page) {
-        return String.format("%s/photostream/search/more", uri);
+        return String.format("%s/photostream/api/search/more", uri);
     }
 }
