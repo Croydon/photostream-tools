@@ -28,6 +28,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
+
 public abstract class PhotoStreamFragment extends Fragment implements OnServiceStateChangedListener {
 
     private boolean serviceDisconnectCalled;
@@ -36,7 +38,7 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
     protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient service, Bundle savedInstanceState);
     protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient service);
 
-    private IPhotoStreamClient photoStreamClient;
+    private PhotoStreamClient photoStreamClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,8 +64,18 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
 
     @Override
     public void onServiceConnected(IPhotoStreamClient client) {
-        photoStreamClient = client;
+        photoStreamClient = (PhotoStreamClient) client;
         onPhotoStreamServiceConnected(client, refSavedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (isConnectedToService()){
+            if (getActivity().isFinishing() && this instanceof OnPhotosReceivedListener) {
+                photoStreamClient.resetEtag();
+            }
+        }
     }
 
     @Override

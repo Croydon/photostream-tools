@@ -24,11 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
-import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
+import java.util.List;
 
-public interface OnPhotosListener extends OnPhotoListener {
-    void onPhotosReceived(PhotoQueryResult result);
-    void onReceivePhotosFailed(HttpResult httpResult);
-    void onNoNewPhotosAvailable();
+import hochschuledarmstadt.photostream_tools.model.Comment;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
+
+public interface OnCommentsReceivedListener extends OnRequestListener {
+    void onCommentsReceived(int photoId, List<Comment> comments);
+    void onReceiveCommentsFailed(int photoId, HttpResult httpResult);
 }

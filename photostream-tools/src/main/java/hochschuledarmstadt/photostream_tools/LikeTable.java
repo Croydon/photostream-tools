@@ -62,7 +62,7 @@ class LikeTable {
         }
     }
 
-    public boolean insertLike(int photoId){
+    public boolean like(int photoId){
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_PHOTO_ID, photoId);
         cv.put(COLUMN_LIKED, true);

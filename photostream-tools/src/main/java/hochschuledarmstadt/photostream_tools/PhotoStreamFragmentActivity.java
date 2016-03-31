@@ -32,6 +32,8 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
 
     private ArrayList<OnServiceStateChangedListener> serviceStateChangedListeners = new ArrayList<>();
 
+    boolean alreadyNotified = false;
+
     @Override
     public void removeOnServiceStateChangedListener(OnServiceStateChangedListener onServiceStateChangedListener) {
         if (serviceStateChangedListeners.contains(onServiceStateChangedListener))
@@ -40,10 +42,11 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
 
     @Override
     public void addOnServiceStateChangedListener(OnServiceStateChangedListener onServiceStateChangedListener) {
-        if (!serviceStateChangedListeners.contains(onServiceStateChangedListener))
+        if (!serviceStateChangedListeners.contains(onServiceStateChangedListener)) {
             serviceStateChangedListeners.add(onServiceStateChangedListener);
-        if (getPhotoStreamClient() != null)
-            notifyOnServiceConnected(getPhotoStreamClient());
+            if (isConnectedToService())
+                onServiceStateChangedListener.onServiceConnected(getPhotoStreamClient());
+        }
     }
 
     /**
@@ -62,12 +65,18 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
     }
 
     private void notifyOnServiceConnected(IPhotoStreamClient photoStreamClient){
-        for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
-            onServiceStateChangedListener.onServiceConnected(photoStreamClient);
+        if (!serviceStateChangedListeners.isEmpty()) {
+            if (!alreadyNotified) {
+                alreadyNotified = true;
+                for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
+                    onServiceStateChangedListener.onServiceConnected(photoStreamClient);
+            }
+        }
     }
 
     private void notifyOnServiceDisconnected(IPhotoStreamClient photoStreamClient){
         for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
             onServiceStateChangedListener.onServiceDisconnected(photoStreamClient);
+        alreadyNotified = false;
     }
 }

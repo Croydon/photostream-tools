@@ -80,14 +80,15 @@ public class MenuActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 final MenuItemWrapper menuItem = menuAdapter.getItemAtPosition(position);
-                Intent intent = new Intent(MenuActivity.this, menuItem.getActivityClass());
+                Class<? extends PhotoStreamActivity> clazz = menuItem.getActivityClass();
+                Intent intent = new Intent(MenuActivity.this, clazz);
                 startActivity(intent);
             }
         });
         recyclerView.setAdapter(menuAdapter);
     }
 
-    static class MenuItemWrapper {
+    private static class MenuItemWrapper {
 
         private final Class<? extends PhotoStreamActivity> activityClass;
         private final String menuTitle;

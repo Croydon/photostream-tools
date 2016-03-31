@@ -40,9 +40,7 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
 
 public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentViewHolder>{
 
-    public CommentAdapter() {
-
-    }
+    public CommentAdapter() { }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;

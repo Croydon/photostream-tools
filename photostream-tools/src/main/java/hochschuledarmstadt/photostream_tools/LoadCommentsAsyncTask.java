@@ -24,36 +24,32 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.os.AsyncTask;
-
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.CommentQueryResult;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-class GetCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult> {
+class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult> {
 
     private final OnCommentsResultListener callback;
     private final String installationId;
     private final int photoId;
 
-    public GetCommentsAsyncTask(String installationId, String uri, int photoId, OnCommentsResultListener callback){
+    public LoadCommentsAsyncTask(String installationId, String uri, int photoId, OnCommentsResultListener callback){
         super(uri);
         this.installationId = installationId;
         this.photoId = photoId;
         this.callback = callback;
     }
 
-    private static final String TAG = GetCommentsAsyncTask.class.getName();
+    private static final String TAG = LoadCommentsAsyncTask.class.getName();
 
     @Override
     protected CommentQueryResult doInBackground(Void... params) {

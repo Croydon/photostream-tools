@@ -35,13 +35,13 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentsListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-public class CommentActivity extends PhotoStreamActivity implements OnCommentsListener {
+public class CommentActivity extends PhotoStreamActivity implements OnCommentsReceivedListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
     private static final int PHOTO_ID = 1;
@@ -51,14 +51,14 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsLi
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-        photoStreamClient.addOnCommentsListener(this);
+        photoStreamClient.addOnCommentsReceivedListener(this);
         if (savedInstanceState == null)
             photoStreamClient.loadComments(PHOTO_ID);
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-        photoStreamClient.removeOnCommentsListener(this);
+        photoStreamClient.removeOnCommentsReceivedListener(this);
     }
 
     @Override
@@ -84,36 +84,15 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsLi
     }
 
     @Override
-    public void onGetComments(int photoId, List<Comment> comments) {
+    public void onCommentsReceived(int photoId, List<Comment> comments) {
         if (PHOTO_ID == photoId)
             adapter.set(comments);
     }
 
     @Override
-    public void onGetCommentsFailed(int photoId, HttpResult httpResult) {
+    public void onReceiveCommentsFailed(int photoId, HttpResult httpResult) {
         String title = "Could not load comments";
-        String message = String.format("Response Code: %s\nMessage:%s", httpResult.getResponseCode(), httpResult.getMessage());
-        Utils.showSimpleAlertDialog(this, title, message);
-    }
-
-    @Override
-    public void onCommentDeleted(int commentId) {
-
-    }
-
-    @Override
-    public void onCommentDeleteFailed(int commentId, HttpResult httpResult) {
-
-    }
-
-    @Override
-    public void onNewComment(Comment comment) {
-
-    }
-
-    @Override
-    public void onSendCommentFailed(HttpResult httpResult) {
-
+        Utils.showErrorInAlertDialog(this, title, httpResult);
     }
 
     @Override

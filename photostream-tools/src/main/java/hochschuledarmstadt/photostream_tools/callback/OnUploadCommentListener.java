@@ -22,25 +22,10 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.examples;
-
-import android.content.Context;
-import android.support.v7.app.AlertDialog;
+package hochschuledarmstadt.photostream_tools.callback;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-/**
- * Created by Andreas Schattney on 14.03.2016.
- */
-public class Utils {
-
-    public static void showErrorInAlertDialog(Context context, String title, HttpResult httpResult){
-        int responseCode = httpResult.getResponseCode();
-        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.create().show();
-    }
-
+public interface OnUploadCommentListener extends OnRequestListener {
+    void onSendCommentFailed(HttpResult httpResult);
 }

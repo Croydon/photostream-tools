@@ -24,7 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -91,7 +90,7 @@ public class BitmapUtils {
     }
 
 
-    private static InputStream getInputStream(Context context, Uri uri, int type) throws IOException {
+    private static InputStream createInputStream(Context context, Uri uri, int type) throws IOException {
         switch(type){
             case TYPE_ASSET:
                 return context.getAssets().open(uri.toString().replace("assets://", ""));
@@ -106,8 +105,8 @@ public class BitmapUtils {
     private static Bitmap internalDecodeBitmap(Context context, Uri uri, int type) throws FileNotFoundException {
         Bitmap bm = null;
         try {
-            BitmapFactory.Options options = lessResolution(getInputStream(context, uri, type), 400, 400);
-            bm = BitmapFactory.decodeStream(getInputStream(context, uri, type), null, options);
+            BitmapFactory.Options options = lessResolution(createInputStream(context, uri, type), 400, 400);
+            bm = BitmapFactory.decodeStream(createInputStream(context, uri, type), null, options);
             ExifInterface exif = new ExifInterface(getRealPathFromURI(context, uri));
             String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
             int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;

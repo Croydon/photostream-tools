@@ -25,9 +25,12 @@
 package hochschuledarmstadt.photostream_tools;
 
 public enum RequestType {
-    UPLOAD,
-    PHOTOS,
-    LIKE,
-    SEARCH,
-    COMMENT
+    LOAD_PHOTOS,
+    UPLOAD_PHOTO,
+    DELETE_PHOTO,
+    LIKE_PHOTO,
+    SEARCH_PHOTOS,
+    LOAD_COMMENTS,
+    UPLOAD_COMMENT,
+    DELETE_COMMENT,
 }

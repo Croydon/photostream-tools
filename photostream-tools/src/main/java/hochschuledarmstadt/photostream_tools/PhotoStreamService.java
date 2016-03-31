@@ -39,13 +39,13 @@ import android.support.annotation.Nullable;
 public class PhotoStreamService extends Service {
 
     private static final String TAG = PhotoStreamService.class.getName();
-    public static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";
+    private static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";
 
     private IBinder photoStreamServiceBinder = new PhotoStreamServiceBinder();
     private PhotoStreamClient photoStreamClient;
 
     public class PhotoStreamServiceBinder extends Binder {
-        public IPhotoStreamClient getClient() {
+        public PhotoStreamClient getClient() {
             return photoStreamClient;
         }
     }
@@ -58,8 +58,9 @@ public class PhotoStreamService extends Service {
         final Context context = getApplicationContext();
         final DbConnection dbConnection = DbConnection.getInstance(context);
         final String uniqueAndroidId = getUniqueAndroidId();
+        final PhotoStreamCallbackContainer container = new PhotoStreamCallbackContainer();
 
-        photoStreamClient = new PhotoStreamClient(context, photoStreamUrl, dbConnection, uniqueAndroidId);
+        photoStreamClient = new PhotoStreamClient(context, photoStreamUrl, dbConnection, uniqueAndroidId, container);
         photoStreamClient.bootstrap();
 
     }

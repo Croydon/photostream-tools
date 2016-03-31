@@ -25,9 +25,6 @@
 package hochschuledarmstadt.photostream_tools.examples.upload;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,7 +35,6 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 
-import java.io.File;
 import java.io.IOException;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
@@ -69,7 +65,7 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
             @Override
             public void onClick(View v) {
                 IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
-                if (!photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD)) {
+                if (!photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD_PHOTO)) {
                     byte[] imageBytes = BitmapUtils.bitmapToBytes(bitmap);
                     try {
                         photoStreamClient.uploadPhoto(imageBytes, editText.getText().toString().trim());

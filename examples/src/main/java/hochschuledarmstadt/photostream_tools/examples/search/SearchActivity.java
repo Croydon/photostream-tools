@@ -41,6 +41,7 @@ import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoAdapter;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -95,7 +96,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchPhoto
     @Override
     public void onSearchedPhotosReceived(PhotoQueryResult result) {
         List<Photo> photos = result.getPhotos();
-        loadMoreButton.setVisibility(photos.size() == 0 ? Button.GONE : Button.VISIBLE);
+        loadMoreButton.setVisibility(result.hasNextPage() ? Button.VISIBLE : Button.GONE);
         if (result.getPage() == 1)
             photoAdapter.set(photos);
         else
@@ -104,22 +105,8 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchPhoto
 
     @Override
     public void onReceiveSearchedPhotosFailed(String query, HttpResult httpResult) {
-        Toast.makeText(this, String.format("Receiving next page failed: %s", httpResult.getMessage()), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNewPhotoReceived(Photo photo) {
-        photoAdapter.addAtFront(photo);
-    }
-
-    @Override
-    public void onPhotoDeleted(int photoId) {
-        photoAdapter.remove(photoId);
-    }
-
-    @Override
-    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
-        Toast.makeText(this, String.format("Deleting photo with id %s failed: %s", photoId, httpResult.getMessage()), Toast.LENGTH_SHORT).show();
+        String title = "Could not load photos";
+        Utils.showErrorInAlertDialog(this, title, httpResult);
     }
 
     @Override

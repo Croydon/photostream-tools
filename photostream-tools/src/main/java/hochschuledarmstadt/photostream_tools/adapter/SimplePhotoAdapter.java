@@ -44,14 +44,14 @@ public abstract class SimplePhotoAdapter<T extends RecyclerView.ViewHolder> exte
     }
 
     public boolean setLikeForPhoto(int photoId) {
-        return internalSetLikeOrDislike(photoId, LIKE);
+        return internalSetOrResetLike(photoId, LIKE);
     }
 
-    public boolean setDislikeForPhoto(int photoId) {
-        return internalSetLikeOrDislike(photoId, DISLIKE);
+    public boolean resetLikeForPhoto(int photoId) {
+        return internalSetOrResetLike(photoId, DISLIKE);
     }
 
-    private boolean internalSetLikeOrDislike(int photoId, int likeConstant) {
+    private boolean internalSetOrResetLike(int photoId, int likeConstant) {
         int itemCount = getItemCount();
         for (int position = 0; position < itemCount; position++) {
             Photo photo = getItemAtPosition(position);

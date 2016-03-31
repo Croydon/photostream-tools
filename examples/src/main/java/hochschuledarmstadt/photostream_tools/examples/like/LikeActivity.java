@@ -35,6 +35,7 @@ import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeListener {
@@ -109,7 +110,8 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
 
     @Override
     public void onPhotoLikeFailed(int photoId, HttpResult httpResult) {
-        Toast.makeText(this, httpResult.getMessage(), Toast.LENGTH_SHORT).show();
+        String title = "Failed";
+        Utils.showErrorInAlertDialog(this, title, httpResult);
     }
 
     @Override

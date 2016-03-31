@@ -91,7 +91,7 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
 
     private void saveUserVotedPhoto(int photoId) {
         likeTable.openDatabase();
-        likeTable.insertLike(photoId);
+        likeTable.like(photoId);
         likeTable.closeDatabase();
     }
 

@@ -24,16 +24,9 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import java.util.List;
-
-import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-public interface OnCommentsListener extends OnRequestListener {
-    void onGetComments(int photoId, List<Comment> comments);
-    void onGetCommentsFailed(int photoId, HttpResult httpResult);
+public interface OnCommentDeletedListener extends OnRequestListener{
     void onCommentDeleted(int commentId);
     void onCommentDeleteFailed(int commentId, HttpResult httpResult);
-    void onNewComment(Comment comment);
-    void onSendCommentFailed(HttpResult httpResult);
 }

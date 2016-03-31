@@ -38,14 +38,16 @@ import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotosListener;
+import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListener {
+public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnPhotoDeletedListener, OnNewPhotoReceivedListener {
 
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
@@ -57,14 +59,14 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-        photoStreamClient.addOnPhotosListener(this);
+        photoStreamClient.addOnPhotosReceivedListener(this);
         if (savedInstanceState == null)
-            photoStreamClient.loadPhotos(adapter.getItemCount() > 0);
+            photoStreamClient.loadPhotos();
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-        photoStreamClient.removeOnPhotosListener(this);
+        photoStreamClient.removeOnPhotosReceivedListener(this);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
         loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.PHOTOS)) {
+                if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)) {
                     getPhotoStreamClient().loadMorePhotos();
                 }
             }
@@ -122,8 +124,8 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
-            if (!client.hasOpenRequestsOfType(RequestType.PHOTOS)){
-                getPhotoStreamClient().loadPhotos(adapter.getItemCount() > 0);
+            if (!client.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)){
+                getPhotoStreamClient().loadPhotos();
             }
             return true;
         }
@@ -142,30 +144,12 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
 
     @Override
     public void onReceivePhotosFailed(HttpResult httpResult) {
-        int responseCode = httpResult.getResponseCode();
         String title = "Could not load photos";
-        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
-        Utils.showSimpleAlertDialog(this, title, message);
+        Utils.showErrorInAlertDialog(this, title, httpResult);
     }
 
     @Override
     public void onNoNewPhotosAvailable() {
-
-    }
-
-
-    @Override
-    public void onNewPhotoReceived(Photo photo) {
-
-    }
-
-    @Override
-    public void onPhotoDeleted(int photoId) {
-
-    }
-
-    @Override
-    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
 
     }
 
@@ -177,5 +161,20 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosListen
     @Override
     public void onDismissProgressDialog() {
         findViewById(R.id.progressCircle).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onNewPhotoReceived(Photo photo) {
+        adapter.add(photo);
+    }
+
+    @Override
+    public void onPhotoDeleted(int photoId) {
+        adapter.remove(photoId);
+    }
+
+    @Override
+    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
+
     }
 }

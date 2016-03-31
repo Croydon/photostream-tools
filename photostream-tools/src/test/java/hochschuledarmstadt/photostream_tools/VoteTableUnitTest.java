@@ -22,25 +22,47 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.examples;
+package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
-import android.support.v7.app.AlertDialog;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Created by Andreas Schattney on 14.03.2016.
+ * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-public class Utils {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class VoteTableUnitTest {
 
-    public static void showErrorInAlertDialog(Context context, String title, HttpResult httpResult){
-        int responseCode = httpResult.getResponseCode();
-        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.create().show();
+    private LikeTable voteTable;
+
+    @Before
+    public void setUp() {
+        voteTable = new LikeTable(DbConnection.getInstance(RuntimeEnvironment.application.getApplicationContext()));
+        voteTable.openDatabase();
+    }
+
+    @After
+    public void tearDown() {
+        voteTable.closeDatabase();
+    }
+
+    @Test
+    public void canInsertVote() {
+        assertTrue(voteTable.like(1));
+    }
+
+    @Test
+    public void alreadyVoted() {
+        voteTable.like(1);
+        assertTrue(voteTable.hasUserLikedPhoto(1));
     }
 
 }
