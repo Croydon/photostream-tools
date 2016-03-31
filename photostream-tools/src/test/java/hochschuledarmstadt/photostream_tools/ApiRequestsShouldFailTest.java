@@ -103,8 +103,8 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void sendComment(){
-        final int photoId = -1;
+    public void uploadComment(){
+        final int photoId = INVALID_PHOTO_ID;
         StoreCommentAsyncTask.OnCommentSentListener listener = mock(StoreCommentAsyncTask.OnCommentSentListener.class);
         StoreCommentAsyncTask storeCommentAsyncTask = new StoreCommentAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, "this will fail", listener);
         storeCommentAsyncTask.execute();
@@ -120,7 +120,7 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void getComments(){
+    public void loadComments(){
         final int photoId = INVALID_PHOTO_ID;
         LoadCommentsAsyncTask.OnCommentsResultListener listener = mock(LoadCommentsAsyncTask.OnCommentsResultListener.class);
         LoadCommentsAsyncTask loadCommentsAsyncTask = new LoadCommentsAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, listener);
@@ -137,7 +137,7 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void upvotePhoto(){
+    public void likePhoto(){
         final int photoId = INVALID_PHOTO_ID;
         LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         LikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(LikePhotoAsyncTask.OnVotePhotoResultListener.class);
@@ -155,7 +155,7 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void downvotePhoto(){
+    public void resetLikeForPhoto(){
         final int photoId = INVALID_PHOTO_ID;
         LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         DislikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(DislikePhotoAsyncTask.OnVotePhotoResultListener.class);
@@ -182,6 +182,23 @@ public class ApiRequestsShouldFailTest {
         try {
             deleteCommentAsyncTask.get();
             verify(callback, times(1)).onCommentDeleteFailed(eq(commentId), any(HttpResult.class));
+        } catch (InterruptedException e) {
+            assertFalse(e.toString(), true);
+        } catch (ExecutionException e) {
+            assertFalse(e.toString(), true);
+        }
+    }
+
+    @Test
+    public void deletePhoto(){
+        final int photoId = INVALID_PHOTO_ID;
+        DeletePhotoAsyncTask.OnDeletePhotoResultListener callback = mock(DeletePhotoAsyncTask.OnDeletePhotoResultListener.class);
+        DeletePhotoAsyncTask deletePhotoAsyncTask = new DeletePhotoAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, callback);
+        deletePhotoAsyncTask.execute();
+        Robolectric.flushBackgroundThreadScheduler();
+        try {
+            deletePhotoAsyncTask.get();
+            verify(callback, times(1)).onPhotoDeleteFailed(eq(photoId), any(HttpResult.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
