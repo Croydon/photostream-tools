@@ -7,7 +7,7 @@ Als Abhängigkeit in der build.gradle deklarieren:
 ```gradle
 dependencies {
   ...
-  compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.26'
+  compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.34'
 }
 ```
 
