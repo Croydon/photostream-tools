@@ -29,7 +29,25 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
+/**
+ * {@code void onCommentsReceived(int photoId, List<Comment> comments)}<br>
+ * Wird aufgerufen wenn die Kommentare zu einem Photo abefragt werden konnten <br> <br>
+ * {@code void onReceiveCommentsFailed(int photoId, HttpResult httpResult)} <br>
+ * Wird aufgerufen wenn beim Abrufen der Kommentare ein Fehler aufgetreten ist <br> <br>
+ */
 public interface OnCommentsReceivedListener extends OnRequestListener {
+
+    /**
+     * Wird aufgerufen wenn die Kommentare zu einem Photo abefragt werden konnten
+     * @param photoId id des Photos zu der die Kommentare zugeordnet sind
+     * @param comments die Kommentare
+     */
     void onCommentsReceived(int photoId, List<Comment> comments);
+
+    /**
+     * Wird aufgerufen wenn beim Abrufen der Kommentare ein Fehler aufgetreten ist
+     * @param photoId id des Photos zu der die Kommentare zugeordnet sind
+     * @param httpResult enthält den HTTP Status Code, sowie die Fehlernachricht
+     */
     void onReceiveCommentsFailed(int photoId, HttpResult httpResult);
 }

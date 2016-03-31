@@ -26,6 +26,16 @@ package hochschuledarmstadt.photostream_tools.callback;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
+/**
+ * {@code void onNewPhotoReceived(Photo photo)}<br>
+ * Wird aufgerufen wenn ein neues Photo veröffentlicht wurde
+ * {@code photo} kann ein eigenes Photo sein oder ein Photo von einem anderen Gerät
+ */
 public interface OnNewPhotoReceivedListener extends OnRequestListener {
+    /**
+     * Wird aufgerufen wenn ein neues Photo veröffentlicht wurde
+     * {@code photo} kann ein eigenes Photo sein oder ein Photo von einem anderen Gerät
+     * @param photo das Photo
+     */
     void onNewPhotoReceived(Photo photo);
 }

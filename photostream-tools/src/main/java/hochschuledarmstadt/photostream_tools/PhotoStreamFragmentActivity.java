@@ -28,6 +28,9 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
+/**
+ * Fragmente, die von {@link PhotoStreamFragment} erben, erhalten über diese Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
+ */
 public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity implements ServiceStateChangedNotifier {
 
     private ArrayList<OnServiceStateChangedListener> serviceStateChangedListeners = new ArrayList<>();

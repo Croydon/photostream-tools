@@ -30,6 +30,9 @@ import android.support.v4.app.Fragment;
 
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 
+/**
+ * Fragmente erhalten durch Erben von dieser Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
+ */
 public abstract class PhotoStreamFragment extends Fragment implements OnServiceStateChangedListener {
 
     private boolean serviceDisconnectCalled;

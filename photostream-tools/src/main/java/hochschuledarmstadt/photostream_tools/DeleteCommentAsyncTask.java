@@ -24,8 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.os.AsyncTask;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;

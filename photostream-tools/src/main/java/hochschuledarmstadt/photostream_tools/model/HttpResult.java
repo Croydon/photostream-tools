@@ -27,6 +27,9 @@ package hochschuledarmstadt.photostream_tools.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Repräsentiert einen Fehler während eines Http Requests
+ */
 public class HttpResult {
 
     public HttpResult(int responseCode, String message){
@@ -42,18 +45,16 @@ public class HttpResult {
     private String message;
 
     /**
-     *
-     * @return
-     * The responseCode
+     * Liefert den HTTP Status Code zurück
+     * @return HTTP Status Code
      */
     public Integer getResponseCode() {
         return responseCode;
     }
 
     /**
-     *
-     * @return
-     * The message
+     * Liefert die Fehlernachricht zurück.
+     * @return Fehlernachricht
      */
     public String getMessage() {
         return message;

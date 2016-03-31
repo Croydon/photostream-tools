@@ -39,6 +39,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * Repräsentiert ein Photo aus dem Photo Stream
+ */
 public class Photo implements Parcelable, Id{
 
     private static final String TAG = Photo.class.getName();
@@ -49,7 +52,7 @@ public class Photo implements Parcelable, Id{
     private String imageFilePath;
     @SerializedName("comment")
     @Expose
-    private String comment;
+    private String description;
     @SerializedName("favorite")
     @Expose
     private int liked;
@@ -64,27 +67,24 @@ public class Photo implements Parcelable, Id{
     private int commentCount;
 
     /**
-     *
-     * @return
-     * The imageFilePath
+     * Liefert den absoluten Dateipfad zurück, an dem das Photo abgespeichert ist
+     * @return absoluten Dateipfad
      */
     public String getImageFilePath() {
         return imageFilePath;
     }
 
     /**
-     *
-     * @return
-     * The comment
+     * Liefert die Beschreibung zu dem Photo zurück
+     * @return Beschreibung
      */
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
 
     /**
-     *
-     * @return
-     * The liked
+     * Liefert zurück ob das Photo über das aktuelle Gerät geliked wurde.
+     * @return liked
      */
     public boolean isLiked() {
         return liked == 1;
@@ -95,22 +95,33 @@ public class Photo implements Parcelable, Id{
     }
 
     /**
-     * Use this flag to determine if the photo can be deleted by the user
-     * @return
-     * true if the photo can be deleted
+     * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist das Photo zu löschen.
+     * @return {@code true}, wenn das Photo von dem aktuellen Gerät veröffentlicht wurde, ansonsten {@code false}
      */
     public boolean isDeleteable() {
         return deleteable;
     }
 
+    /**
+     * Liefert die Anzahl der Kommentare zu einem Photo
+     * @return Anzahl der Kommentare
+     */
     public int getCommentCount() {
         return commentCount;
+    }
+
+    /**
+     * Liefert die id des Photos zurück
+     * @return id
+     */
+    public Integer getId() {
+        return id;
     }
 
     protected Photo(Parcel in) {
         id = in.readInt();
         imageFilePath = in.readString();
-        comment = in.readString();
+        description = in.readString();
         liked = in.readInt();
     }
 
@@ -123,7 +134,7 @@ public class Photo implements Parcelable, Id{
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(imageFilePath);
-        dest.writeString(comment);
+        dest.writeString(description);
         dest.writeInt(liked);
     }
 
@@ -138,14 +149,6 @@ public class Photo implements Parcelable, Id{
             return new Photo[size];
         }
     };
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     private static String getImageFileName(int id){
         return String.format(FILENAME_FORMAT, id);

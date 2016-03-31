@@ -24,9 +24,98 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+
+import java.util.Collection;
+
 import hochschuledarmstadt.photostream_tools.model.Comment;
 
+/**
+ * Mit dieser Klasse können Kommentare in einer RecyclerView angezeigt werden
+ * @param <H> ViewHolder Klasse
+ */
 public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Comment>{
 
+    /**
+     * Liefert den Kommentar ({@code Comment}) an der Position {@code position} zurück
+     * @param position Position in der Liste
+     * @return {@code Comment} der Kommentar
+     */
+    @Override
+    public Comment getItemAtPosition(int position) {
+        return super.getItemAtPosition(position);
+    }
+
+    /**
+     * Hängt einen Kommentar {@code comment} an das <b>Ende</b> der Liste an
+     * @param comment Kommentar, der an das <b>Ende</b> der Liste hinzugefügt werden soll
+     */
+    @Override
+    public void addAtFront(Comment comment) {
+        super.addAtFront(comment);
+    }
+
+    /**
+     * Hängt einen Kommentar {@code comment} an den <b>Anfang</b> der Liste an
+     * @param comment Kommentar, der an den <b>Anfang</b> der Liste hinzugefügt werden soll
+     */
+    @Override
+    public void add(Comment comment) {
+        super.add(comment);
+    }
+
+    /**
+     * Fügt alle Elemente in der Liste {@code comments} an das Ende der Liste an
+     * @param comments Liste von Kommentaren, die an das Ende Liste angefügt werden sollen
+     */
+    @Override
+    public void addAll(Collection<? extends Comment> comments) {
+        super.addAll(comments);
+    }
+
+    /**
+     * Ersetzt die aktuelle Liste des Adapters durch eine neue Liste von Kommentaren {@code comments}
+     * @param comments die neue Liste von Kommentaren
+     */
+    @Override
+    public void set(Collection<? extends Comment> comments) {
+        super.set(comments);
+    }
+
+    /**
+     * Entfernt einen Kommentar aus der Liste mit der übergebenen {@code id}
+     * @param id id des Kommentars
+     */
+    @Override
+    public void remove(int id) {
+        super.remove(id);
+    }
+
+    /**
+     * Liefert die Anzahl der Kommentare in der Liste
+     * @return Anzahl der Kommentare
+     */
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
+
+    /**
+     * Speichert die aktuelle Liste von Kommentaren in ein Bundle
+     * @return bundle
+     */
+    @Override
+    public Bundle saveInstanceState() {
+        return super.saveInstanceState();
+    }
+
+    /**
+     * Stellt die Liste von Kommentaren aus einem Bundle wieder her
+     * @param bundle das Bundle, welches die Liste von Kommentaren enthält
+     */
+    @Override
+    public void restoreInstanceState(Bundle bundle) {
+        super.restoreInstanceState(bundle);
+    }
 }

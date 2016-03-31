@@ -22,10 +22,42 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.callback;
+package hochschuledarmstadt.photostream_tools.model;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public interface OnUploadCommentListener extends OnRequestListener {
-    void onSendCommentFailed(HttpResult httpResult);
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Repräsentiert das Ergebnis zu der Abfrage von allen Kommentaren zu einem Photo
+ */
+public class LoadCommentsQueryResult {
+
+    @SerializedName("photo_id")
+    @Expose
+    private int photoId;
+
+    @SerializedName("comments")
+    @Expose
+    private List<Comment> comments = new ArrayList<>();
+
+    /**
+     * Liefert die photo id zurück, zu der die Kommentare zugeordnet sind
+     * @return photo id
+     */
+    public int getPhotoId() {
+        return photoId;
+    }
+
+    /**
+     * Lieferte alle Kommentare zu dem Photo zurück
+     * @return Liste von Kommentaren
+     */
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+
 }

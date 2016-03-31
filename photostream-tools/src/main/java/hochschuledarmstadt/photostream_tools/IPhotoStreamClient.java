@@ -29,90 +29,186 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
-import hochschuledarmstadt.photostream_tools.callback.OnUploadCommentListener;
+import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 
+/**
+ * Über dieses Interface kann mit dem PhotoStream Server kommuniziert werden.
+ */
 public interface IPhotoStreamClient {
 
     /**
-     * Registriert einen Listener der aufgerufen wird, wenn ein Photo geliked wird oder ein Like von einem Photo entfernt wird
-     * @param onPhotoLikeListener
+     * Registriert einen Listener des Typs {@link OnPhotoLikeListener}. <br>
+     * Die Ergebnisse von den Methodenaufrufen {@link IPhotoStreamClient#likePhoto(int)} und {@link IPhotoStreamClient#resetLikeForPhoto(int)} <br>
+     * werden über die Methoden des Interfaces {@link OnPhotoLikeListener} zurück geliefert
+     * @param onPhotoLikeListener listener
      */
     void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
+
+    /**
+     * Entfernt den Listener {@code onPhotoLikeListener}
+     * @param onPhotoLikeListener listener
+     */
     void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
 
     /**
-     * Registriert einen Listener der aufgerufen wird, wenn Kommentare zu einem Photo geladen wurden
+     * Registriert einen Listener des Typs {@link OnCommentsReceivedListener}. <br>
+     * Das Ergebnis von dem Methodenaufruf {@link IPhotoStreamClient#loadComments(int)} <br>
+     * wird über die Methoden des Interfaces {@link OnCommentsReceivedListener} zurück geliefert
      * @param onCommentsReceivedListener listener
      */
     void addOnCommentsReceivedListener(OnCommentsReceivedListener onCommentsReceivedListener);
+
+    /**
+     * Entfernt den Listener {@code onCommentsReceivedListener}
+     * @param onCommentsReceivedListener listener
+     */
     void removeOnCommentsReceivedListener(OnCommentsReceivedListener onCommentsReceivedListener);
 
     /**
-     * Registriert einen Listener der aufgerufen wird, wenn Photos vom Server geladen wurden
+     * Registriert einen Listener des Typs {@link OnPhotosReceivedListener}. <br>
+     * Die Ergebnisse von den Methodenaufrufen {@link IPhotoStreamClient#loadPhotos()} und {@link IPhotoStreamClient#loadMorePhotos()} <br>
+     * werden über die Methoden des Interfaces {@link OnPhotosReceivedListener} zurück geliefert
      * @param onPhotosReceivedListener listener
      */
     void addOnPhotosReceivedListener(OnPhotosReceivedListener onPhotosReceivedListener);
+
+    /**
+     * Entfernt den Listener {@code onPhotosReceivedListener}
+     * @param onPhotosReceivedListener listener
+     */
     void removeOnPhotosReceivedListener(OnPhotosReceivedListener onPhotosReceivedListener);
 
     /**
-     * Registriert einen Listener der aufgerufen wird, wenn gesuchte Photos vom Server geladen wurden
-     * @param onSearchPhotosResultListener
+     * Registriert einen Listener des Typs {@link OnSearchedPhotosReceivedListener}. <br>
+     * Die Ergebnisse von den Methodenaufrufen {@link IPhotoStreamClient#searchPhotos(String)} und {@link IPhotoStreamClient#searchMorePhotos()} <br>
+     * werden über die Methoden des Interfaces {@link OnSearchedPhotosReceivedListener} zurück geliefert
+     * @param onSearchedPhotosReceivedListener listener
      */
-    void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener);
-    void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener);
+    void addOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener);
 
     /**
-     * Registriert einen Listener der aufgerufen wird, wenn ein Photo an den Server gesendet wurde
+     * Entfernt den Listener {@code onSearchedPhotosReceivedListener}
+     * @param onSearchedPhotosReceivedListener listener
+     */
+    void removeOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener);
+
+    /**
+     * Registriert einen Listener des Typs {@link OnPhotoUploadListener}. <br>
+     * Das Ergebnis von dem Methodenaufruf {@link IPhotoStreamClient#uploadPhoto(byte[], String)}} <br>
+     * wird über die Methoden des Interfaces {@link OnPhotoUploadListener} zurück geliefert
      * @param onPhotoUploadListener listener
      */
     void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener);
+
+    /**
+     * Entfernt den Listener {@code onPhotoUploadListener}
+     * @param onPhotoUploadListener listener
+     */
     void removeOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener);
 
+    /**
+     * Registriert einen Listener des Typs {@link OnPhotoDeletedListener}. <br>
+     * Das Ergebnis von dem Methodenaufruf {@link IPhotoStreamClient#deletePhoto(int)} <br>
+     * wird über die Methoden des Interfaces {@link OnPhotoDeletedListener} zurück geliefert
+     * @param onPhotoDeletedListener listener
+     */
     void addOnPhotoDeletedListener(OnPhotoDeletedListener onPhotoDeletedListener);
+
+    /**
+     * Entfernt den Listener {@code onPhotoDeletedListener}
+     * @param onPhotoDeletedListener listener
+     */
     void removeOnPhotoDeletedListener(OnPhotoDeletedListener onPhotoDeletedListener);
 
+    /**
+     * Registriert einen Listener des Typs {@link OnNewPhotoReceivedListener}. <br>
+     * Wenn ein neues Photo über den Server veröffentlicht wurde, dann wird das neue Photo
+     * über die Methoden des Interfaces {@link OnNewPhotoReceivedListener} zurück geliefert
+     * @param onNewPhotoReceivedListener listener
+     */
     void addOnNewPhotoReceivedListener(OnNewPhotoReceivedListener onNewPhotoReceivedListener);
+
+    /**
+     * Entfernt den Listener {@code onNewPhotoReceivedListener}
+     * @param onNewPhotoReceivedListener listener
+     */
     void removeOnNewPhotoReceivedListener(OnNewPhotoReceivedListener onNewPhotoReceivedListener);
 
+    /**
+     * Registriert einen Listener des Typs {@link OnNewCommentReceivedListener}. <br>
+     * Wenn ein neuer Kommentar über den Server veröffentlicht wurde, dann wird der neue Kommentar <br>
+     * über die Methoden des Interfaces {@link OnNewCommentReceivedListener} zurück geliefert
+     * @param onNewCommentReceivedListener listener
+     */
     void addOnNewCommentReceivedListener(OnNewCommentReceivedListener onNewCommentReceivedListener);
+
+    /**
+     * Entfernt den Listener {@code onNewCommentReceivedListener}
+     * @param onNewCommentReceivedListener listener
+     */
     void removeOnNewCommentReceivedListener(OnNewCommentReceivedListener onNewCommentReceivedListener);
 
-    void addOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener);
-    void removeOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener);
+    /**
+     * Registriert einen Listener des Typs {@link OnCommentUploadListener}. <br>
+     * Schlägt das Veröffentlichen des Kommentars über den Methodenaufruf {@link IPhotoStreamClient#uploadComment(int, String)} fehl, <br>
+     * dann wird über die Methoden des Interfaces {@link OnCommentUploadListener} der Fehler zurück geliefert. <br>
+     * Wurde der Kommentar veröffentlicht, dann liefert das Interface {@link OnNewCommentReceivedListener} den Kommentar zurück.
+     * @param onCommentUploadListener listener
+     */
+    void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener);
 
+    /**
+     * Entfernt den Listener {@code onCommentUploadListener}
+     * @param onCommentUploadListener listener
+     */
+    void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener);
+
+    /**
+     * Registriert einen Listener des Typs {@link OnCommentDeletedListener}. <br>
+     * Die Ergebnisse von dem Methodenaufruf {@link IPhotoStreamClient#deleteComment(int)} <br>
+     * werden über die Methoden des Interfaces {@link OnCommentDeletedListener} zurück geliefert
+     * @param onCommentDeletedListener listener
+     */
     void addOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener);
+
+    /**
+     * Entfernt den Listener {@code onCommentDeletedListener}
+     * @param onCommentDeletedListener listener
+     */
     void removeOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener);
 
     /**
-     * Sendet ein Photo {@code imageBytes} an den PhotoStream Server.
+     * Asynchroner Aufruf. <br>
+     * Veröffentlicht ein Photo {@code imageBytes} über den Server.
      * Verwenden Sie die Methode BitmapUtils.bitmapToBytes(Bitmap bitmap) um ein Bitmap in bytes zu konvertieren
-     * @param imageBytes image as bytes
-     * @param comment the comment for the photo
-     * @return true
+     * Das Ergebnis dieses Aufrufs (<i>erfolgreich</i> oder <i>nicht erfolgreich</i> wird über den Listener {@link OnPhotoUploadListener} zurück geliefert.
+     * Das neue Photo wird über den Listener {@link OnNewPhotoReceivedListener} zurück geliefert
+     * @param imageBytes das Photo als Byte Array
+     * @param description die Beschreibung zu dem Photo
      * @throws IOException
      * @throws JSONException
      */
-    boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException;
+    void uploadPhoto(byte[] imageBytes, String description) throws IOException, JSONException;
 
     /**
      * Asynchroner Aufruf. <br>
      * Lädt die erste Seite von Photos aus dem Stream. <br>
-     * Abgerufene Photos werden über den Listener {@code OnPhotosListener} zurückgeliefert
+     * Das Ergebnis wird über den Listener {@link OnPhotosReceivedListener} zurück geliefert
      */
     void loadPhotos();
 
     /**
      * Asynchroner Aufruf. <br>
      * Lädt die nächste Seite von Photos aus dem Stream. <br>
-     * Abgerufene Photos werden über den Listener {@code OnPhotosListener} zurückgeliefert
+     * Das Ergebnis wird über den Listener {@link OnPhotosReceivedListener} zurück geliefert
      */
     void loadMorePhotos();
 
@@ -120,7 +216,7 @@ public interface IPhotoStreamClient {
      * Asynchroner Aufruf. <br>
      * Serverseitige Suche von Photos anhand der Photobeschreibung {@code query}. <br>
      * Das Ergebnis ist die erste Seite der Suche. <br>
-     * Photos werden über den Listener {@code OnSearchPhotosResultListener} zurückgeliefert
+     * Das Ergebnis wird über den Listener {@link OnSearchedPhotosReceivedListener} zurück geliefert.
      * @param query Beschreibung zu dem Photo
      */
     void searchPhotos(String query);
@@ -128,14 +224,14 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Lädt die nächste Seite aus dem vorherigen Suchergebnis. <br>
-     * Photos werden über den Listener {@code OnSearchPhotosResultListener} zurückgeliefert
+     * Das Ergebnis wird über den Listener {@link OnSearchedPhotosReceivedListener} zurück geliefert.
      */
     void searchMorePhotos();
 
     /**
      * Asynchroner Aufruf. <br>
      * Löscht ein Photo von dem Server <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnPhotosListener} und {@code OnSearchPhotosResultListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnPhotoDeletedListener} zurück geliefert.
      * @param photoId id des zu löschenden Photos
      */
     void deletePhoto(int photoId);
@@ -143,7 +239,7 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Liked ein Photo mit der id {@code photoId} <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnPhotoLikeListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnPhotoLikeListener} zurück geliefert.
      * @param photoId id des Photos, welches geliked werden soll
      */
     void likePhoto(int photoId);
@@ -151,7 +247,7 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Entfernt einen Like von einem Photo mit der id {@code photoId} <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnPhotoLikeListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnPhotoLikeListener} zurück geliefert.
      * @param photoId id des Photos von dem der Like entfernt werden soll
      */
     void resetLikeForPhoto(int photoId);
@@ -167,7 +263,7 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Fragt alle Kommentare zu dem Photo mit der id {@code photoId} von dem Server ab. <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnCommentsListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnCommentsReceivedListener} zurück geliefert.
      * @param photoId id des Photos
      */
     void loadComments(int photoId);
@@ -175,7 +271,7 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Sendet einen Kommentar an den Server. Der Kommentar {@code comment} wird zum Photo mit der id {@code photoId} gespeichert. <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnCommentsListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnCommentUploadListener} zurück geliefert.
      * @param photoId id des Photos
      * @param comment Kommentar zu dem Photo
      */
@@ -184,15 +280,15 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Löscht einen Kommentar von dem Server mit der id {@code commentId} <br>
-     * Das Ergebnis wird an Listener des Typs {@code OnCommentsListener} zurückgeliefert. <br>
+     * Das Ergebnis wird über den Listener {@link OnCommentDeletedListener} zurück geliefert.
      * @param commentId der Kommentar, der gelöscht werden soll
      */
     void deleteComment(int commentId);
 
     /**
      * Synchroner Aufruf. <br>
-     * Mit dieser Methode kann abgefragt werden, ob aktuell ein Request zu einer bestimmten Kategorie {@code requestType} momentan verarbeitet
-     * @param requestType der Requesttyp
+     * Mit dieser Methode kann abgefragt werden, ob aktuell ein Request zu einer bestimmten Kategorie {@link RequestType} momentan verarbeitet
+     * @param requestType Typ des Requests ({@link RequestType})
      * @return {@code true}, wenn mindestens ein Request aus der angegebenen Kategorie verarbeitet wird, ansonsten {@code false}
      */
     boolean hasOpenRequestsOfType(RequestType requestType);

@@ -34,6 +34,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 
+/**
+ * Activities erhalten durch Erben von dieser Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
+ */
 public abstract class PhotoStreamActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = PhotoStreamActivity.class.getName();

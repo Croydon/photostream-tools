@@ -24,7 +24,17 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
+/**
+ * Wird verwendet um Beginn und Ende eines HTTP Requests zu signalisieren
+ */
 public interface OnRequestListener {
+    /**
+     * Wird aufgerufen, kurz bevor ein HTTP Request gesendet wird
+     */
     void onShowProgressDialog();
+
+    /**
+     * Wird aufgerufen, wenn ein HTTP Request beendet ist
+     */
     void onDismissProgressDialog();
 }

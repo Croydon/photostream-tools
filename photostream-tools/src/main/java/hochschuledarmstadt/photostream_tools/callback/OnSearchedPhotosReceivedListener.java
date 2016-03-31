@@ -27,7 +27,23 @@ package hochschuledarmstadt.photostream_tools.callback;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public interface OnSearchPhotosResultListener extends OnRequestListener {
+/**
+ * {@code void onSearchedPhotosReceived(PhotoQueryResult result)}<br>
+ * Wird aufgerufen, wenn eine Seite von gesuchten Photos geladen werden konnte <br> <br>
+ * {@code onReceiveSearchedPhotosFailed(String query, HttpResult httpResult)}<br>
+ * Wird aufgerufen, wenn eine Seite von gesuchten Photos <b>nicht</b> geladen werden konnte
+ */
+public interface OnSearchedPhotosReceivedListener extends OnRequestListener {
+    /**
+     * Wird aufgerufen, wenn eine Seite von gesuchten Photos geladen werden konnte
+     * @param result enthält die geladene Seite, sowie die Photos aus der Seite
+     */
     void onSearchedPhotosReceived(PhotoQueryResult result);
+
+    /**
+     * Wird aufgerufen, wenn eine Seite von gesuchten Photos <b>nicht</b> geladen werden konnte
+     * @param query die query mit der Photos gesucht wurden
+     * @param httpResult enthält den HTTP Status Code und die Fehlernachricht
+     */
     void onReceiveSearchedPhotosFailed(String query, HttpResult httpResult);
 }

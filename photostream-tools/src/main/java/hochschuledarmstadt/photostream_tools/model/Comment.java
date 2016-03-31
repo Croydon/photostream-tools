@@ -31,6 +31,9 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Diese Klasse repräsentiert einen anonymen Kommentar zu einem Photo
+ */
 public class Comment implements Parcelable, Id {
 
     @SerializedName("photo_id")
@@ -45,28 +48,35 @@ public class Comment implements Parcelable, Id {
     @SerializedName("deleteable")
     @Expose
     private boolean deleteable;
+
     /**
-     *
-     * @return
-     * The commentId
+     * Liefert die id des Kommentars zurück
+     * @return id
      */
     public Integer getId() {
         return commentId;
     }
 
     /**
-     *
-     * @return
-     * The message
+     * Liefert den Inhalt des Kommentars zurück
+     * @return inhalt
      */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist diesen Kommentar zu löschen.
+     * @return {@code true}, wenn der Kommentar von dem aktuellen Gerät veröffentlicht wurde, ansonsten {@code false}
+     */
     public boolean isDeleteable() {
         return deleteable;
     }
 
+    /**
+     * Liefert die id des Photos zurück
+     * @return photo id
+     */
     public Integer getPhotoId() {
         return photoId;
     }

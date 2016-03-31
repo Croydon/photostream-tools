@@ -32,8 +32,8 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;

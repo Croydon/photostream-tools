@@ -24,13 +24,40 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+/**
+ * Diese Enumeration enthält alle Arten von Requests, die an den Server gesendet werden können
+ */
 public enum RequestType {
+    /**
+     * {@link IPhotoStreamClient#loadPhotos()} und {@link IPhotoStreamClient#loadMorePhotos()}
+     */
     LOAD_PHOTOS,
+    /**
+     * {@link IPhotoStreamClient#uploadPhoto(byte[], String)}
+     */
     UPLOAD_PHOTO,
+    /**
+     * {@link IPhotoStreamClient#deletePhoto(int)}
+     */
     DELETE_PHOTO,
+    /**
+     * {@link IPhotoStreamClient#likePhoto(int)} und {@link IPhotoStreamClient#resetLikeForPhoto(int)}
+     */
     LIKE_PHOTO,
+    /**
+     * {@link IPhotoStreamClient#searchPhotos(String)} und {@link IPhotoStreamClient#searchMorePhotos()}
+     */
     SEARCH_PHOTOS,
+    /**
+     * {@link IPhotoStreamClient#loadComments(int)}
+     */
     LOAD_COMMENTS,
+    /**
+     * {@link IPhotoStreamClient#uploadComment(int, String)} (int)}
+     */
     UPLOAD_COMMENT,
+    /**
+     * {@link IPhotoStreamClient#deleteComment(int)}
+     */
     DELETE_COMMENT,
 }

@@ -24,13 +24,19 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-public abstract class SimplePhotoAdapter<T extends RecyclerView.ViewHolder> extends BaseAdapter<T, Photo> {
+/**
+ * Mit dieser Klasse können Photos in einer RecyclerView angezeigt werden
+ * @param <H> ViewHolder Klasse
+ */
+public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Photo> {
 
     private static final int LIKE = -10;
     private static final int DISLIKE = -11;
@@ -43,10 +49,102 @@ public abstract class SimplePhotoAdapter<T extends RecyclerView.ViewHolder> exte
         super(new ArrayList<Photo>());
     }
 
+    /**
+     * Liefert das Photo ({@code Photo}) an der Position {@code position} zurück
+     * @param position Position in der Liste
+     * @return {@code Photo} der Kommentar
+     */
+    @Override
+    public Photo getItemAtPosition(int position) {
+        return super.getItemAtPosition(position);
+    }
+
+    /**
+     * Hängt ein Photo {@code photo} an das <b>Ende</b> der Liste an
+     * @param photo Photo das an das <b>Ende</b> der Liste hinzugefügt werden soll
+     */
+    @Override
+    public void addAtFront(Photo photo) {
+        super.addAtFront(photo);
+    }
+
+    /**
+     * Hängt ein Photo {@code photo} an den <b>Anfang</b> der Liste an
+     * @param photo Photo, das an den <b>Anfang</b> der Liste hinzugefügt werden soll
+     */
+    @Override
+    public void add(Photo photo) {
+        super.add(photo);
+    }
+
+    /**
+     * Fügt alle Elemente in der Liste {@code photos} an das Ende der Liste an
+     * @param photos Liste von Photos, die an das Ende Liste angefügt werden sollen
+     */
+    @Override
+    public void addAll(Collection<? extends Photo> photos) {
+        super.addAll(photos);
+    }
+
+    /**
+     * Ersetzt die aktuelle Liste des Adapters durch eine neue Liste von Photos {@code photos}
+     * @param photos die neue Liste von Photos
+     */
+    @Override
+    public void set(Collection<? extends Photo> photos) {
+        super.set(photos);
+    }
+
+    /**
+     * Entfernt ein Photo aus der Liste mit der übergebenen {@code id}
+     * @param id id des Photos
+     */
+    @Override
+    public void remove(int id) {
+        super.remove(id);
+    }
+
+    /**
+     * Liefert die Anzahl der Photos in der Liste
+     * @return Anzahl der Photos
+     */
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
+
+    /**
+     * Speichert die aktuelle Liste von Photos in ein Bundle
+     * @return bundle
+     */
+    @Override
+    public Bundle saveInstanceState() {
+        return super.saveInstanceState();
+    }
+
+    /**
+     * Stellt die Liste von Photos aus einem Bundle wieder her
+     * @param bundle das Bundle, welches die Liste von Photos enthält
+     */
+    @Override
+    public void restoreInstanceState(Bundle bundle) {
+        super.restoreInstanceState(bundle);
+    }
+    
+    /**
+     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>geliked</b>
+     * @param photoId id des Photos
+     * @return {@code true}, wenn das Photo innerhalb die Liste vorhanden ist, ansonsten {@code false}
+     */
     public boolean setLikeForPhoto(int photoId) {
         return internalSetOrResetLike(photoId, LIKE);
     }
 
+    /**
+     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>nicht geliked</b>
+     * @param photoId id des Photos
+     * @return {@code true}, wenn das Photo innerhalb die Liste vorhanden ist, ansonsten {@code false}
+     */
     public boolean resetLikeForPhoto(int photoId) {
         return internalSetOrResetLike(photoId, DISLIKE);
     }

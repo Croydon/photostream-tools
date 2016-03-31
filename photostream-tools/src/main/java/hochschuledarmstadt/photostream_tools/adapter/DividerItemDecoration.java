@@ -34,8 +34,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
-
+/**
+ * Diese Klasse bietet einen visuellen Begrenzer zwischen Items in einer RecyclerView
+ */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;

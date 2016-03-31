@@ -24,7 +24,7 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-public interface ServiceStateChangedNotifier {
+interface ServiceStateChangedNotifier {
     void addOnServiceStateChangedListener(OnServiceStateChangedListener onServiceStateChangedListener);
     void removeOnServiceStateChangedListener(OnServiceStateChangedListener onServiceStateChangedListener);
 }

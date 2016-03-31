@@ -42,7 +42,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class BitmapUtils {
+/**
+ * Über die Methoden dieser Klasse können Bitmaps geladen werden, die direkt für den Photo Upload skaliert werden.
+ * Zusätzlich sind Methoden für das Recyclen von Bitmaps und konvertieren von Bitmaps in Byte Arrays vorhanden.
+ */
+public final class BitmapUtils {
+
+    private BitmapUtils() { }
 
     private static final String TAG = BitmapUtils.class.getName();
 
@@ -70,10 +76,24 @@ public class BitmapUtils {
             bitmap.recycle();
     }
 
+    /**
+     * Lädt ein Bitmap anhand eines Dateinamens aus dem Asset Ordner
+     * @param context android context
+     * @param assetFileName Dateiname
+     * @return Bitmap
+     * @throws FileNotFoundException wird geworfen, wenn die Resource nicht vorhanden ist
+     */
     public static Bitmap decodeBitmapFromAssetFile(Context context, String assetFileName) throws FileNotFoundException {
         return internalDecodeBitmap(context, Uri.parse(String.format("assets://%s", assetFileName)), TYPE_ASSET);
     }
 
+    /**
+     * Lädt ein Bitmap anhand eines Dateipfads
+     * @param context android context
+     * @param file dateipfad
+     * @return Bitmap
+     * @throws FileNotFoundException wird geworfen, wenn die Resource nicht vorhanden ist
+     */
     public static Bitmap decodeBitmapFromFile(Context context, File file) throws FileNotFoundException {
         return internalDecodeBitmap(context, Uri.fromFile(file), TYPE_FILE);
     }
@@ -83,7 +103,7 @@ public class BitmapUtils {
      * @param context Android Context
      * @param uri bitmap source
      * @return Bitmap
-     * @throws FileNotFoundException wird geworfen, wenn der Uri nicht aufgelöst werden konnte
+     * @throws FileNotFoundException wird geworfen, wenn die Resource nicht vorhanden ist
      */
     public static Bitmap decodeBitmapFromUri(Context context, Uri uri) throws FileNotFoundException {
         return internalDecodeBitmap(context, uri, TYPE_OTHER);

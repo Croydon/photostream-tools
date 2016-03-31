@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -44,8 +45,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
-import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
-import hochschuledarmstadt.photostream_tools.callback.OnUploadCommentListener;
+import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -64,10 +64,10 @@ class PhotoStreamCallbackContainer {
     private ArrayList<OnNewPhotoReceivedListener> onNewPhotoReceivedListeners = new ArrayList<>();
     private ArrayList<OnPhotoDeletedListener> onPhotoDeletedListeners = new ArrayList<>();
     private ArrayList<OnPhotoLikeListener> onPhotoLikeListeners = new ArrayList<>();
-    private ArrayList<OnSearchPhotosResultListener> onSearchPhotosListeners = new ArrayList<>();
+    private ArrayList<OnSearchedPhotosReceivedListener> onSearchPhotosListeners = new ArrayList<>();
     private ArrayList<OnCommentsReceivedListener> onCommentsReceivedListeners = new ArrayList<>();
     private ArrayList<OnCommentDeletedListener> onCommentDeletedListeners = new ArrayList<>();
-    private ArrayList<OnUploadCommentListener> onUploadCommentListeners = new ArrayList<>();
+    private ArrayList<OnCommentUploadListener> onCommentUploadListeners = new ArrayList<>();
     private ArrayList<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
 
     private final HashMap<RequestType, ArrayList<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
@@ -84,7 +84,7 @@ class PhotoStreamCallbackContainer {
         requestListenerMap.put(RequestType.LIKE_PHOTO, onPhotoLikeListeners);
         requestListenerMap.put(RequestType.SEARCH_PHOTOS, onSearchPhotosListeners);
         requestListenerMap.put(RequestType.LOAD_COMMENTS, onCommentsReceivedListeners);
-        requestListenerMap.put(RequestType.UPLOAD_COMMENT, onUploadCommentListeners);
+        requestListenerMap.put(RequestType.UPLOAD_COMMENT, onCommentUploadListeners);
         requestListenerMap.put(RequestType.DELETE_COMMENT, onCommentDeletedListeners);
     }
 
@@ -143,12 +143,12 @@ class PhotoStreamCallbackContainer {
         removeListener(onNewCommentReceivedListeners, onNewCommentReceivedListener);
     }
 
-    public void addOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener) {
-        addListener(onUploadCommentListeners, onUploadCommentListener, RequestType.UPLOAD_COMMENT);
+    public void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
+        addListener(onCommentUploadListeners, onCommentUploadListener, RequestType.UPLOAD_COMMENT);
     }
 
-    public void removeOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener){
-        removeListener(onUploadCommentListeners, onUploadCommentListener);
+    public void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener){
+        removeListener(onCommentUploadListeners, onCommentUploadListener);
     }
 
     public void addOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener) {
@@ -183,12 +183,12 @@ class PhotoStreamCallbackContainer {
         removeListener(onPhotosReceivedListeners, onPhotosReceivedListener);
     }
 
-    public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener) {
-        addListener(onSearchPhotosListeners, onSearchPhotosResultListener, RequestType.SEARCH_PHOTOS);
+    public void addOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener) {
+        addListener(onSearchPhotosListeners, onSearchedPhotosReceivedListener, RequestType.SEARCH_PHOTOS);
     }
 
-    public void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener) {
-        removeListener(onSearchPhotosListeners, onSearchPhotosResultListener);
+    public void removeOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener) {
+        removeListener(onSearchPhotosListeners, onSearchedPhotosReceivedListener);
     }
 
     public void notifyOnNoNewPhotosAvailable() {
@@ -261,7 +261,7 @@ class PhotoStreamCallbackContainer {
             @Override
             public void run() {
                 ArrayList<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
-                for (OnRequestListener onRequestListener : onRequestListeners){
+                for (OnRequestListener onRequestListener : onRequestListeners) {
                     onRequestListener.onDismissProgressDialog();
                 }
             }
@@ -354,18 +354,18 @@ class PhotoStreamCallbackContainer {
     }
 
     public void notifyOnSearchPhotosError(String query, HttpResult httpResult) {
-        for (OnSearchPhotosResultListener listener : onSearchPhotosListeners)
+        for (OnSearchedPhotosReceivedListener listener : onSearchPhotosListeners)
             listener.onReceiveSearchedPhotosFailed(query, httpResult);
     }
 
     public void notifyOnSearchPhotosResult(PhotoQueryResult photoQueryResult) {
-        for (OnSearchPhotosResultListener listener : onSearchPhotosListeners)
+        for (OnSearchedPhotosReceivedListener listener : onSearchPhotosListeners)
             listener.onSearchedPhotosReceived(photoQueryResult);
     }
 
     public void notifyOnCommentSentFailed(HttpResult httpResult) {
-        for (OnUploadCommentListener listener : onUploadCommentListeners)
-            listener.onSendCommentFailed(httpResult);
+        for (OnCommentUploadListener listener : onCommentUploadListeners)
+            listener.onCommentUploadFailed(httpResult);
     }
 
     public void notifyOnNewComment(Comment comment) {

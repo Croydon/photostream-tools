@@ -24,7 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools.examples.search;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -39,7 +38,7 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
+import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoAdapter;
@@ -47,7 +46,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class SearchActivity extends PhotoStreamActivity implements OnSearchPhotosResultListener {
+public class SearchActivity extends PhotoStreamActivity implements OnSearchedPhotosReceivedListener {
 
     private static final int COLUMNS_PER_ROW = 2;
 

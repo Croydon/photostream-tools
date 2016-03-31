@@ -26,9 +26,6 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 
-/**
- * Created by Andreas Schattney on 15.03.2016.
- */
 class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
     public LoadMorePhotosAsyncTask(Context context, String installationId, String uri, GetPhotosCallback callback) {
         super(context, installationId, uri, null, callback);

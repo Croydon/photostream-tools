@@ -39,15 +39,15 @@ import java.io.IOException;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnSearchPhotosResultListener;
-import hochschuledarmstadt.photostream_tools.callback.OnUploadCommentListener;
+import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -115,13 +115,13 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public void addOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener){
-        callbackContainer.addOnSearchPhotosResultListener(onSearchPhotosResultListener);
+    public void addOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener){
+        callbackContainer.addOnSearchPhotosResultListener(onSearchedPhotosReceivedListener);
     }
 
     @Override
-    public void removeOnSearchPhotosResultListener(OnSearchPhotosResultListener onSearchPhotosResultListener){
-        callbackContainer.removeOnSearchPhotosResultListener(onSearchPhotosResultListener);
+    public void removeOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener){
+        callbackContainer.removeOnSearchPhotosResultListener(onSearchedPhotosReceivedListener);
     }
 
     void bootstrap(){
@@ -401,13 +401,13 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public void addOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener) {
-        callbackContainer.addOnUploadCommentListener(onUploadCommentListener);
+    public void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
+        callbackContainer.addOnUploadCommentListener(onCommentUploadListener);
     }
 
     @Override
-    public void removeOnUploadCommentListener(OnUploadCommentListener onUploadCommentListener) {
-        callbackContainer.removeOnUploadCommentListener(onUploadCommentListener);
+    public void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
+        callbackContainer.removeOnUploadCommentListener(onCommentUploadListener);
     }
 
     @Override
@@ -468,9 +468,9 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public boolean uploadPhoto(byte[] imageBytes, String comment) throws IOException, JSONException {
+    public void uploadPhoto(byte[] imageBytes, String description) throws IOException, JSONException {
         final RequestType requestType = RequestType.UPLOAD_PHOTO;
-        final JSONObject jsonObject = createJsonObject(imageBytes, comment);
+        final JSONObject jsonObject = createJsonObject(imageBytes, description);
         StorePhotoAsyncTask task = new StorePhotoAsyncTask(androidId, photoStreamUrl, new StorePhotoAsyncTask.OnPhotoStoredCallback() {
             @Override
             public void onPhotoStoreSuccess(Photo photo) {
@@ -495,7 +495,6 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         });
         addOpenRequest(requestType);
         task.execute(jsonObject);
-        return true;
     }
 
     private void addOpenRequest(RequestType requestType) {

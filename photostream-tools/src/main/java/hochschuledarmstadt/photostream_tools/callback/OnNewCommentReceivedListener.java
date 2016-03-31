@@ -27,6 +27,16 @@ package hochschuledarmstadt.photostream_tools.callback;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
 
+/**
+ * {@code void onNewComment(Comment comment)}<br>
+ * Wird aufgerufen wenn ein neuer Kommentar zu einem Photo vorhanden ist.<br>
+ * {@code comment} kann ein eigener Kommentar sein oder ein Kommentar von einem anderen Gerät
+ */
 public interface OnNewCommentReceivedListener extends OnRequestListener {
+    /**
+     * Wird aufgerufen wenn ein neuer Kommentar zu einem Photo vorhanden ist.<br>
+     * {@code comment} kann ein eigener Kommentar sein oder ein Kommentar von einem anderen Gerät
+     * @param comment der Kommentar
+     */
     void onNewComment(Comment comment);
 }

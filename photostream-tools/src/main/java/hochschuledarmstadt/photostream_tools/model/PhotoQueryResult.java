@@ -30,41 +30,42 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repräsentiert das Ergebnis zu der Abfrage einer Seite von Photos aus dem Stream
+ */
 public class PhotoQueryResult {
 
     @SerializedName("has_next_page")
     @Expose
     private boolean nextPage;
+
     @SerializedName("page")
     @Expose
     private Integer page;
+
     @SerializedName("photos")
     @Expose
     private List<Photo> photos = new ArrayList<>();
 
     /**
-     *
-     * @return
-     * The page
+     * Liefert die Seite
+     * @return Seite
      */
     public Integer getPage() {
         return page;
     }
 
     /**
-     *
-     * @return
-     * The items
+     * Liefert die Photos aus der aktuellen Seite des Streams
+     * @return Liste von Photos
      */
     public List<Photo> getPhotos() {
         return photos;
     }
 
-
     /**
-     *
-     * @return
-     * {@code true} if there is another page with more data, {@code false} otherweise
+     * Liefert zurück, ob noch weitere Photos im Stream vorhanden sind
+     * @return {@code true}, wenn noch weitere Photos abgerufen werden können, ansonsten {@code false}
      */
     public boolean hasNextPage() {
         return nextPage;

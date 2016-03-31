@@ -22,40 +22,18 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.model;
+package hochschuledarmstadt.photostream_tools.callback;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CommentQueryResult {
-
-    @SerializedName("photo_id")
-    @Expose
-    private int photoId;
-    @SerializedName("comments")
-    @Expose
-    private List<Comment> comments = new ArrayList<>();
-
+/**
+ * {@code void onCommentUploadFailed(HttpResult httpResult)}<br>
+ * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
+ */
+public interface OnCommentUploadListener extends OnRequestListener {
     /**
-     *
-     * @return
-     * The photoId
+     * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
+     * @param httpResult enthält HTTP Status Code sowie die Fehlernachricht
      */
-    public int getPhotoId() {
-        return photoId;
-    }
-
-    /**
-     *
-     * @return
-     * The comments
-     */
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-
+    void onCommentUploadFailed(HttpResult httpResult);
 }

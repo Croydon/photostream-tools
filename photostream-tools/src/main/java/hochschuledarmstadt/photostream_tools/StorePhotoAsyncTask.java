@@ -24,15 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.os.AsyncTask;
-
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;

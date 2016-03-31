@@ -28,14 +28,15 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -52,6 +53,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
     private static final String KEY_BUTTON_VISIBILITY = "KEY_BUTTON_VISIBILITY";
+    private static final String TAG = PhotoActivity.class.getName();
 
     private RecyclerView recyclerView;
     private PhotoAdapter adapter;
@@ -59,6 +61,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
+        Log.d(TAG, "onPhotoStreamServiceConnected()");
         photoStreamClient.addOnPhotosReceivedListener(this);
         if (savedInstanceState == null)
             photoStreamClient.loadPhotos();
@@ -66,6 +69,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
+        Log.d(TAG, "onPhotoStreamServiceDisconnected()");
         photoStreamClient.removeOnPhotosReceivedListener(this);
     }
 
@@ -73,6 +77,8 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
+
+        Log.d(TAG, "onCreate()");
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
@@ -110,6 +116,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState()");
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
         outState.putInt(KEY_BUTTON_VISIBILITY, loadMoreButton.getVisibility() == Button.VISIBLE ? 1 : 0);
     }
@@ -176,5 +183,41 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     @Override
     public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart()");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart()");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume()");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
     }
 }

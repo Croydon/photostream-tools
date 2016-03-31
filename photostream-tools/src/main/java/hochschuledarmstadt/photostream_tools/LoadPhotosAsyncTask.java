@@ -119,6 +119,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
         callback.onPhotosError(httpResult);
     }
 
+
     public interface GetPhotosCallback {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
         void onPhotosError(HttpResult httpResult);

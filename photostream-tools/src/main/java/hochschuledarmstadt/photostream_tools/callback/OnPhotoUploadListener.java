@@ -27,7 +27,23 @@ package hochschuledarmstadt.photostream_tools.callback;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
+/**
+ * {@code void onPhotoUploaded(Photo photo)}<br>
+ * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde <br> <br>
+ * {@code void onPhotoUploadFailed(HttpResult httpResult)}<br>
+ * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
+ */
 public interface OnPhotoUploadListener extends OnRequestListener {
+
+    /**
+     * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde
+     * @param photo das veröffentlichte Photo
+     */
     void onPhotoUploaded(Photo photo);
+
+    /**
+     * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
+     * @param httpResult enthält den HTTP Status Code sowie die Fehlernachricht
+     */
     void onPhotoUploadFailed(HttpResult httpResult);
 }

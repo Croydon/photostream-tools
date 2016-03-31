@@ -58,7 +58,7 @@ public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.
         Photo photo = getItemAtPosition(position);
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
         holder.imageView.setImageBitmap(bitmap);
-        holder.textView.setText(photo.getComment());
+        holder.textView.setText(photo.getDescription());
     }
 
     @Override

@@ -24,16 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools.examples.comment;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
-import hochschuledarmstadt.photostream_tools.adapter.BaseAdapter;
 import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Comment;

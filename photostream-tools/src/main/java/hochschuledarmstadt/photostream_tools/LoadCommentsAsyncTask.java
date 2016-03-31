@@ -33,10 +33,10 @@ import java.net.URL;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.CommentQueryResult;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.LoadCommentsQueryResult;
 
-class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult> {
+class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryResult> {
 
     private final OnCommentsResultListener callback;
     private final String installationId;
@@ -52,7 +52,7 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult
     private static final String TAG = LoadCommentsAsyncTask.class.getName();
 
     @Override
-    protected CommentQueryResult doInBackground(Void... params) {
+    protected LoadCommentsQueryResult doInBackground(Void... params) {
         try {
             return getComments();
         } catch (IOException e) {
@@ -65,7 +65,7 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult
         return null;
     }
 
-    private CommentQueryResult getComments() throws IOException, HttpPhotoStreamException {
+    private LoadCommentsQueryResult getComments() throws IOException, HttpPhotoStreamException {
         final String url = String.format("%s/photostream/api/image/%s/comments", uri, photoId);
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setDoInput(true);
@@ -74,9 +74,9 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult
         final int responseCode = urlConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             final String result = convertStreamToString(urlConnection.getInputStream());
-            CommentQueryResult commentQueryResult = new Gson().fromJson(result, CommentQueryResult.class);
-            final List<Comment> comments = commentQueryResult.getComments();
-            final Integer photoId = commentQueryResult.getPhotoId();
+            LoadCommentsQueryResult loadCommentsQueryResult = new Gson().fromJson(result, LoadCommentsQueryResult.class);
+            final List<Comment> comments = loadCommentsQueryResult.getComments();
+            final Integer photoId = loadCommentsQueryResult.getPhotoId();
             for (Comment comment : comments) {
                 try {
                     Field field = comment.getClass().getDeclaredField("photoId");
@@ -88,18 +88,18 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentQueryResult
                     Logger.log(TAG, LogLevel.ERROR, e.toString());
                 }
             }
-            return commentQueryResult;
+            return loadCommentsQueryResult;
         }else{
             throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
     }
 
     @Override
-    protected void onPostExecute(CommentQueryResult commentQueryResult) {
-        super.onPostExecute(commentQueryResult);
-        if (commentQueryResult != null) {
-            final int photoId = commentQueryResult.getPhotoId();
-            callback.onGetComments(photoId, commentQueryResult.getComments());
+    protected void onPostExecute(LoadCommentsQueryResult loadCommentsQueryResult) {
+        super.onPostExecute(loadCommentsQueryResult);
+        if (loadCommentsQueryResult != null) {
+            final int photoId = loadCommentsQueryResult.getPhotoId();
+            callback.onGetComments(photoId, loadCommentsQueryResult.getComments());
         }
     }
 
