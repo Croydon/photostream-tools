@@ -30,9 +30,9 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
- * {@code void onCommentsReceived(int photoId, List<Comment> comments)}<br>
+ * {@link OnCommentsReceivedListener#onCommentsReceived(int, List)}<br>
  * Wird aufgerufen wenn die Kommentare zu einem Photo abefragt werden konnten <br> <br>
- * {@code void onReceiveCommentsFailed(int photoId, HttpResult httpResult)} <br>
+ * {@link OnCommentsReceivedListener#onReceiveCommentsFailed(int, HttpResult)} <br>
  * Wird aufgerufen wenn beim Abrufen der Kommentare ein Fehler aufgetreten ist <br> <br>
  */
 public interface OnCommentsReceivedListener extends OnRequestListener {

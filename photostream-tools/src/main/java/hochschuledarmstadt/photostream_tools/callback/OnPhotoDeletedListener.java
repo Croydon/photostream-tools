@@ -27,9 +27,9 @@ package hochschuledarmstadt.photostream_tools.callback;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
- * {@code void onPhotoDeleted(int photoId)}<br>
+ * {@link OnPhotoDeletedListener#onPhotoDeleted(int)}<br>
  * Wird aufgerufen wenn ein Photo gelöscht wurde <br> <br>
- * {@code void onPhotoDeleteFailed(int photoId, HttpResult httpResult)}<br>
+ * {@link OnPhotoDeletedListener#onPhotoDeleteFailed(int, HttpResult)}<br>
  * Wird aufgerufen wenn ein Photo aufgrund eines Fehlers nicht gelöscht werden konnte. <br> <br>
  * entspricht der id des Photos das nicht gelöscht werden konnte.
  */

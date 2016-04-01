@@ -53,7 +53,18 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         }
     }
 
+    /**
+     * Wird aufgerufen, wenn die Activity die Verbindung zu dem Service hergestellt hat
+     * @param photoStreamClient Das Client Objekt
+     * @param savedInstanceState Wenn die Activity reinitialisiert wird (z.B. Wechsel von Portrait in den Landscape Modus), dann enthält diese Variable die gespeicherten Variablen
+     */
     protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState);
+
+    /**
+     * Wird aufgerufen, <b>kurz bevor</b> die Activity die Verbindung zu dem Service trennt <br>
+     * Nach dieser Methode ist die Verbindung zum Service getrennt.
+     * @param photoStreamClient
+     */
     protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient);
 
     @Override
@@ -97,10 +108,18 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         super.onDestroy();
     }
 
+    /**
+     * Liefert zurück ob die Activity mit dem Service verbunden ist
+     * @return {@code true}, wenn die Activity mit dem Service verbunden ist, ansonsten {@code false}
+     */
     protected boolean isConnectedToService() {
         return photoStreamClient != null && bound;
     }
 
+    /**
+     * Wenn die Activity mit dem Service verbunden ist, dann wird die Instanz des Clients zurück geliefert, ansonsten {@code null}
+     * @return Instanz des Clients oder {@code null}
+     */
     protected IPhotoStreamClient getPhotoStreamClient() {
         return photoStreamClient;
     }

@@ -28,11 +28,11 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 /**
- * {@code void onPhotosReceived(PhotoQueryResult result)}<br>
+ * {@link OnPhotosReceivedListener#onPhotosReceived(PhotoQueryResult)}<br>
  * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream geladen werden konnte <br> <br>
- * {@code void onReceivePhotosFailed(HttpResult httpResult)}<br>
+ * {@link OnPhotosReceivedListener#onReceivePhotosFailed(HttpResult)}<br>
  * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream aufgrund eines Fehlers nicht geladen werden konnte. <br> <br>
- * {@code void onNoNewPhotosAvailable()} <br>
+ * {@link OnPhotosReceivedListener#onNoNewPhotosAvailable()} <br>
  * Wird aufgerufen, wenn keine neuen Photos im Stream vorhanden sind.
  *
  */

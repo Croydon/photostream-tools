@@ -28,9 +28,9 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 /**
- * {@code void onSearchedPhotosReceived(PhotoQueryResult result)}<br>
+ * {@link OnSearchedPhotosReceivedListener#onSearchedPhotosReceived(PhotoQueryResult)}<br>
  * Wird aufgerufen, wenn eine Seite von gesuchten Photos geladen werden konnte <br> <br>
- * {@code onReceiveSearchedPhotosFailed(String query, HttpResult httpResult)}<br>
+ * {@link OnSearchedPhotosReceivedListener#onReceiveSearchedPhotosFailed(String, HttpResult)}<br>
  * Wird aufgerufen, wenn eine Seite von gesuchten Photos <b>nicht</b> geladen werden konnte
  */
 public interface OnSearchedPhotosReceivedListener extends OnRequestListener {

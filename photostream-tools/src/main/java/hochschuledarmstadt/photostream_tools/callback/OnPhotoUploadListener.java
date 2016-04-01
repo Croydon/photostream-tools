@@ -28,9 +28,9 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
- * {@code void onPhotoUploaded(Photo photo)}<br>
+ * {@link OnPhotoUploadListener#onPhotoUploaded(Photo)}<br>
  * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde <br> <br>
- * {@code void onPhotoUploadFailed(HttpResult httpResult)}<br>
+ * {@link OnPhotoUploadListener#onPhotoUploadFailed(HttpResult)}<br>
  * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
  */
 public interface OnPhotoUploadListener extends OnRequestListener {

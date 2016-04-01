@@ -60,8 +60,8 @@ public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Hängt ein Photo {@code photo} an das <b>Ende</b> der Liste an
-     * @param photo Photo das an das <b>Ende</b> der Liste hinzugefügt werden soll
+     * Hängt ein Photo {@code photo} an den <b>Anfang</b> der Liste an
+     * @param photo Photo das an den <b>Anfang</b> der Liste hinzugefügt werden soll
      */
     @Override
     public void addAtFront(Photo photo) {
@@ -69,8 +69,8 @@ public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Hängt ein Photo {@code photo} an den <b>Anfang</b> der Liste an
-     * @param photo Photo, das an den <b>Anfang</b> der Liste hinzugefügt werden soll
+     * Hängt ein Photo {@code photo} an das <b>Ende</b> der Liste an
+     * @param photo Photo, das an das <b>Ende</b> der Liste hinzugefügt werden soll
      */
     @Override
     public void add(Photo photo) {
@@ -78,8 +78,8 @@ public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Fügt alle Elemente in der Liste {@code photos} an das Ende der Liste an
-     * @param photos Liste von Photos, die an das Ende Liste angefügt werden sollen
+     * Fügt alle Elemente in der Liste {@code photos} an das <b>Ende</b> der Liste an
+     * @param photos Liste von Photos, die an das <b>Ende</b> Liste angefügt werden sollen
      */
     @Override
     public void addAll(Collection<? extends Photo> photos) {

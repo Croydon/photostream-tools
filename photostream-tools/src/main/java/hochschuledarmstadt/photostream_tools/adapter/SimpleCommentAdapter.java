@@ -48,8 +48,8 @@ public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> ex
     }
 
     /**
-     * Hängt einen Kommentar {@code comment} an das <b>Ende</b> der Liste an
-     * @param comment Kommentar, der an das <b>Ende</b> der Liste hinzugefügt werden soll
+     * Hängt einen Kommentar {@code comment} an den <b>Anfang</b> der Liste an
+     * @param comment Kommentar, der an den <b>Anfang</b> der Liste hinzugefügt werden soll
      */
     @Override
     public void addAtFront(Comment comment) {
@@ -57,8 +57,8 @@ public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> ex
     }
 
     /**
-     * Hängt einen Kommentar {@code comment} an den <b>Anfang</b> der Liste an
-     * @param comment Kommentar, der an den <b>Anfang</b> der Liste hinzugefügt werden soll
+     * Hängt einen Kommentar {@code comment} an das <b>Ende</b> der Liste an
+     * @param comment Kommentar, der an das <b>Ende</b> der Liste hinzugefügt werden soll
      */
     @Override
     public void add(Comment comment) {
@@ -66,8 +66,8 @@ public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> ex
     }
 
     /**
-     * Fügt alle Elemente in der Liste {@code comments} an das Ende der Liste an
-     * @param comments Liste von Kommentaren, die an das Ende Liste angefügt werden sollen
+     * Fügt alle Elemente in der Liste {@code comments} an das <b>Ende</b> der Liste an
+     * @param comments Liste von Kommentaren, die an das <b>Ende</b> Liste angefügt werden sollen
      */
     @Override
     public void addAll(Collection<? extends Comment> comments) {

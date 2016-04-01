@@ -61,8 +61,20 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
         super.onDestroy();
     }
 
+    /**
+     * Liefert zurück ob das Fragment mit dem Service verbunden ist
+     * @return {@code true}, wenn das Fragment mit dem Service verbunden ist, ansonsten {@code false}
+     */
     protected boolean isConnectedToService(){
         return photoStreamClient != null;
+    }
+
+    /**
+     * Wenn das Fragment mit dem Service verbunden ist, dann wird die Instanz des Clients zurück geliefert, ansonsten {@code null}
+     * @return Instanz des Clients oder {@code null}
+     */
+    public IPhotoStreamClient getPhotoStreamClient() {
+        return photoStreamClient;
     }
 
     @Override
@@ -99,9 +111,5 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
             onPhotoStreamServiceDisconnected(client);
         }
         photoStreamClient = null;
-    }
-
-    public IPhotoStreamClient getPhotoStreamClient() {
-        return photoStreamClient;
     }
 }
