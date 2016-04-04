@@ -39,7 +39,7 @@ import android.support.annotation.Nullable;
 /**
  * Kommunikationsschnittstelle zu dem PhotoStream Server
  */
-public class PhotoStreamService extends Service {
+public final class PhotoStreamService extends Service {
 
     private static final String TAG = PhotoStreamService.class.getName();
     private static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";

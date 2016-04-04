@@ -24,6 +24,8 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.content.Context;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +47,10 @@ public class VoteTableUnitTest {
 
     @Before
     public void setUp() {
-        voteTable = new LikeTable(DbConnection.getInstance(RuntimeEnvironment.application.getApplicationContext()));
+        final Context context = RuntimeEnvironment.application.getApplicationContext();
+        DbConnection dbTestConnectionDelegate = DbTestConnectionDelegate.getInstance(context);
+        context.deleteDatabase(DbTestConnectionDelegate.DATABASE_NAME);
+        voteTable = new LikeTable(dbTestConnectionDelegate);
         voteTable.openDatabase();
     }
 

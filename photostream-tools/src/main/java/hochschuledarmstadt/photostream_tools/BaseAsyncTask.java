@@ -40,31 +40,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
-    public static final int CONNECT_TIMEOUT = 6000;
-
-    public BaseAsyncTask(){
-    }
-
-    @NonNull
-    protected String convertStreamToString(InputStream is) throws IOException {
-        InputStreamReader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
-        char[] buffer = new char[4096];
-        StringBuilder stringBuilder = new StringBuilder();
-        int read;
-        while ((read = reader.read(buffer, 0, buffer.length)) != -1) {
-            stringBuilder.append(buffer, 0, read);
-        }
-        return stringBuilder.toString();
-    }
-
-    protected HttpResult getHttpErrorResult(InputStream errorStream) throws IOException {
-        final String result = convertStreamToString(errorStream);
-        try{
-            return new Gson().fromJson(result, HttpResult.class);
-        }catch(Exception e){
-            return new HttpResult(500, "Internal Server Error");
-        }
-    }
+    public BaseAsyncTask(){ }
 
     protected void postError(final HttpResult httpResult) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {

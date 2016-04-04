@@ -27,7 +27,7 @@ package hochschuledarmstadt.photostream_tools;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class UrlBuilder {
+class UrlBuilder {
 
     private final String baseUrl;
 

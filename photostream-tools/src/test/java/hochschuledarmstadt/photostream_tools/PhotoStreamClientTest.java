@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class PhotoStreamClientTest {
 
-    public static final String PHOTO_STREAM_URL = "http://doesntmatterbecausehttpconnectionwillbemocked.com";
+    public static final String PHOTO_STREAM_URL = "http://doesnt-matter-because-httpconnection-will-be-mocked.com";
     private Context context;
     private PhotoStreamClient photoStreamClient;
     private DbTestConnectionDelegate dbTestConnectionDelegate;

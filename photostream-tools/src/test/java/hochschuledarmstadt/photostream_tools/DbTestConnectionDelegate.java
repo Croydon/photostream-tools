@@ -32,9 +32,9 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public class DbTestConnectionDelegate extends DbConnection {
 
-    private static DbTestConnectionDelegate instance;
+    public static final String DATABASE_NAME = "test.db";
 
     public DbTestConnectionDelegate(Context context) {
-        super(context, "test.db", null, 1);
+        super(context, DATABASE_NAME, null, 1);
     }
 }
