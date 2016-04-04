@@ -35,7 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-public class HttpPostExecutor extends HttpExecutor {
+class HttpPostExecutor extends HttpExecutor {
 
     public HttpPostExecutor(String url, String installationId){
         super(url, installationId);

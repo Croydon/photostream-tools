@@ -24,7 +24,7 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-public class HttpResponse {
+class HttpResponse {
 
     private final int statusCode;
     private final String result;

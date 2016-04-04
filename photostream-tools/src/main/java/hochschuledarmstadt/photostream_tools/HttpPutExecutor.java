@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class HttpPutExecutor extends HttpExecutor{
+class HttpPutExecutor extends HttpExecutor{
 
     public HttpPutExecutor(String url, String installationId) {
         super(url, installationId);
