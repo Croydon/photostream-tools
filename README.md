@@ -1,31 +1,5 @@
 # photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
 
-## Gradle
-
-Als Abhängigkeit in der build.gradle deklarieren:
-
-```gradle
-dependencies {
-  ...
-  compile 'hochschuledarmstadt.photostream_tools:photostream-tools:0.0.34'
-}
-```
-
-## Server Adresse
-
-Im Android Manifest:
-
-```xml
-...
-<application>
-  ...
-    <meta-data
-        android:name="PHOTOSTREAM_URL"
-        android:value="http://ip:port" />
-  ...
-</application>
-```
-
 ## Verwendung
 
 <a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-tools/tree/master/examples">Beispielprojekt</a> ansehen
