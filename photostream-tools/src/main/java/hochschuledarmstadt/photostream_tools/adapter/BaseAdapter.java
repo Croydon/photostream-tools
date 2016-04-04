@@ -31,18 +31,20 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import hochschuledarmstadt.photostream_tools.model.Id;
+import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends Parcelable & Id> extends RecyclerView.Adapter<T>{
+abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem & Parcelable> extends RecyclerView.Adapter<T>{
 
     protected static final String KEY_ITEMS = "KEY_ITEMS";
     protected ArrayList<H> items = new ArrayList<>();
 
-    public BaseAdapter(ArrayList<H> items){
-        this.items = items;
-    }
     public BaseAdapter(){
         this(new ArrayList<H>());
+    }
+
+    public BaseAdapter(ArrayList<H> items){
+        this.items = items;
+        setHasStableIds(true);
     }
 
     /**
@@ -98,17 +100,14 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends Parcelab
      * @param id id des Items
      */
     public void remove(int id) {
-        int removedAt = -1;
         for (int position = 0; position < items.size(); position++){
             H photo = getItemAtPosition(position);
             if (itemHasEqualId(id, photo)) {
                 items.remove(position);
-                removedAt = position;
+                notifyItemRemoved(position);
                 break;
             }
         }
-        if (removedAt != -1)
-            notifyItemRemoved(removedAt);
     }
 
     /**

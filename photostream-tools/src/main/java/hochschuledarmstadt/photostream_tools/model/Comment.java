@@ -34,7 +34,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Diese Klasse repräsentiert einen anonymen Kommentar zu einem Photo
  */
-public class Comment implements Parcelable, Id {
+public class Comment extends BaseItem implements Parcelable {
 
     @SerializedName("photo_id")
     @Expose
@@ -53,7 +53,7 @@ public class Comment implements Parcelable, Id {
      * Liefert die id des Kommentars zurück
      * @return id
      */
-    public Integer getId() {
+    public int getId() {
         return commentId;
     }
 

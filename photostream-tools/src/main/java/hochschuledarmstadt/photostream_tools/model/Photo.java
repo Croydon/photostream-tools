@@ -42,7 +42,7 @@ import java.io.IOException;
 /**
  * Repräsentiert ein Photo aus dem Photo Stream
  */
-public class Photo implements Parcelable, Id{
+public class Photo extends BaseItem implements Parcelable{
 
     private static final String TAG = Photo.class.getName();
     public static final String FILENAME_FORMAT = "%s.jpg";
@@ -114,7 +114,7 @@ public class Photo implements Parcelable, Id{
      * Liefert die id des Photos zurück
      * @return id
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 

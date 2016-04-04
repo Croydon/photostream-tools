@@ -59,18 +59,18 @@ class PhotoStreamCallbackContainer {
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
 
-    private ArrayList<OnPhotoUploadListener> onPhotoUploadListeners = new ArrayList<>();
-    private ArrayList<OnPhotosReceivedListener> onPhotosReceivedListeners = new ArrayList<>();
-    private ArrayList<OnNewPhotoReceivedListener> onNewPhotoReceivedListeners = new ArrayList<>();
-    private ArrayList<OnPhotoDeletedListener> onPhotoDeletedListeners = new ArrayList<>();
-    private ArrayList<OnPhotoLikeListener> onPhotoLikeListeners = new ArrayList<>();
-    private ArrayList<OnSearchedPhotosReceivedListener> onSearchPhotosListeners = new ArrayList<>();
-    private ArrayList<OnCommentsReceivedListener> onCommentsReceivedListeners = new ArrayList<>();
-    private ArrayList<OnCommentDeletedListener> onCommentDeletedListeners = new ArrayList<>();
-    private ArrayList<OnCommentUploadListener> onCommentUploadListeners = new ArrayList<>();
-    private ArrayList<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
+    private List<OnPhotoUploadListener> onPhotoUploadListeners = new ArrayList<>();
+    private List<OnPhotosReceivedListener> onPhotosReceivedListeners = new ArrayList<>();
+    private List<OnNewPhotoReceivedListener> onNewPhotoReceivedListeners = new ArrayList<>();
+    private List<OnPhotoDeletedListener> onPhotoDeletedListeners = new ArrayList<>();
+    private List<OnPhotoLikeListener> onPhotoLikeListeners = new ArrayList<>();
+    private List<OnSearchedPhotosReceivedListener> onSearchPhotosListeners = new ArrayList<>();
+    private List<OnCommentsReceivedListener> onCommentsReceivedListeners = new ArrayList<>();
+    private List<OnCommentDeletedListener> onCommentDeletedListeners = new ArrayList<>();
+    private List<OnCommentUploadListener> onCommentUploadListeners = new ArrayList<>();
+    private List<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
 
-    private final HashMap<RequestType, ArrayList<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
+    private final HashMap<RequestType, List<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
     private List<PhotoStreamActivity> activities = new ArrayList<>();
 
     public PhotoStreamCallbackContainer(){
@@ -99,14 +99,14 @@ class PhotoStreamCallbackContainer {
         return false;
     }
 
-    private <T extends OnRequestListener> void addListener(ArrayList<T> listeners, T listener, RequestType requestType){
+    private <T extends OnRequestListener> void addListener(List<T> listeners, T listener, RequestType requestType){
         if (!listeners.contains(listener))
             listeners.add(listener);
         if (hasOpenRequestsOfType(requestType))
             listener.onShowProgressDialog();
     }
 
-    private <T extends OnRequestListener> void removeListener(ArrayList<T> listeners, T listener){
+    private <T extends OnRequestListener> void removeListener(List<T> listeners, T listener){
         if (listeners.contains(listener))
             listeners.remove(listener);
     }
@@ -250,14 +250,14 @@ class PhotoStreamCallbackContainer {
     }
 
     public void notifyShowProgressDialog(RequestType requestType) {
-        ArrayList<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+        List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
         for (OnRequestListener onRequestListener : onRequestListeners){
             onRequestListener.onShowProgressDialog();
         }
     }
 
     public void notifyDismissProgressDialog(final RequestType requestType) {
-        ArrayList<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+       List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
         for (OnRequestListener onRequestListener : onRequestListeners) {
             onRequestListener.onDismissProgressDialog();
         }

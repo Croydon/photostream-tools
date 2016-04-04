@@ -24,6 +24,9 @@
 
 package hochschuledarmstadt.photostream_tools.model;
 
-public interface Id {
-    Integer getId();
+public abstract class BaseItem {
+
+    public BaseItem() { }
+
+    public abstract int getId();
 }
