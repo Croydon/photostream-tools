@@ -34,12 +34,12 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
 
     private static final String TAG = DeletePhotoAsyncTask.class.getName();
     private final OnDeletePhotoResultListener callback;
-    private final String installationId;
     private final int photoId;
+    private final HttpDeleteExecutor executor;
 
-    public DeletePhotoAsyncTask(String installationId, String uri, int photoId, OnDeletePhotoResultListener callback){
-        super(uri);
-        this.installationId = installationId;
+    public DeletePhotoAsyncTask(HttpDeleteExecutor executor, int photoId, OnDeletePhotoResultListener callback){
+        super();
+        this.executor = executor;
         this.photoId = photoId;
         this.callback = callback;
     }
@@ -60,15 +60,7 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
     }
 
     private void deletePhoto() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/api/image/%s", uri, photoId);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setRequestMethod("DELETE");
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        final int responseCode = urlConnection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK){
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
-        }
+        executor.execute();
     }
 
     @Override
@@ -83,7 +75,7 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
         callback.onPhotoDeleteFailed(photoId, httpResult);
     }
 
-    public interface OnDeletePhotoResultListener {
+    interface OnDeletePhotoResultListener {
         void onPhotoDeleted(int photoId);
         void onPhotoDeleteFailed(int photoId, HttpResult httpResult);
     }

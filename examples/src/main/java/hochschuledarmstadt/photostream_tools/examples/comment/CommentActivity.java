@@ -43,7 +43,14 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 public class CommentActivity extends PhotoStreamActivity implements OnCommentsReceivedListener {
 
+    /**
+     * Key für das Speichern der Kommentare in der Methode "onSaveInstanceState(...)"
+     */
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
+
+    /**
+     * Die Photo Id, für die Kommentare abgerufen werden
+     */
     private static final int PHOTO_ID = 1;
 
     private RecyclerView recyclerView;
@@ -52,12 +59,14 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnCommentsReceivedListener(this);
+        // Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
         if (savedInstanceState == null)
             photoStreamClient.loadComments(PHOTO_ID);
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
+        // Listener wieder entfernen um Memory Leak zu vermeiden
         photoStreamClient.removeOnCommentsReceivedListener(this);
     }
 
@@ -65,27 +74,37 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
+        // RecyclerView referenzieren
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        // LinearLayoutManager setzen (entspricht ListView)
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        // Visuellen Begrenzer setzen für Kommentare in der Liste
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        // Standard Animationen aktivieren
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter();
+        // Wenn die Activity neu aufgebaut wird
         if (savedInstanceState != null) {
+            // dann die Kommentare aus dem Bundle wieder herstellen
             Bundle bundle = savedInstanceState.getBundle(KEY_ADAPTER);
             adapter.restoreInstanceState(bundle);
         }
+        // Der RecyclerView den Adapter zuweisen
         recyclerView.setAdapter(adapter);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // Kommentare aus dem Adapter im Bundle speichern
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
     }
 
     @Override
     public void onCommentsReceived(int photoId, List<Comment> comments) {
+        // Wenn die Kommentare zur aktuellen PHOTO_ID gehören
         if (PHOTO_ID == photoId)
+            // dann die Kommentare setzen
             adapter.set(comments);
     }
 
@@ -97,11 +116,13 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
 
     @Override
     public void onShowProgressDialog() {
+        // ProgressBar anzeigen
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
     public void onDismissProgressDialog() {
+        // ProgressBar verstecken
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
     }
 }

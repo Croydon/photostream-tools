@@ -42,17 +42,20 @@ public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentV
         public TextView textView;
         public CommentViewHolder(View itemView) {
             super(itemView);
+            // TextView referenzieren
             textView = (TextView) itemView.findViewById(R.id.textView);
         }
     }
 
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // Wird aufgerufen, wenn ein neues Layout benötigt wird
         return new CommentViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(CommentViewHolder holder, int position) {
+        // Wird aufgerufen, wenn ein Layout aktualisiert werden muss
         Comment comment = getItemAtPosition(position);
         holder.textView.setText(comment.getMessage());
     }

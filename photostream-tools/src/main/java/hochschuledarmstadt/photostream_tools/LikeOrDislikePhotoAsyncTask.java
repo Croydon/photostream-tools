@@ -36,14 +36,14 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
 
     private static final String TAG = LikeOrDislikePhotoAsyncTask.class.getName();
     private final OnVotePhotoResultListener callback;
-    private final String installationId;
     private final int photoId;
     private final LikeTable likeTable;
+    private final HttpPutExecutor executor;
 
-    public LikeOrDislikePhotoAsyncTask(LikeTable likeTable, String installationId, String uri, int photoId, OnVotePhotoResultListener callback){
-        super(uri);
+    public LikeOrDislikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback){
+        super();
+        this.executor = executor;
         this.likeTable = likeTable;
-        this.installationId = installationId;
         this.photoId = photoId;
         this.callback = callback;
     }
@@ -66,17 +66,9 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
     }
 
     private void likeOrDislikePhoto() throws IOException, JSONException, HttpPhotoStreamException {
-        final String url = buildUri(uri, photoId);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setRequestMethod("PUT");
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK){
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
-        }
+        executor.execute();
     }
 
-    protected abstract String buildUri(String uri, int photoId);
     protected abstract void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId);
     protected abstract void sendResult(OnVotePhotoResultListener callback, int photoId);
 
@@ -89,18 +81,12 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
         }
     }
 
-    private void saveUserVotedPhoto(int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
-    }
-
     @Override
     protected void sendError(HttpResult httpResult) {
         callback.onPhotoLikeFailed(photoId, httpResult);
     }
 
-    public interface OnVotePhotoResultListener {
+    interface OnVotePhotoResultListener {
         void onPhotoLiked(int photoId);
         void onPhotoDisliked(int photoId);
         void onPhotoLikeFailed(int photoId, HttpResult httpResult);

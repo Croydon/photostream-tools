@@ -24,22 +24,36 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+/**
+ * Created by Andreas Schattney on 04.04.2016.
+ */
+public class WebSocketClientStub implements WebSocketClient {
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
+    private AndroidSocket.OnMessageListener messageListener;
+    private boolean connected = false;
+
+    @Override
+    public void setMessageListener(AndroidSocket.OnMessageListener messageListener) {
+        this.messageListener = messageListener;
+    }
+
+    public AndroidSocket.OnMessageListener getMessageListener() {
+        return messageListener;
     }
 
     @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
+    public boolean connect() {
+        connected = true;
+        return true;
     }
 
     @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
+    public void disconnect() {
+        connected = false;
     }
 
+    @Override
+    public boolean isConnected() {
+        return connected;
+    }
 }

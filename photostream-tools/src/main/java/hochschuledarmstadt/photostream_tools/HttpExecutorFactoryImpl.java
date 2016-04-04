@@ -24,22 +24,28 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+class HttpExecutorFactoryImpl implements HttpExecutorFactory {
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
+    private final String androidId;
+
+    public HttpExecutorFactoryImpl(String androidId){
+        this.androidId = androidId;
     }
 
-    @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
+    public HttpPutExecutor createHttpPutExecutor(String url){
+        return new HttpPutExecutor(url, androidId);
     }
 
-    @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
+    public HttpGetExecutor createHttpGetExecutor(String url){
+        return new HttpGetExecutor(url, androidId);
+    }
+
+    public HttpDeleteExecutor createHttpDeleteExecutor(String url){
+        return new HttpDeleteExecutor(url, androidId);
+    }
+
+    public HttpPostExecutor createHttpPostExecutor(String url){
+        return new HttpPostExecutor(url, androidId);
     }
 
 }

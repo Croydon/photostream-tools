@@ -39,12 +39,12 @@ import hochschuledarmstadt.photostream_tools.model.LoadCommentsQueryResult;
 class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryResult> {
 
     private final OnCommentsResultListener callback;
-    private final String installationId;
+    private final HttpGetExecutor executor;
     private final int photoId;
 
-    public LoadCommentsAsyncTask(String installationId, String uri, int photoId, OnCommentsResultListener callback){
-        super(uri);
-        this.installationId = installationId;
+    public LoadCommentsAsyncTask(HttpGetExecutor executor, int photoId, OnCommentsResultListener callback){
+        super();
+        this.executor = executor;
         this.photoId = photoId;
         this.callback = callback;
     }
@@ -66,32 +66,22 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
     }
 
     private LoadCommentsQueryResult getComments() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/api/image/%s/comments", uri, photoId);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        final int responseCode = urlConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            final String result = convertStreamToString(urlConnection.getInputStream());
-            LoadCommentsQueryResult loadCommentsQueryResult = new Gson().fromJson(result, LoadCommentsQueryResult.class);
-            final List<Comment> comments = loadCommentsQueryResult.getComments();
-            final Integer photoId = loadCommentsQueryResult.getPhotoId();
-            for (Comment comment : comments) {
-                try {
-                    Field field = comment.getClass().getDeclaredField("photoId");
-                    field.setAccessible(true);
-                    field.set(comment, photoId);
-                } catch (IllegalAccessException e) {
-                    Logger.log(TAG, LogLevel.ERROR, e.toString());
-                } catch (NoSuchFieldException e) {
-                    Logger.log(TAG, LogLevel.ERROR, e.toString());
-                }
+        HttpResponse httpResponse = executor.execute();
+        LoadCommentsQueryResult loadCommentsQueryResult = new Gson().fromJson(httpResponse.getResult(), LoadCommentsQueryResult.class);
+        final List<Comment> comments = loadCommentsQueryResult.getComments();
+        final Integer photoId = loadCommentsQueryResult.getPhotoId();
+        for (Comment comment : comments) {
+            try {
+                Field field = comment.getClass().getDeclaredField("photoId");
+                field.setAccessible(true);
+                field.set(comment, photoId);
+            } catch (IllegalAccessException e) {
+                Logger.log(TAG, LogLevel.ERROR, e.toString());
+            } catch (NoSuchFieldException e) {
+                Logger.log(TAG, LogLevel.ERROR, e.toString());
             }
-            return loadCommentsQueryResult;
-        }else{
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
         }
+        return loadCommentsQueryResult;
     }
 
     @Override
@@ -108,7 +98,7 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
         callback.onGetCommentsFailed(photoId, httpResult);
     }
 
-    public interface OnCommentsResultListener {
+    interface OnCommentsResultListener {
         void onGetComments(int photoId, List<Comment> comments);
         void onGetCommentsFailed(int photoId, HttpResult httpResult);
     }

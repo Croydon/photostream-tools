@@ -24,58 +24,15 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.util.Log;
+/**
+ * Created by Andreas Schattney on 04.04.2016.
+ */
+public interface WebSocketClient {
+    void setMessageListener(AndroidSocket.OnMessageListener messageListener);
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+    boolean connect();
 
-import io.socket.client.IO;
-import io.socket.engineio.client.transports.WebSocket;
+    void disconnect();
 
-class WebSocketClient {
-
-    public static final int RECONNECTION_DELAY_IN_MILLIS = 10000;
-    public static final int COUNT_OF_RECONNECTION_ATTEMPTS = 10;
-    private final String installationId;
-    private final String url;
-    private final AndroidSocket.OnMessageListener messageListener;
-    private AndroidSocket androidSocket;
-
-    public WebSocketClient(String url, String installationId, AndroidSocket.OnMessageListener messageListener) {
-        this.url = url;
-        this.installationId = installationId;
-        this.messageListener = messageListener;
-    }
-
-    public boolean connect() {
-        IO.Options options = new IO.Options();
-        try {
-            options.reconnectionDelay = RECONNECTION_DELAY_IN_MILLIS;
-            options.reconnection = true;
-            options.transports = new String[]{WebSocket.NAME};
-            options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
-
-            URI uri = URI.create(url + "/?token=" + installationId);
-            if (androidSocket == null)
-                androidSocket = new AndroidSocket(options, uri, messageListener);
-            return androidSocket.connect();
-        } catch (KeyManagementException e) {
-            Log.e(PhotoStreamService.class.getName(), e.toString());
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(PhotoStreamService.class.getName(), e.toString());
-        } catch (URISyntaxException e) {
-            Log.e(PhotoStreamService.class.getName(), e.toString());
-        }
-        return false;
-    }
-
-    public void disconnect() {
-        androidSocket.disconnect();
-    }
-
-    public boolean isConnected() {
-        return androidSocket.isConnected();
-    }
+    boolean isConnected();
 }

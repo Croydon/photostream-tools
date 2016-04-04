@@ -41,14 +41,13 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
 
     private static final String TAG = StorePhotoAsyncTask.class.getName();
-    public static final String UTF_8 = "UTF-8";
     private final OnPhotoStoredCallback callback;
-    private final String installationId;
+    private final HttpPostExecutor executor;
 
-    public StorePhotoAsyncTask(String installationId, String uri, OnPhotoStoredCallback callback){
-        super(uri);
+    public StorePhotoAsyncTask(HttpPostExecutor executor, OnPhotoStoredCallback callback){
+        super();
+        this.executor = executor;
         this.callback = callback;
-        this.installationId = installationId;
     }
 
     @Override
@@ -71,31 +70,12 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     }
 
     private Photo uploadPhoto(JSONObject jsonObject) throws IOException, HttpPhotoStreamException {
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(buildUri()).openConnection();
-        urlConnection.setRequestMethod("POST");
-        urlConnection.setDoOutput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        urlConnection.addRequestProperty("Content-Type", "application/json");
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), Charset.forName(UTF_8)));
-        String s = jsonObject.toString();
-        writer.write(s, 0, s.length());
-        writer.flush();
-        writer.close();
-        final int status = urlConnection.getResponseCode();
-        if (status == HttpURLConnection.HTTP_OK){
-            String newEtag = urlConnection.getHeaderField("ETag");
+        HttpResponse httpResponse = executor.execute(jsonObject.toString());
+        String newEtag = executor.geteTag();
+        if (newEtag != null)
             callback.onNewETag(newEtag);
-            String result = convertStreamToString(urlConnection.getInputStream());
-            Photo photo = new Gson().fromJson(result, Photo.class);
-            return photo;
-        }else{
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
-        }
-    }
-
-    private String buildUri() {
-        return String.format("%s/photostream/api/image", uri);
+        Photo photo = new Gson().fromJson(httpResponse.getResult(), Photo.class);
+        return photo;
     }
 
     @Override
@@ -110,7 +90,7 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
         callback.onPhotoStoreError(httpResult);
     }
 
-    public interface OnPhotoStoredCallback {
+    interface OnPhotoStoredCallback {
         void onPhotoStoreSuccess(Photo photo);
         void onPhotoStoreError(HttpResult httpResult);
         void onNewETag(String eTag);

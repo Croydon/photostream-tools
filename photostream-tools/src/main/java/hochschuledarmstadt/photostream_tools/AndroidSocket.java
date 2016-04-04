@@ -206,7 +206,7 @@ class AndroidSocket {
         return socket != null && socket.connected();
     }
 
-    public interface OnMessageListener{
+    interface OnMessageListener{
         void onNewPhoto(Photo photo);
         void onNewComment(Comment comment);
         void onCommentDeleted(int commentId);

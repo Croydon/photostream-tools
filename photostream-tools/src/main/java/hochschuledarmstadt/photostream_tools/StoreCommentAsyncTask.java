@@ -43,14 +43,14 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
 
     private static final String UTF_8 = "UTF-8";
     private static final String TAG = StoreCommentAsyncTask.class.getName();
-    private final String installationId;
+    private final HttpPostExecutor executor;
     private final OnCommentSentListener callback;
     private final int photoId;
     private final String comment;
 
-    public StoreCommentAsyncTask(String installationId, String uri, int photoId, String comment, OnCommentSentListener callback){
-        super(uri);
-        this.installationId = installationId;
+    public StoreCommentAsyncTask(HttpPostExecutor executor, int photoId, String comment, OnCommentSentListener callback){
+        super();
+        this.executor = executor;
         this.photoId = photoId;
         this.comment = comment;
         this.callback = callback;
@@ -71,41 +71,17 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
     }
 
     private Comment sendComment() throws IOException, HttpPhotoStreamException {
-        final String url = buildUri();
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setRequestMethod("POST");
-        urlConnection.setDoOutput(true);
-        urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        urlConnection.addRequestProperty("Content-Type", "application/json");
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), Charset.forName(UTF_8)));
-
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("message", comment);
             String s = jsonObject.toString();
-            writer.write(s, 0, s.length());
-            writer.flush();
+            HttpResponse httpResponse = executor.execute(s);
+            Comment comment = new Gson().fromJson(httpResponse.getResult(), Comment.class);
+            return comment;
         } catch (JSONException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-        }finally{
-            writer.close();
         }
-
-        int status = urlConnection.getResponseCode();
-        boolean success = (status == HttpURLConnection.HTTP_OK);
-        if (success){
-            String result = convertStreamToString(urlConnection.getInputStream());
-            Comment comment = new Gson().fromJson(result.toString(), Comment.class);
-            return comment;
-        }else{
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
-        }
-    }
-
-    private String buildUri() {
-        return String.format("%s/photostream/api/image/%s/comment", uri, photoId);
+        throw new IOException("JSONException");
     }
 
     @Override
@@ -120,7 +96,7 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
         callback.onSendCommentFailed(httpResult);
     }
 
-    public interface OnCommentSentListener {
+    interface OnCommentSentListener {
         void onCommentSent(Comment comment);
         void onSendCommentFailed(HttpResult httpResult);
     }

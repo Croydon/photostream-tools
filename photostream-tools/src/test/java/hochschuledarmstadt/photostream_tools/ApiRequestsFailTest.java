@@ -25,7 +25,9 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +36,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
@@ -42,19 +46,19 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class ApiRequestsShouldFailTest {
+public class ApiRequestsFailTest {
 
-    private static final String TEST_INSTALLATION_ID = "TEST_INSTALLATION_ID";
-    private static final String EXTERNAL_URI = "http://5.45.97.155:8082";
     public static final int INVALID_PHOTO_ID = -1;
     private static final int INVALID_COMMENT_ID = -1;
 
@@ -71,14 +75,15 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void loadPhotos() {
+    public void loadPhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = createMockHttpGetExecutor();
         LoadPhotosAsyncTask.GetPhotosCallback callback = mock(LoadPhotosAsyncTask.GetPhotosCallback.class);
-        LoadPhotosAsyncTask streamAsyncTask = new LoadPhotosAsyncTask(context, TEST_INSTALLATION_ID, EXTERNAL_URI, null, callback);
+        LoadPhotosAsyncTask streamAsyncTask = new LoadPhotosAsyncTask(executor, context, callback);
         streamAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
-            PhotoQueryResult photoQueryResult = streamAsyncTask.get();
-            verify(callback, times(1)).onPhotosResult(photoQueryResult);
+            streamAsyncTask.get();
+            verify(callback, times(1)).onPhotosError(any(HttpResult.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -87,14 +92,15 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void loadMorePhotos() {
+    public void loadMorePhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = createMockHttpGetExecutor();
         LoadMorePhotosAsyncTask.GetPhotosCallback callback = mock(LoadMorePhotosAsyncTask.GetPhotosCallback.class);
-        LoadMorePhotosAsyncTask streamAsyncTask = new LoadMorePhotosAsyncTask(context, TEST_INSTALLATION_ID, EXTERNAL_URI, callback);
+        LoadMorePhotosAsyncTask streamAsyncTask = new LoadMorePhotosAsyncTask(executor, context, callback);
         streamAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
             PhotoQueryResult photoQueryResult = streamAsyncTask.get();
-            verify(callback, times(1)).onPhotosResult(photoQueryResult);
+            verify(callback, times(1)).onPhotosError(any(HttpResult.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -103,10 +109,11 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void uploadComment(){
+    public void uploadComment() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPostExecutor executor = createMockHttpPostExecutor();
         final int photoId = INVALID_PHOTO_ID;
         StoreCommentAsyncTask.OnCommentSentListener listener = mock(StoreCommentAsyncTask.OnCommentSentListener.class);
-        StoreCommentAsyncTask storeCommentAsyncTask = new StoreCommentAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, "this will fail", listener);
+        StoreCommentAsyncTask storeCommentAsyncTask = new StoreCommentAsyncTask(executor, photoId, "this will fail", listener);
         storeCommentAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -119,11 +126,20 @@ public class ApiRequestsShouldFailTest {
         }
     }
 
+    @NonNull
+    private HttpPostExecutor createMockHttpPostExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPostExecutor executor = mock(HttpPostExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
     @Test
-    public void loadComments(){
+    public void loadComments() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = createMockHttpGetExecutor();
         final int photoId = INVALID_PHOTO_ID;
         LoadCommentsAsyncTask.OnCommentsResultListener listener = mock(LoadCommentsAsyncTask.OnCommentsResultListener.class);
-        LoadCommentsAsyncTask loadCommentsAsyncTask = new LoadCommentsAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, listener);
+        LoadCommentsAsyncTask loadCommentsAsyncTask = new LoadCommentsAsyncTask(executor, photoId, listener);
         loadCommentsAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -136,12 +152,21 @@ public class ApiRequestsShouldFailTest {
         }
     }
 
+    @NonNull
+    private HttpGetExecutor createMockHttpGetExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = mock(HttpGetExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
     @Test
-    public void likePhoto(){
+    public void likePhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPutExecutor executor = createMockHttpPutExecutor();
         final int photoId = INVALID_PHOTO_ID;
         LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         LikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(LikePhotoAsyncTask.OnVotePhotoResultListener.class);
-        LikePhotoAsyncTask votePhotoAsyncTask = new LikePhotoAsyncTask(voteTable, TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, callback);
+        LikePhotoAsyncTask votePhotoAsyncTask = new LikePhotoAsyncTask(executor, voteTable, photoId, callback);
         votePhotoAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -154,12 +179,21 @@ public class ApiRequestsShouldFailTest {
         }
     }
 
+    @NonNull
+    private HttpPutExecutor createMockHttpPutExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPutExecutor executor = mock(HttpPutExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
     @Test
-    public void resetLikeForPhoto(){
+    public void resetLikeForPhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPutExecutor executor = createMockHttpPutExecutor();
         final int photoId = INVALID_PHOTO_ID;
         LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         DislikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(DislikePhotoAsyncTask.OnVotePhotoResultListener.class);
-        DislikePhotoAsyncTask votePhotoAsyncTask = new DislikePhotoAsyncTask(voteTable, TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, callback);
+        DislikePhotoAsyncTask votePhotoAsyncTask = new DislikePhotoAsyncTask(executor, voteTable, photoId, callback);
         votePhotoAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -173,10 +207,11 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void deleteComment(){
+    public void deleteComment() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpDeleteExecutor executor = createMockHttpDeleteExecutor();
         final int commentId = INVALID_COMMENT_ID;
         DeleteCommentAsyncTask.OnDeleteCommentResultListener callback = mock(DeleteCommentAsyncTask.OnDeleteCommentResultListener.class);
-        DeleteCommentAsyncTask deleteCommentAsyncTask = new DeleteCommentAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, commentId, callback);
+        DeleteCommentAsyncTask deleteCommentAsyncTask = new DeleteCommentAsyncTask(executor, commentId, callback);
         deleteCommentAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -190,10 +225,11 @@ public class ApiRequestsShouldFailTest {
     }
 
     @Test
-    public void deletePhoto(){
+    public void deletePhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpDeleteExecutor executor = createMockHttpDeleteExecutor();
         final int photoId = INVALID_PHOTO_ID;
         DeletePhotoAsyncTask.OnDeletePhotoResultListener callback = mock(DeletePhotoAsyncTask.OnDeletePhotoResultListener.class);
-        DeletePhotoAsyncTask deletePhotoAsyncTask = new DeletePhotoAsyncTask(TEST_INSTALLATION_ID, EXTERNAL_URI, photoId, callback);
+        DeletePhotoAsyncTask deletePhotoAsyncTask = new DeletePhotoAsyncTask(executor, photoId, callback);
         deletePhotoAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -204,6 +240,14 @@ public class ApiRequestsShouldFailTest {
         } catch (ExecutionException e) {
             assertFalse(e.toString(), true);
         }
+    }
+
+    @NonNull
+    private HttpDeleteExecutor createMockHttpDeleteExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpDeleteExecutor executor = mock(HttpDeleteExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
     }
 
 }

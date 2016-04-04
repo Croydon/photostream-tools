@@ -41,17 +41,15 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
 
     private static final String TAG = SearchPhotosAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;
+    private final HttpGetExecutor executor;
     private final Context context;
-    private final String installationId;
-    private final int page;
     private final String query;
 
-    public SearchPhotosAsyncTask(Context context, String installationId, String uri, String query, int page, OnSearchPhotosResultCallback callback){
-        super(uri);
+    public SearchPhotosAsyncTask(HttpGetExecutor executor, Context context, String query, OnSearchPhotosResultCallback callback){
+        super();
+        this.executor = executor;
         this.context = context;
-        this.installationId = installationId;
         this.query = query;
-        this.page = page;
         this.callback = callback;
     }
 
@@ -74,28 +72,14 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
         return null;
     }
 
-    protected String buildUrl(String uri, int page){
-        return String.format("%s/photostream/api/search/?q=%s", uri, query);
-    }
-
     private PhotoQueryResult searchPhotos() throws IOException, HttpPhotoStreamException {
-        final String url = buildUrl(uri, page);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        final int responseCode = urlConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK){
-            String result = convertStreamToString(urlConnection.getInputStream());
-            PhotoQueryResult photoQueryResult = new Gson().fromJson(result, PhotoQueryResult.class);
-            final List<Photo> photos = photoQueryResult.getPhotos();
-            for (Photo photo : photos){
-                photo.saveToImageToCache(context);
-            }
-            return photoQueryResult;
-        }else{
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
+        HttpResponse httpResponse = executor.execute();
+        PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
+        final List<Photo> photos = photoQueryResult.getPhotos();
+        for (Photo photo : photos){
+            photo.saveToImageToCache(context);
         }
+        return photoQueryResult;
     }
 
     @Override
@@ -111,7 +95,7 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
         callback.onSearchPhotosError(httpResult);
     }
 
-    public interface OnSearchPhotosResultCallback {
+    interface OnSearchPhotosResultCallback {
         void onSearchPhotosResult(PhotoQueryResult photoQueryResult);
         void onSearchPhotosError(HttpResult httpResult);
     }

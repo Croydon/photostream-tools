@@ -24,22 +24,21 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+public class HttpResponse {
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
+    private final int statusCode;
+    private final String result;
+
+    public HttpResponse(int statusCode, String result){
+        this.statusCode = statusCode;
+        this.result = result;
     }
 
-    @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
+    public int getStatusCode() {
+        return statusCode;
     }
 
-    @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
+    public String getResult() {
+        return result;
     }
-
 }

@@ -34,13 +34,12 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
 
     private static final String TAG = DeleteCommentAsyncTask.class.getName();
     private final OnDeleteCommentResultListener callback;
-    private final String installationId;
-
+    private final HttpDeleteExecutor executor;
     private final int commentId;
 
-    public DeleteCommentAsyncTask(String installationId, String uri, int commentId, OnDeleteCommentResultListener callback){
-        super(uri);
-        this.installationId = installationId;
+    public DeleteCommentAsyncTask(HttpDeleteExecutor executor, int commentId, OnDeleteCommentResultListener callback){
+        super();
+        this.executor = executor;
         this.commentId = commentId;
         this.callback = callback;
     }
@@ -61,15 +60,7 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
     }
 
     private void deleteComment() throws IOException, HttpPhotoStreamException {
-        final String url = String.format("%s/photostream/api/comment/%s", uri, commentId);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setRequestMethod("DELETE");
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        final int responseCode = urlConnection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK){
-            throw new HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
-        }
+        executor.execute();
     }
 
     @Override
@@ -84,7 +75,7 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
         callback.onCommentDeleteFailed(commentId, httpResult);
     }
 
-    public interface OnDeleteCommentResultListener {
+    interface OnDeleteCommentResultListener {
         void onCommentDeleted(int commentId);
         void onCommentDeleteFailed(int commentId, HttpResult httpResult);
     }

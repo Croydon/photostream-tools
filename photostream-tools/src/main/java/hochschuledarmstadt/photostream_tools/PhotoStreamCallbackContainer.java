@@ -257,20 +257,15 @@ class PhotoStreamCallbackContainer {
     }
 
     public void notifyDismissProgressDialog(final RequestType requestType) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
-                for (OnRequestListener onRequestListener : onRequestListeners) {
-                    onRequestListener.onDismissProgressDialog();
-                }
-            }
-        }, 200);
+        ArrayList<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+        for (OnRequestListener onRequestListener : onRequestListeners) {
+            onRequestListener.onDismissProgressDialog();
+        }
     }
 
     public void notifyOnNewPhoto(Context context, Photo photo) {
         internalNotifyOnNewPhoto(photo);
-        if (!isAppInForeground() && photoIsNotFromThisUser(photo)) {
+        if (appIsInBackground() && photoIsNotFromThisUser(photo)) {
             Intent newPhotoIntent = new Intent(INTENT_NEW_PHOTO);
             newPhotoIntent.setPackage(context.getPackageName());
             context.sendBroadcast(newPhotoIntent);
@@ -338,7 +333,7 @@ class PhotoStreamCallbackContainer {
             listener.onCommentsReceived(photoId, comments);
     }
 
-    public boolean isAppInForeground() {
+    public boolean appIsInBackground() {
         return activities.size() > 0;
     }
 
@@ -370,7 +365,7 @@ class PhotoStreamCallbackContainer {
 
     public void notifyOnNewComment(Comment comment) {
         for (OnNewCommentReceivedListener listener : onNewCommentReceivedListeners)
-            listener.onNewComment(comment);
+            listener.onNewCommentReceived(comment);
     }
 
     public void notifyPhotoUploadFailed(HttpResult httpResult) {
@@ -378,7 +373,7 @@ class PhotoStreamCallbackContainer {
             onPhotoUploadListener.onPhotoUploadFailed(httpResult);
     }
 
-    public void notifyPhotoUploadSucceded(Photo photo) {
+    public void notifyPhotoUploadSucceeded(Photo photo) {
         for (OnPhotoUploadListener onPhotoUploadListener : onPhotoUploadListeners)
             onPhotoUploadListener.onPhotoUploaded(photo);
     }

@@ -24,22 +24,27 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
+class HttpDeleteExecutor extends HttpExecutor{
+
+    public HttpDeleteExecutor(String url, String installationId) {
+        super(url, installationId);
     }
 
-    @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
+    public HttpResponse execute() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpURLConnection urlConnection = (HttpURLConnection) new URL(getUrl()).openConnection();
+        urlConnection.setRequestMethod("DELETE");
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.addRequestProperty("installation_id", getInstallationId());
+        final int responseCode = urlConnection.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK){
+            throw new BaseAsyncTask.HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));
+        }else{
+            return new HttpResponse(urlConnection.getResponseCode(), null);
+        }
     }
-
-    @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
-    }
-
 }

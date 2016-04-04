@@ -24,9 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -38,11 +35,24 @@ import java.nio.charset.Charset;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+abstract class HttpExecutor {
 
-    public static final int CONNECT_TIMEOUT = 6000;
+    protected static final int CONNECT_TIMEOUT = 6000;
+    protected static final String UTF_8 = "UTF-8";
+    private final String installationId;
+    private final String url;
 
-    public BaseAsyncTask(){
+    protected String getInstallationId() {
+        return installationId;
+    }
+
+    protected String getUrl() {
+        return url;
+    }
+
+    public HttpExecutor(String url, String installationId) {
+        this.url = url;
+        this.installationId = installationId;
     }
 
     @NonNull
@@ -63,29 +73,6 @@ abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params,
             return new Gson().fromJson(result, HttpResult.class);
         }catch(Exception e){
             return new HttpResult(500, "Internal Server Error");
-        }
-    }
-
-    protected void postError(final HttpResult httpResult) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                sendError(httpResult);
-            }
-        });
-    }
-
-    protected abstract void sendError(HttpResult httpResult);
-
-    protected static class HttpPhotoStreamException extends Throwable {
-
-        private final HttpResult httpResult;
-
-        public HttpPhotoStreamException(HttpResult httpResult) {
-            this.httpResult = httpResult;
-        }
-        public HttpResult getHttpResult() {
-            return httpResult;
         }
     }
 

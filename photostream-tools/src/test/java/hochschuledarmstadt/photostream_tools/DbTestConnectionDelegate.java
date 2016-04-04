@@ -24,22 +24,17 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
+/**
+ * Created by Andreas Schattney on 04.04.2016.
+ */
+public class DbTestConnectionDelegate extends DbConnection {
+
+    private static DbTestConnectionDelegate instance;
+
+    public DbTestConnectionDelegate(Context context) {
+        super(context, "test.db", null, 1);
     }
-
-    @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.like(photoId);
-        likeTable.closeDatabase();
-    }
-
-    @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
-    }
-
 }

@@ -27,6 +27,7 @@ package hochschuledarmstadt.photostream_tools;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.squareup.okhttp.HttpUrl;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -41,16 +42,13 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
     private static final String TAG = LoadPhotosAsyncTask.class.getName();
     private final GetPhotosCallback callback;
+    private final HttpGetExecutor executor;
     private final Context context;
-    private final String installationId;
-    private final int page = 1;
-    private final String eTag;
 
-    public LoadPhotosAsyncTask(Context context, String installationId, String uri, String eTag, GetPhotosCallback callback){
-        super(uri);
+    public LoadPhotosAsyncTask(HttpGetExecutor executor, Context context, GetPhotosCallback callback){
+        super();
+        this.executor = executor;
         this.context = context;
-        this.installationId = installationId;
-        this.eTag = eTag;
         this.callback = callback;
     }
 
@@ -75,33 +73,19 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
         return null;
     }
 
-    protected String buildUrl(String uri, int page){
-        return String.format("%s/photostream/api/stream", uri);
-    }
-
     private PhotoQueryResult getPhotos() throws IOException, HttpPhotoStreamException {
-        final String url = buildUrl(uri, page);
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-        urlConnection.setDoInput(true);
-        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-        urlConnection.addRequestProperty("installation_id", installationId);
-        if (eTag != null)
-            urlConnection.addRequestProperty("if-modified-since", eTag);
-        int httpResponseCode = urlConnection.getResponseCode();
-        if (httpResponseCode == HttpURLConnection.HTTP_OK) {
-            callback.onNewETag(urlConnection.getHeaderField("ETag"));
-            final String result = convertStreamToString(urlConnection.getInputStream());
-            PhotoQueryResult photoQueryResult = new Gson().fromJson(result, PhotoQueryResult.class);
+        HttpResponse httpResponse = executor.execute();
+        int statusCode = httpResponse.getStatusCode();
+        if (statusCode == HttpURLConnection.HTTP_OK){
+            callback.onNewETag(executor.getEtag());
+            PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
             final List<Photo> photos = photoQueryResult.getPhotos();
             for (Photo photo : photos) {
                 photo.saveToImageToCache(context);
             }
             return photoQueryResult;
-        }else if(httpResponseCode == HttpURLConnection.HTTP_NOT_MODIFIED){
+        }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){
             callback.onNoNewPhotosAvailable();
-        }else {
-            HttpResult httpResult = getHttpErrorResult(urlConnection.getErrorStream());
-            throw new HttpPhotoStreamException(httpResult);
         }
         return null;
     }
@@ -120,7 +104,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     }
 
 
-    public interface GetPhotosCallback {
+    interface GetPhotosCallback {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
         void onPhotosError(HttpResult httpResult);
         void onNewETag(String eTag);
