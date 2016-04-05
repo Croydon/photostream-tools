@@ -1,4 +1,4 @@
-# photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools)
+# photostream-tools [![Build Status](https://travis-ci.org/aschattney/photostream-tools.svg?branch=master)](https://travis-ci.org/aschattney/photostream-tools) [![Coverage Status](https://coveralls.io/repos/github/aschattney/photostream-tools/badge.svg?branch=master)](https://coveralls.io/github/aschattney/photostream-tools?branch=master)
 
 ## Verwendung
 
