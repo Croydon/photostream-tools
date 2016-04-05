@@ -109,7 +109,21 @@ tasks.coveralls {
     dependsOn 'check'
 }
 
-cobertura.coverageFormats = ['xml']
+cobertura.coverageFormats = ['html','xml']
+
+cobertura {
+    coverageExcludes = [
+                        '.*\\\\.package-info.*', '.*\\.R.*', '.*BuildConfig.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.callback.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.model.*',
+                        '.*Http.*',
+                        '.*PhotoStreamActivity.*',
+                        '.*PhotoStreamService.*',
+                        '.*WebSocket.*',
+                        '.*PhotoStreamClient',
+                        '.*AndroidSocket.*',
+                        '.*PhotoStreamFragment.*']
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
