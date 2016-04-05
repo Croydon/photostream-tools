@@ -41,6 +41,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Über die Methoden dieser Klasse können Bitmaps geladen werden, die direkt für den Photo Upload skaliert werden.
@@ -115,7 +117,11 @@ public final class BitmapUtils {
             case TYPE_ASSET:
                 return context.getAssets().open(uri.toString().replace("assets://", ""));
             case TYPE_FILE:
-                return new FileInputStream(uri.toString());
+                try{
+                    return new FileInputStream(uri.toString());
+                }catch(Exception e){
+                    return new FileInputStream(new File(Uri.decode(uri.toString()).replace("file://","")));
+                }
             case TYPE_OTHER:
                 return context.getContentResolver().openInputStream(uri);
         }

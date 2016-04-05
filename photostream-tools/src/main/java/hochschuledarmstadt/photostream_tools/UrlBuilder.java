@@ -83,5 +83,5 @@ class UrlBuilder {
             return String.format("%s/photostream/api/search/?q=%s", baseUrl, query);
         }
     }
-    
+
 }
