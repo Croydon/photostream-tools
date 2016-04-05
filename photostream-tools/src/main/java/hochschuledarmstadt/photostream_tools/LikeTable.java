@@ -69,7 +69,7 @@ class LikeTable {
         return database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE) > 0;
     }
 
-    public boolean deleteLike(int photoId){
+    public boolean resetLike(int photoId){
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_PHOTO_ID, photoId);
         cv.put(COLUMN_LIKED, false);

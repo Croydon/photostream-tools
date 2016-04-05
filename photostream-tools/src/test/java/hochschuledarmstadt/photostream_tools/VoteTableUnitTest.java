@@ -34,6 +34,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -60,14 +61,22 @@ public class VoteTableUnitTest {
     }
 
     @Test
-    public void canInsertVote() {
+    public void insertVote() {
         assertTrue(voteTable.like(1));
     }
 
     @Test
-    public void alreadyVoted() {
+    public void hasUserLikedPhoto() {
         voteTable.like(1);
         assertTrue(voteTable.hasUserLikedPhoto(1));
+    }
+
+    @Test
+    public void resetLikeForPhoto() {
+        voteTable.like(1);
+        assertTrue(voteTable.hasUserLikedPhoto(1));
+        voteTable.resetLike(1);
+        assertFalse(voteTable.hasUserLikedPhoto(1));
     }
 
 }

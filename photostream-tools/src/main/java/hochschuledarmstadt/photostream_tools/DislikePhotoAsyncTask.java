@@ -33,7 +33,7 @@ class DislikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
     @Override
     protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
         likeTable.openDatabase();
-        likeTable.deleteLike(photoId);
+        likeTable.resetLike(photoId);
         likeTable.closeDatabase();
     }
 

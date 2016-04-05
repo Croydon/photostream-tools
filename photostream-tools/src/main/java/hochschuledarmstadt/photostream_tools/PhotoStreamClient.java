@@ -502,6 +502,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     @Override
     public void uploadPhoto(byte[] imageBytes, String description) throws IOException, JSONException {
+
+        if (imageBytes == null || description == null)
+            throw new NullPointerException(imageBytes == null ? "imageBytes is null!" : "description is null!");
+
         String url = urlBuilder.getUploadPhotoApiUrl();
         HttpPostExecutor httpPostExecutor = httpExecutorFactory.createHttpPostExecutor(url);
         final RequestType requestType = RequestType.UPLOAD_PHOTO;

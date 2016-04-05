@@ -28,6 +28,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.apache.tools.ant.taskdefs.condition.Http;
+import org.bouncycastle.util.Store;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,8 +101,43 @@ public class ApiRequestsFailTest {
         streamAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
-            PhotoQueryResult photoQueryResult = streamAsyncTask.get();
+            streamAsyncTask.get();
             verify(callback, times(1)).onPhotosError(any(HttpResult.class));
+        } catch (InterruptedException e) {
+            assertFalse(e.toString(), true);
+        } catch (ExecutionException e) {
+            assertFalse(e.toString(), true);
+        }
+    }
+
+    @Test
+    public void searchPhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = createMockHttpGetExecutor();
+        String query = "query";
+        SearchPhotosAsyncTask.OnSearchPhotosResultCallback callback = mock(SearchPhotosAsyncTask.OnSearchPhotosResultCallback.class);
+        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, context, query, callback);
+        searchPhotosAsyncTask.execute();
+        Robolectric.flushBackgroundThreadScheduler();
+        try {
+            searchPhotosAsyncTask.get();
+            verify(callback, times(1)).onSearchPhotosError(any(HttpResult.class));
+        } catch (InterruptedException e) {
+            assertFalse(e.toString(), true);
+        } catch (ExecutionException e) {
+            assertFalse(e.toString(), true);
+        }
+    }
+
+    @Test
+    public void searchMorePhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = createMockHttpGetExecutor();
+        SearchMorePhotosAsyncTask.OnSearchPhotosResultCallback callback = mock(SearchMorePhotosAsyncTask.OnSearchPhotosResultCallback.class);
+        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, context, callback);
+        searchPhotosAsyncTask.execute();
+        Robolectric.flushBackgroundThreadScheduler();
+        try {
+            searchPhotosAsyncTask.get();
+            verify(callback, times(1)).onSearchPhotosError(any(HttpResult.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -126,12 +163,21 @@ public class ApiRequestsFailTest {
         }
     }
 
-    @NonNull
-    private HttpPostExecutor createMockHttpPostExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
-        HttpPostExecutor executor = mock(HttpPostExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
-        when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
-        return executor;
+    @Test
+    public void uploadPhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPostExecutor executor = createMockHttpPostExecutor();
+        StorePhotoAsyncTask.OnPhotoStoredCallback listener = mock(StorePhotoAsyncTask.OnPhotoStoredCallback.class);
+        StorePhotoAsyncTask storePhotoAsyncTask = new StorePhotoAsyncTask(executor, listener);
+        storePhotoAsyncTask.execute(new JSONObject());
+        Robolectric.flushBackgroundThreadScheduler();
+        try {
+            storePhotoAsyncTask.get();
+            verify(listener, times(1)).onPhotoStoreError(any(HttpResult.class));
+        } catch (InterruptedException e) {
+            assertFalse(e.toString(), true);
+        } catch (ExecutionException e) {
+            assertFalse(e.toString(), true);
+        }
     }
 
     @Test
@@ -152,14 +198,6 @@ public class ApiRequestsFailTest {
         }
     }
 
-    @NonNull
-    private HttpGetExecutor createMockHttpGetExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
-        HttpGetExecutor executor = mock(HttpGetExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
-        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
-        return executor;
-    }
-
     @Test
     public void likePhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPutExecutor executor = createMockHttpPutExecutor();
@@ -177,14 +215,6 @@ public class ApiRequestsFailTest {
         } catch (ExecutionException e) {
             assertFalse(e.toString(), true);
         }
-    }
-
-    @NonNull
-    private HttpPutExecutor createMockHttpPutExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
-        HttpPutExecutor executor = mock(HttpPutExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
-        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
-        return executor;
     }
 
     @Test
@@ -243,8 +273,33 @@ public class ApiRequestsFailTest {
     }
 
     @NonNull
+    private HttpPostExecutor createMockHttpPostExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPostExecutor executor = mock(HttpPostExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
+
+    @NonNull
     private HttpDeleteExecutor createMockHttpDeleteExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpDeleteExecutor executor = mock(HttpDeleteExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
+    @NonNull
+    private HttpPutExecutor createMockHttpPutExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpPutExecutor executor = mock(HttpPutExecutor.class);
+        HttpResult errorResult = new HttpResult(500, null);
+        when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
+        return executor;
+    }
+
+    @NonNull
+    private HttpGetExecutor createMockHttpGetExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
+        HttpGetExecutor executor = mock(HttpGetExecutor.class);
         HttpResult errorResult = new HttpResult(500, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;

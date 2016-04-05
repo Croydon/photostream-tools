@@ -1,9 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'net.saliman.cobertura'
 
 group = 'hochschuledarmstadt.photostream_tools'
 version = '0.0.36'
+
+cobertura.coverageFormats = ['html', 'xml']
 
 android {
     compileSdkVersion 23
