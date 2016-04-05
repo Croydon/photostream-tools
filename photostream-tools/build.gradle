@@ -119,6 +119,7 @@ cobertura {
                         '.*hochschuledarmstadt\\.photostream_tools\\.model.*',
                         '.*Http.*',
                         '.*PhotoStreamActivity.*',
+                        '.*BitmapUtils.*',
                         '.*PhotoStreamService.*',
                         '.*WebSocket.*',
                         '.*PhotoStreamClient',
