@@ -7,8 +7,6 @@ apply plugin: 'com.github.kt3k.coveralls'
 group = 'hochschuledarmstadt.photostream_tools'
 version = '0.0.36'
 
-cobertura.coverageFormats = ['html', 'xml']
-
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -111,6 +109,7 @@ tasks.coveralls {
     dependsOn 'check'
 }
 
+cobertura.coverageFormats = ['xml']
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
