@@ -115,6 +115,7 @@ cobertura {
     coverageExcludes = [
                         '.*\\\\.package-info.*', '.*\\.R.*', '.*BuildConfig.*',
                         '.*hochschuledarmstadt\\.photostream_tools\\.callback.*',
+                        '.*DividerItemDecoration',
                         '.*hochschuledarmstadt\\.photostream_tools\\.model.*',
                         '.*Http.*',
                         '.*PhotoStreamActivity.*',
