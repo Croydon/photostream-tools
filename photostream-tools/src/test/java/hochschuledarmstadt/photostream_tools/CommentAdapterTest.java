@@ -26,7 +26,6 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -35,24 +34,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
 
-import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
+import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class AdapterTest {
+public class CommentAdapterTest {
 
     private static class TestViewHolder extends RecyclerView.ViewHolder{
         public TestViewHolder(View itemView) {
@@ -60,21 +58,28 @@ public class AdapterTest {
         }
     }
 
-    private SimplePhotoAdapter<TestViewHolder> simplePhotoAdapter;
+    private TestCommentAdapter simpleCommentAdapter;
+
+    private static class TestCommentAdapter extends SimpleCommentAdapter<TestViewHolder>{
+
+        TestCommentAdapter(){
+            super();
+        }
+
+        @Override
+        public TestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return null;
+        }
+
+        @Override
+        public void onBindViewHolder(TestViewHolder holder, int position) {
+
+        }
+    }
 
     @Before
     public void setUp() {
-        simplePhotoAdapter = new SimplePhotoAdapter<TestViewHolder>() {
-            @Override
-            public TestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return null;
-            }
-
-            @Override
-            public void onBindViewHolder(TestViewHolder holder, int position) {
-
-            }
-        };
+        simpleCommentAdapter = new TestCommentAdapter();
     }
 
     @After
@@ -84,45 +89,45 @@ public class AdapterTest {
 
     @Test
     public void testAddAtFront(){
-        Photo fakePhoto = mock(Photo.class);
-        simplePhotoAdapter.addAtFront(fakePhoto);
-        assertTrue(simplePhotoAdapter.getItemCount() == 1);
+        Comment fakeComment = mock(Comment.class);
+        simpleCommentAdapter.addAtFront(fakeComment);
+        assertTrue(simpleCommentAdapter.getItemCount() == 1);
     }
 
     @Test
     public void testAdd(){
-        Photo fakePhoto = mock(Photo.class);
-        simplePhotoAdapter.add(fakePhoto);
-        assertTrue(simplePhotoAdapter.getItemCount() == 1);
+        Comment fakeComment = mock(Comment.class);
+        simpleCommentAdapter.add(fakeComment);
+        assertTrue(simpleCommentAdapter.getItemCount() == 1);
     }
 
     @Test
     public void testAddMultipleAtEndAndFront() {
-        Photo fakePhoto1 = mock(Photo.class);
-        Photo fakePhoto2 = mock(Photo.class);
-        Photo fakePhoto3 = mock(Photo.class);
-        simplePhotoAdapter.add(fakePhoto1);
-        simplePhotoAdapter.add(fakePhoto2);
-        simplePhotoAdapter.addAtFront(fakePhoto3);
-        assertEquals(fakePhoto3, simplePhotoAdapter.getItemAtPosition(0));
+        Comment fakeComment1 = mock(Comment.class);
+        Comment fakeComment2 = mock(Comment.class);
+        Comment fakeComment3 = mock(Comment.class);
+        simpleCommentAdapter.add(fakeComment1);
+        simpleCommentAdapter.add(fakeComment2);
+        simpleCommentAdapter.addAtFront(fakeComment3);
+        assertEquals(fakeComment3, simpleCommentAdapter.getItemAtPosition(0));
     }
 
     @Test
     public void testAddMultiple() {
-        Photo fakePhoto1 = mock(Photo.class);
-        Photo fakePhoto2 = mock(Photo.class);
-        Photo fakePhoto3 = mock(Photo.class);
-        simplePhotoAdapter.addAll(Arrays.asList(fakePhoto1, fakePhoto2, fakePhoto3));
-        assertEquals(fakePhoto3, simplePhotoAdapter.getItemAtPosition(2));
+        Comment fakeComment1 = mock(Comment.class);
+        Comment fakeComment2 = mock(Comment.class);
+        Comment fakeComment3 = mock(Comment.class);
+        simpleCommentAdapter.addAll(Arrays.asList(fakeComment1, fakeComment2, fakeComment3));
+        assertEquals(fakeComment3, simpleCommentAdapter.getItemAtPosition(2));
     }
 
     @Test
     public void testRemove() {
-        Photo fakePhoto1 = mock(Photo.class);
-        when(fakePhoto1.getId()).thenReturn(1);
-        simplePhotoAdapter.add(fakePhoto1);
-        simplePhotoAdapter.remove(1);
-        assertEquals(0, simplePhotoAdapter.getItemCount());
+        Comment fakeComment1 = mock(Comment.class);
+        when(fakeComment1.getId()).thenReturn(1);
+        simpleCommentAdapter.add(fakeComment1);
+        simpleCommentAdapter.remove(1);
+        assertEquals(0, simpleCommentAdapter.getItemCount());
     }
 
     @Test
@@ -132,23 +137,23 @@ public class AdapterTest {
     }
 
     private Bundle saveInstanceState() {
-        Photo fakePhoto1 = mock(Photo.class);
-        simplePhotoAdapter.add(fakePhoto1);
-        return simplePhotoAdapter.saveInstanceState();
+        Comment fakeComment1 = mock(Comment.class);
+        simpleCommentAdapter.add(fakeComment1);
+        return simpleCommentAdapter.saveInstanceState();
     }
 
     @Test
     public void testRestoreInstanceState() {
         Bundle bundle = saveInstanceState();
-        simplePhotoAdapter.restoreInstanceState(bundle);
-        assertEquals(1, simplePhotoAdapter.getItemCount());
+        simpleCommentAdapter.restoreInstanceState(bundle);
+        assertEquals(1, simpleCommentAdapter.getItemCount());
     }
 
     @Test
     public void testSetNewItems() {
-        simplePhotoAdapter.add(mock(Photo.class));
-        simplePhotoAdapter.set(Arrays.asList(mock(Photo.class), mock(Photo.class), mock(Photo.class), mock(Photo.class)));
-        assertEquals(4, simplePhotoAdapter.getItemCount());
+        simpleCommentAdapter.add(mock(Comment.class));
+        simpleCommentAdapter.set(Arrays.asList(mock(Comment.class), mock(Comment.class), mock(Comment.class), mock(Comment.class)));
+        assertEquals(4, simpleCommentAdapter.getItemCount());
     }
 
 }
