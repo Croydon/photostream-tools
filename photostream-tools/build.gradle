@@ -1,12 +1,11 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'net.saliman.cobertura'
+apply plugin: "net.saliman.cobertura"
+apply plugin: 'com.github.kt3k.coveralls'
 
 group = 'hochschuledarmstadt.photostream_tools'
 version = '0.0.36'
-
-cobertura.coverageFormats = ['html', 'xml']
 
 android {
     compileSdkVersion 23
@@ -24,6 +23,9 @@ android {
         versionName "1.0"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -101,6 +103,10 @@ task androidSourcesJar(type: Jar) {
 artifacts {
     archives androidSourcesJar
     archives androidJavadocsJar
+}
+
+tasks.coveralls {
+    dependsOn 'check'
 }
 
 
