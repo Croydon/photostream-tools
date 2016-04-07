@@ -31,7 +31,11 @@
 
         <activity android:name=".like.LikeActivity" />
         <activity android:name=".upload.PhotoUploadActivity" />
-        <activity android:name=".search.SearchActivity"/>
+        <activity android:name=".search.SearchActivity" />
+        <activity
+            android:name=".viewpager.ViewPagerActivity"
+            android:label="@string/title_activity_view_pager"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

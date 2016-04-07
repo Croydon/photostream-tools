@@ -47,6 +47,7 @@ import hochschuledarmstadt.photostream_tools.examples.like.LikeActivity;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 import hochschuledarmstadt.photostream_tools.examples.search.SearchActivity;
 import hochschuledarmstadt.photostream_tools.examples.upload.PhotoUploadActivity;
+import hochschuledarmstadt.photostream_tools.examples.viewpager.ViewPagerActivity;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -55,13 +56,15 @@ public class MenuActivity extends AppCompatActivity {
     private static final String MENU_LIKE = "Like";
     private static final String MENU_UPLOAD_PHOTO = "Upload Photo";
     private static final String MENU_SEARCH = "Search Photos";
+    private static final String MENU_VIEW_PAGER = "View Pager";
 
     private static final MenuItemWrapper[] menu = new MenuItemWrapper[]{
             new MenuItemWrapper(MENU_PHOTOS, PhotoActivity.class),
             new MenuItemWrapper(MENU_COMMENTS, CommentActivity.class),
             new MenuItemWrapper(MENU_LIKE, LikeActivity.class),
             new MenuItemWrapper(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
-            new MenuItemWrapper(MENU_SEARCH, SearchActivity.class)
+            new MenuItemWrapper(MENU_SEARCH, SearchActivity.class),
+            new MenuItemWrapper(MENU_VIEW_PAGER, ViewPagerActivity.class)
     };
 
     private MenuAdapter menuAdapter;
