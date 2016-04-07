@@ -87,16 +87,6 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
         notifyDataSetChanged();
     }
 
-    @Override
-    public Parcelable saveState() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void restoreState(Parcelable state, ClassLoader loader) {
-        throw new UnsupportedOperationException();
-    }
-
     public static class SavedState implements Parcelable{
 
         private List<Photo> photos;

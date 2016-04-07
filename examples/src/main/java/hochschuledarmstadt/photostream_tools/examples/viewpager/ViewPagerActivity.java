@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
+import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
@@ -68,6 +69,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
                     if(photoStreamClient != null)
                         photoStreamClient.loadMorePhotos();
                 }
+                updateActionBarSubtitle();
             }
 
             @Override
@@ -78,9 +80,24 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
         viewPager.addOnPageChangeListener(pageChangeListener);
         adapter = new PhotoFragmentPagerAdapter(getSupportFragmentManager());
-        if (savedInstanceState != null)
+
+        if (savedInstanceState != null) {
             adapter.restoreInstanceState(savedInstanceState.getParcelable(KEY_ADAPTER));
+            updateActionBarSubtitle();
+        }else{
+            setDefaultActionBarSubtitle();
+        }
+
         viewPager.setAdapter(adapter);
+
+    }
+
+    private void setDefaultActionBarSubtitle() {
+        getSupportActionBar().setSubtitle(String.format("%s/%s", 0, 0));
+    }
+
+    private void updateActionBarSubtitle() {
+        getSupportActionBar().setSubtitle(String.format("%s/%s", viewPager.getCurrentItem() + 1, adapter.getCount()));
     }
 
     @Override
@@ -93,6 +110,13 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         super.onPhotoStreamServiceConnected(photoStreamClient, savedInstanceState);
         photoStreamClient.addOnPhotosReceivedListener(this);
+        if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)){
+            photoStreamClient.loadPhotos();
+        }
+    }
+
+    private boolean shouldLoadPhotos(IPhotoStreamClient photoStreamClient) {
+        return adapter.getCount() == 0 && photoStreamClient.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS);
     }
 
     @Override
@@ -107,6 +131,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
             adapter.set(result.getPhotos());
         else
             adapter.addAll(result.getPhotos());
+        updateActionBarSubtitle();
     }
 
     @Override
