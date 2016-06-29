@@ -68,8 +68,11 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_like);
+        // Views referenzieren
         textView = (TextView) findViewById(R.id.statusTextView);
         likeButton = (Button) findViewById(R.id.likeButton);
+
+        // OnClickListener für den LikeButton setzen
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +84,7 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
             }
         });
 
+        // Zustand der Views wiederherstellen, wenn die Activity neu aufgebaut wird
         if (savedInstanceState != null){
             likeButton.setText(savedInstanceState.getString(KEY_LIKEBUTTON_TEXT));
             textView.setText(savedInstanceState.getString(KEY_TEXTVIEW_TEXT));
@@ -88,6 +92,9 @@ public class LikeActivity extends PhotoStreamActivity implements OnPhotoLikeList
 
     }
 
+    /*
+        Zustand der Views sichern, bevor die aktuelle Instanz der Activity zerstört wird
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

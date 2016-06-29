@@ -62,7 +62,8 @@ class WebSocketClientImpl implements WebSocketClient {
             options.transports = new String[]{WebSocket.NAME};
             options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
 
-            URI uri = URI.create(url + "/?token=" + installationId);
+            String endpoint = String.format("%s/?token=%s", this.url, installationId);
+            URI uri = URI.create(endpoint);
             if (androidSocket == null)
                 androidSocket = new AndroidSocket(options, uri, messageListener);
             return androidSocket.connect();

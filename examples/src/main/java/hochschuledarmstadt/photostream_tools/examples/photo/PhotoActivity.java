@@ -35,6 +35,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.List;
+
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
@@ -89,8 +91,9 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
         loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!getPhotoStreamClient().hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)) {
-                    getPhotoStreamClient().loadMorePhotos();
+                IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
+                if (!photoStreamClient.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)) {
+                    photoStreamClient.loadMorePhotos();
                 }
             }
         });
@@ -141,11 +144,15 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
 
     @Override
     public void onPhotosReceived(PhotoQueryResult result) {
-        if (result.getPage() == 1){             // Zum ersten Mal abgerufen oder aktualisiert
-            adapter.set(result.getPhotos());    // Photos ersetzen
+        List<Photo> photos = result.getPhotos();
+        if (result.isFirstPage()){
+            // Zum ersten Mal abgerufen oder Aktualisierung des Streams wurde explizit angefordet => Photos ersetzen
+            adapter.set(photos);
         }else{
-            adapter.addAll(result.getPhotos()); // Photos anhängen
+            // Photos an die Liste anhängen
+            adapter.addAll(photos);
         }
+        // Den Button sichtbar machen, wenn weitere Seiten im Stream vorhanden sind, ansonsten ausblenden
         loadMoreButton.setVisibility(result.hasNextPage() ? Button.VISIBLE : Button.GONE);
     }
 

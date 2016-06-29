@@ -24,12 +24,39 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-public interface WebSocketClient {
-    void setMessageListener(AndroidSocket.OnMessageListener messageListener);
+import java.io.IOException;
 
-    boolean connect();
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-    void disconnect();
+public class HttpPhotoNotModifiedExecutorFactoryStub implements HttpExecutorFactory {
 
-    boolean isConnected();
+    @Override
+    public HttpPutExecutor createHttpPutExecutor(String url) {
+        return null;
+    }
+
+    @Override
+    public HttpGetExecutor createHttpGetExecutor(String url) {
+        try {
+            HttpGetExecutor executor = mock(HttpGetExecutor.class);
+            when(executor.execute()).thenReturn(new HttpResponse(HttpResponse.STATUS_CONTENT_NOT_MODIFIED, null));
+            return executor;
+        } catch (BaseAsyncTask.HttpPhotoStreamException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public HttpDeleteExecutor createHttpDeleteExecutor(String url) {
+        return null;
+    }
+
+    @Override
+    public HttpPostExecutor createHttpPostExecutor(String url) {
+        return null;
+    }
 }

@@ -26,6 +26,10 @@ package hochschuledarmstadt.photostream_tools;
 
 class HttpResponse {
 
+    public static final int STATUS_CONTENT_NOT_MODIFIED = 304;
+    public static final int STATUS_OK = 200;
+    public static final int STATUS_INTERNAL_SERVER_ERROR = 500;
+
     private final int statusCode;
     private final String result;
 

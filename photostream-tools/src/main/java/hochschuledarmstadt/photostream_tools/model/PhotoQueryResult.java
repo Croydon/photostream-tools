@@ -49,10 +49,18 @@ public class PhotoQueryResult {
 
     /**
      * Liefert die Seite
-     * @return Seite
+     * @return int
      */
-    public Integer getPage() {
+    public int getPage() {
         return page;
+    }
+
+    /**
+     * Liefert {@code true} zurück, wenn die erste Seite aus dem Stream geladen wurde, ansonsten @code{false}
+     * @return {@code true}, wenn erste Seite, ansonsten {@code false}
+     */
+    public boolean isFirstPage(){
+        return page == 1;
     }
 
     /**

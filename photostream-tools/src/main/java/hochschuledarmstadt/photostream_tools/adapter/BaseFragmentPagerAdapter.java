@@ -57,6 +57,11 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
     }
 
     @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
+    @Override
     public int getCount() {
         return photos.size();
     }
@@ -67,7 +72,7 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
     public Fragment getItem(int position) {
         PhotoStreamFragment fragment = createNewFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("photo", photos.get(position));
+        bundle.putInt("position", position);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -83,8 +88,29 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
 
     public void restoreInstanceState(Parcelable state) {
         SavedState savedState = (SavedState) state;
+        this.photos.clear();
         this.photos.addAll(savedState.photos);
         notifyDataSetChanged();
+    }
+
+    public void remove(int photoId) {
+        for (int position = 0; position < photos.size(); position++) {
+            Photo photo = photos.get(position);
+            if (photo.getId() == photoId){
+                photos.remove(position);
+                notifyDataSetChanged();
+                break;
+            }
+        }
+    }
+
+    public void addAtFront(Photo photo) {
+        photos.add(0, photo);
+        notifyDataSetChanged();
+    }
+
+    public Photo getPhotoAtPosition(int position) {
+        return photos.get(position);
     }
 
     public static class SavedState implements Parcelable{

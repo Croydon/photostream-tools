@@ -44,7 +44,6 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
 
     public BaseAdapter(ArrayList<H> items){
         this.items = items;
-        setHasStableIds(true);
     }
 
     /**

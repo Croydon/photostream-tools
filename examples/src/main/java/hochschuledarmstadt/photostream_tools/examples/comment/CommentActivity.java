@@ -56,14 +56,20 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
 
+    // Methode wird von der Bibliothek "photostream-tools" automatisch aufgerufen,
+    // wenn die Activity an den Service gebunden wurde.
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnCommentsReceivedListener(this);
-        // Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
+        //Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
         if (savedInstanceState == null)
             photoStreamClient.loadComments(PHOTO_ID);
     }
 
+    /*
+        Methode wird von der Bibliothek "photostream-tools" automatisch aufgerufen,
+        wenn die Activity vom Service entbunden wurde.
+     */
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         // Listener wieder entfernen um Memory Leak zu vermeiden
@@ -76,7 +82,7 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
         setContentView(R.layout.activity_comment);
         // RecyclerView referenzieren
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        // LinearLayoutManager setzen (entspricht ListView)
+        // LinearLayoutManager setzen (Elemente in der angezeigten Liste werden sequentiell dargestellt)
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         // Visuellen Begrenzer setzen für Kommentare in der Liste
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
@@ -85,7 +91,7 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
         adapter = new CommentAdapter();
         // Wenn die Activity neu aufgebaut wird
         if (savedInstanceState != null) {
-            // dann die Kommentare aus dem Bundle wieder herstellen
+            // dann die Kommentare aus der vorherigen Activity Instanz wiederherstellen
             Bundle bundle = savedInstanceState.getBundle(KEY_ADAPTER);
             adapter.restoreInstanceState(bundle);
         }

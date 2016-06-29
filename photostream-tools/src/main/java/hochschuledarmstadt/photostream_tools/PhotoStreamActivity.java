@@ -40,6 +40,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 public abstract class PhotoStreamActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = PhotoStreamActivity.class.getName();
+
     private PhotoStreamClient photoStreamClient;
     private boolean bound;
     private Bundle refSavedInstanceState;
@@ -48,6 +49,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.refSavedInstanceState = savedInstanceState;
+        // Service starten, wenn die aktuelle Instanz der Activity neu erzeugt wurde
         if (savedInstanceState == null){
             startService(new Intent(this, PhotoStreamService.class));
         }
@@ -78,13 +80,10 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
 
     @Override
     protected void onStop() {
-
         if (isConnectedToService()) {
             photoStreamClient.unregisterActivity(this);
         }
-
         super.onStop();
-
         if (isConnectedToService()){
             if (isFinishing() && this instanceof OnPhotosReceivedListener) {
                 photoStreamClient.resetEtag();

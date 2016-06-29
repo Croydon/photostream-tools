@@ -43,23 +43,23 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public class ContentFragment extends PhotoStreamFragment {
 
-    public static final String KEY_PHOTO = "photo";
+    public static final String KEY_POSITION = "position";
     private ImageView imageView;
-    private Photo photo;
+    private int position;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null)
-            photo = getArguments().getParcelable(KEY_PHOTO);
+            position = getArguments().getInt(KEY_POSITION);
         else
-            photo = savedInstanceState.getParcelable(KEY_PHOTO);
+            position = savedInstanceState.getInt(KEY_POSITION);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(KEY_PHOTO, photo);
+        outState.putInt(KEY_POSITION, position);
     }
 
     @Nullable
@@ -72,6 +72,7 @@ public class ContentFragment extends PhotoStreamFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         imageView = (ImageView) getView().findViewById(R.id.imageView);
+        Photo photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
         try {
             Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(getContext(), new File(photo.getImageFilePath()));
             if (bitmap != null)

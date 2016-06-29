@@ -106,29 +106,26 @@ public class PhotoAdapterTest {
 
     @Test
     public void testAddMultipleAtEndAndFront() {
-        Photo fakePhoto1 = mock(Photo.class);
-        Photo fakePhoto2 = mock(Photo.class);
-        Photo fakePhoto3 = mock(Photo.class);
-        simplePhotoAdapter.add(fakePhoto1);
-        simplePhotoAdapter.add(fakePhoto2);
-        simplePhotoAdapter.addAtFront(fakePhoto3);
-        assertEquals(fakePhoto3, simplePhotoAdapter.getItemAtPosition(0));
+        Photo[] fakePhotos = new Photo[]{mock(Photo.class), mock(Photo.class), mock(Photo.class)};
+        simplePhotoAdapter.add(fakePhotos[0]);
+        simplePhotoAdapter.add(fakePhotos[1]);
+        simplePhotoAdapter.addAtFront(fakePhotos[2]);
+        assertEquals(fakePhotos[2], simplePhotoAdapter.getItemAtPosition(0));
     }
 
     @Test
     public void testAddMultiple() {
-        Photo fakePhoto1 = mock(Photo.class);
-        Photo fakePhoto2 = mock(Photo.class);
-        Photo fakePhoto3 = mock(Photo.class);
-        simplePhotoAdapter.addAll(Arrays.asList(fakePhoto1, fakePhoto2, fakePhoto3));
-        assertEquals(fakePhoto3, simplePhotoAdapter.getItemAtPosition(2));
+        Photo[] fakePhotos = new Photo[]{mock(Photo.class), mock(Photo.class), mock(Photo.class)};
+        int lastItemPosition = fakePhotos.length - 1;
+        simplePhotoAdapter.addAll(Arrays.asList(fakePhotos));
+        assertEquals(fakePhotos[lastItemPosition], simplePhotoAdapter.getItemAtPosition(lastItemPosition));
     }
 
     @Test
     public void testRemove() {
-        Photo fakePhoto1 = mock(Photo.class);
-        when(fakePhoto1.getId()).thenReturn(1);
-        simplePhotoAdapter.add(fakePhoto1);
+        Photo fakePhoto = mock(Photo.class);
+        when(fakePhoto.getId()).thenReturn(1);
+        simplePhotoAdapter.add(fakePhoto);
         simplePhotoAdapter.remove(1);
         assertEquals(0, simplePhotoAdapter.getItemCount());
     }
@@ -140,8 +137,8 @@ public class PhotoAdapterTest {
     }
 
     private Bundle saveInstanceState() {
-        Photo fakePhoto1 = mock(Photo.class);
-        simplePhotoAdapter.add(fakePhoto1);
+        Photo fakePhoto = mock(Photo.class);
+        simplePhotoAdapter.add(fakePhoto);
         return simplePhotoAdapter.saveInstanceState();
     }
 
@@ -153,7 +150,7 @@ public class PhotoAdapterTest {
     }
 
     @Test
-    public void testSetNewItems() {
+    public void testReplaceWithNewPhotos() {
         simplePhotoAdapter.add(mock(Photo.class));
         simplePhotoAdapter.set(Arrays.asList(mock(Photo.class), mock(Photo.class), mock(Photo.class), mock(Photo.class)));
         assertEquals(4, simplePhotoAdapter.getItemCount());

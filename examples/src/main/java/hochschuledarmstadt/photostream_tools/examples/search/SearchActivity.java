@@ -58,6 +58,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
         loadMoreButton = (Button) findViewById(R.id.button);
         loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,10 +66,12 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
                 getPhotoStreamClient().searchMorePhotos();
             }
         });
+
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         photoAdapter = new PhotoAdapter(new PhotoAdapter.OnPhotoClickListener() {
             @Override
             public void onPhotoClick(int position) {
@@ -96,7 +99,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     public void onSearchedPhotosReceived(PhotoQueryResult result) {
         List<Photo> photos = result.getPhotos();
         loadMoreButton.setVisibility(result.hasNextPage() ? Button.VISIBLE : Button.GONE);
-        if (result.getPage() == 1)
+        if (result.isFirstPage())
             photoAdapter.set(photos);
         else
             photoAdapter.addAll(photos);

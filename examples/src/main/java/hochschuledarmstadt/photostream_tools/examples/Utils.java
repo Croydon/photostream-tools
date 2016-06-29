@@ -29,9 +29,6 @@ import android.support.v7.app.AlertDialog;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
-/**
- * Created by Andreas Schattney on 14.03.2016.
- */
 public class Utils {
 
     public static void showErrorInAlertDialog(Context context, String title, HttpResult httpResult){

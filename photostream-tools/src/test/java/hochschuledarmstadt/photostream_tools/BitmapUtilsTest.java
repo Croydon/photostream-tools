@@ -42,6 +42,7 @@ import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,6 +54,9 @@ import static org.junit.Assert.assertTrue;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class BitmapUtilsTest {
 
+    private static final String UNIT_TEST_JPG = "unit_test.jpg";
+    private static final int JPEG_QUALITY = 100;
+    private static final int BITMAP_SIZE = 800;
     private Context context;
 
     @Before
@@ -76,7 +80,7 @@ public class BitmapUtilsTest {
     }
 
     private Bitmap createTestBitmap() {
-        return Bitmap.createBitmap(800,800, Bitmap.Config.ARGB_8888);
+        return Bitmap.createBitmap(BITMAP_SIZE, BITMAP_SIZE, Bitmap.Config.ARGB_8888);
     }
 
     @Test
@@ -103,8 +107,9 @@ public class BitmapUtilsTest {
     public void testReadBitmapFromFile(){
         Bitmap bitmap = createTestBitmap();
         try {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, context.openFileOutput("unit_test.jpg", Context.MODE_PRIVATE));
-            File file = new File(context.getFilesDir(), "unit_test.jpg");
+            FileOutputStream fs = context.openFileOutput(UNIT_TEST_JPG, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fs);
+            File file = new File(context.getFilesDir(), UNIT_TEST_JPG);
             Bitmap result = BitmapUtils.decodeBitmapFromFile(context, file);
             if (file.exists())
                 file.delete();
@@ -117,10 +122,15 @@ public class BitmapUtilsTest {
 
     @Test
     public void testReadBitmapFromUri(){
+
         Bitmap bitmap = createTestBitmap();
+
         try {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, context.openFileOutput("unit_test.jpg", Context.MODE_PRIVATE));
-            File file = new File(context.getFilesDir(), "unit_test.jpg");
+
+            FileOutputStream fs = context.openFileOutput(UNIT_TEST_JPG, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fs);
+
+            File file = new File(context.getFilesDir(), UNIT_TEST_JPG);
             Bitmap result = BitmapUtils.decodeBitmapFromUri(context, Uri.fromFile(file));
             if (file.exists())
                 file.delete();
@@ -130,5 +140,6 @@ public class BitmapUtilsTest {
         } catch (FileNotFoundException e) {
             assertFalse(e.toString(), true);
         }
+
     }
 }

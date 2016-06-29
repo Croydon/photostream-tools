@@ -275,7 +275,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpPostExecutor createMockHttpPostExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPostExecutor executor = mock(HttpPostExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
+        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -284,7 +284,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpDeleteExecutor createMockHttpDeleteExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpDeleteExecutor executor = mock(HttpDeleteExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
+        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -292,7 +292,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpPutExecutor createMockHttpPutExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPutExecutor executor = mock(HttpPutExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
+        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -300,7 +300,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpGetExecutor createMockHttpGetExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = mock(HttpGetExecutor.class);
-        HttpResult errorResult = new HttpResult(500, null);
+        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }

@@ -103,29 +103,26 @@ public class CommentAdapterTest {
 
     @Test
     public void testAddMultipleAtEndAndFront() {
-        Comment fakeComment1 = mock(Comment.class);
-        Comment fakeComment2 = mock(Comment.class);
-        Comment fakeComment3 = mock(Comment.class);
-        simpleCommentAdapter.add(fakeComment1);
-        simpleCommentAdapter.add(fakeComment2);
-        simpleCommentAdapter.addAtFront(fakeComment3);
-        assertEquals(fakeComment3, simpleCommentAdapter.getItemAtPosition(0));
+        Comment[] fakeComments = new Comment[]{mock(Comment.class), mock(Comment.class), mock(Comment.class), mock(Comment.class)};
+        simpleCommentAdapter.add(fakeComments[0]);
+        simpleCommentAdapter.add(fakeComments[1]);
+        simpleCommentAdapter.addAtFront(fakeComments[2]);
+        assertEquals(fakeComments[2], simpleCommentAdapter.getItemAtPosition(0));
     }
 
     @Test
     public void testAddMultiple() {
-        Comment fakeComment1 = mock(Comment.class);
-        Comment fakeComment2 = mock(Comment.class);
-        Comment fakeComment3 = mock(Comment.class);
-        simpleCommentAdapter.addAll(Arrays.asList(fakeComment1, fakeComment2, fakeComment3));
-        assertEquals(fakeComment3, simpleCommentAdapter.getItemAtPosition(2));
+        Comment[] fakeComments = new Comment[]{mock(Comment.class), mock(Comment.class), mock(Comment.class)};
+        simpleCommentAdapter.addAll(Arrays.asList(fakeComments));
+        int lastItemPosition = fakeComments.length - 1;
+        assertEquals(fakeComments[lastItemPosition], simpleCommentAdapter.getItemAtPosition(lastItemPosition));
     }
 
     @Test
     public void testRemove() {
-        Comment fakeComment1 = mock(Comment.class);
-        when(fakeComment1.getId()).thenReturn(1);
-        simpleCommentAdapter.add(fakeComment1);
+        Comment fakeComment = mock(Comment.class);
+        when(fakeComment.getId()).thenReturn(1);
+        simpleCommentAdapter.add(fakeComment);
         simpleCommentAdapter.remove(1);
         assertEquals(0, simpleCommentAdapter.getItemCount());
     }
@@ -137,8 +134,8 @@ public class CommentAdapterTest {
     }
 
     private Bundle saveInstanceState() {
-        Comment fakeComment1 = mock(Comment.class);
-        simpleCommentAdapter.add(fakeComment1);
+        Comment fakeComment = mock(Comment.class);
+        simpleCommentAdapter.add(fakeComment);
         return simpleCommentAdapter.saveInstanceState();
     }
 
@@ -152,8 +149,9 @@ public class CommentAdapterTest {
     @Test
     public void testSetNewItems() {
         simpleCommentAdapter.add(mock(Comment.class));
-        simpleCommentAdapter.set(Arrays.asList(mock(Comment.class), mock(Comment.class), mock(Comment.class), mock(Comment.class)));
-        assertEquals(4, simpleCommentAdapter.getItemCount());
+        Comment[] fakeComments = new Comment[]{mock(Comment.class), mock(Comment.class), mock(Comment.class), mock(Comment.class)};
+        simpleCommentAdapter.set(Arrays.asList(fakeComments));
+        assertEquals(fakeComments.length, simpleCommentAdapter.getItemCount());
     }
 
 }

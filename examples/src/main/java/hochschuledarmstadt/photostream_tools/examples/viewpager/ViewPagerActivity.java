@@ -25,25 +25,33 @@
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
+import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class ViewPagerActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener {
+public class ViewPagerActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnPhotoDeletedListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
+
+    /**
+     * Beschreibt wie früh weitere Photos nachgeladen werden sollen.
+     * Wenn beispielsweise 5 Photos angezeigt werden und auf das dritte Photo gewechselt wird
+     * mit {@code PAGE_POSITION_OFFSET} = 2, dann wird die nächste Seite aus dem Stream geladen,
+     * weil 5 - 3 = 2 = {@code PAGE_POSITION_OFFSET}
+     */
+    private static final int PAGE_POSITION_OFFSET = 2;
     private ViewPager viewPager;
     private PhotoFragmentPagerAdapter adapter;
     private ViewPager.OnPageChangeListener pageChangeListener;
@@ -64,7 +72,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
             @Override
             public void onPageSelected(int position) {
-                if (position + 2 == adapter.getCount()){
+                if (shouldLoadMorePhotos(position)){
                     IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
                     if(photoStreamClient != null)
                         photoStreamClient.loadMorePhotos();
@@ -79,9 +87,11 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         };
 
         viewPager.addOnPageChangeListener(pageChangeListener);
+
         adapter = new PhotoFragmentPagerAdapter(getSupportFragmentManager());
 
         if (savedInstanceState != null) {
+            // Photos aus vorheriger Activity wiederherstellen
             adapter.restoreInstanceState(savedInstanceState.getParcelable(KEY_ADAPTER));
             updateActionBarSubtitle();
         }else{
@@ -90,6 +100,16 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
         viewPager.setAdapter(adapter);
 
+    }
+
+    private boolean shouldLoadMorePhotos(int position) {
+        int n = (position + PAGE_POSITION_OFFSET);
+        boolean couldFetchMorePhotos = isConnectedToService() &&  n >= adapter.getCount();
+        return couldFetchMorePhotos && isNotAlreadyFetchingMorePhotos();
+    }
+
+    private boolean isNotAlreadyFetchingMorePhotos() {
+        return !getPhotoStreamClient().hasOpenRequestsOfType(RequestType.LOAD_PHOTOS);
     }
 
     private void setDefaultActionBarSubtitle() {
@@ -110,24 +130,28 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         super.onPhotoStreamServiceConnected(photoStreamClient, savedInstanceState);
         photoStreamClient.addOnPhotosReceivedListener(this);
+        photoStreamClient.addOnPhotoDeletedListener(this);
+        photoStreamClient.addOnNewPhotoReceivedListener(this);
         if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)){
             photoStreamClient.loadPhotos();
         }
     }
 
     private boolean shouldLoadPhotos(IPhotoStreamClient photoStreamClient) {
-        return adapter.getCount() == 0 && photoStreamClient.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS);
+        return adapter.getCount() == 0 && !photoStreamClient.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS);
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         super.onPhotoStreamServiceDisconnected(photoStreamClient);
         photoStreamClient.removeOnPhotosReceivedListener(this);
+        photoStreamClient.removeOnPhotoDeletedListener(this);
+        photoStreamClient.removeOnNewPhotoReceivedListener(this);
     }
 
     @Override
     public void onPhotosReceived(PhotoQueryResult result) {
-        if (result.getPage() == 1)
+        if (result.isFirstPage())
             adapter.set(result.getPhotos());
         else
             adapter.addAll(result.getPhotos());
@@ -136,7 +160,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
     @Override
     public void onReceivePhotosFailed(HttpResult httpResult) {
-
+        Utils.showErrorInAlertDialog(this, "Could not receive Photos", httpResult);
     }
 
     @Override
@@ -158,5 +182,28 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     protected void onDestroy() {
         viewPager.removeOnPageChangeListener(pageChangeListener);
         super.onDestroy();
+    }
+
+    @Override
+    public void onNewPhotoReceived(Photo photo) {
+        adapter.addAtFront(photo);
+        updateActionBarSubtitle();
+    }
+
+    public Photo getPhoto(int position){
+        return adapter.getPhotoAtPosition(position);
+    }
+
+    @Override
+    public void onPhotoDeleted(int photoId) {
+        adapter.remove(photoId);
+        updateActionBarSubtitle();
+        if(shouldLoadMorePhotos(viewPager.getCurrentItem()))
+            getPhotoStreamClient().loadMorePhotos();
+    }
+
+    @Override
+    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
+        Utils.showErrorInAlertDialog(this, String.format("Couldn't delete photo with id: %s", photoId), httpResult);
     }
 }

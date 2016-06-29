@@ -47,15 +47,25 @@ public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentV
         }
     }
 
+    /*
+        Wird aufgerufen, wenn ein neues Layout benötigt wird.
+        Es werden nur so viele ViewHolder instanziert wie Views in der Liste angezeigt werden können.
+        Sind also in der Liste beispielsweise immer nur 5 Elemente sichtbar, wird diese Methode 5x aufgerufen.
+        Anschließend werden die erzeugten ViewHolder, wenn möglich, für andere Elemente in der Liste wiederverwendet (z.B) beim scrollen)
+    */
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // Wird aufgerufen, wenn ein neues Layout benötigt wird
-        return new CommentViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false));
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v = inflater.inflate(R.layout.comment_item, parent, false);
+        return new CommentViewHolder(v);
     }
 
+    /*
+        Wird aufgerufen, wenn ein Layout in der Liste aktualisiert werden muss.
+        Bedeutet, dass ein bestehender ViewHolder ein anderes Element an der "position" in der Liste repräsentieren soll.
+     */
     @Override
     public void onBindViewHolder(CommentViewHolder holder, int position) {
-        // Wird aufgerufen, wenn ein Layout aktualisiert werden muss
         Comment comment = getItemAtPosition(position);
         holder.textView.setText(comment.getMessage());
     }

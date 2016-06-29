@@ -38,4 +38,6 @@ public class PhotoFragmentPagerAdapter extends BaseFragmentPagerAdapter<ContentF
     protected ContentFragment createNewFragment() {
         return new ContentFragment();
     }
+
+
 }
