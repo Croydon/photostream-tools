@@ -26,10 +26,15 @@ package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
@@ -138,6 +143,53 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      */
     public void restoreInstanceState(Bundle bundle){
         items = bundle.getParcelableArrayList(KEY_ITEMS);
+    }
+
+    private Map<Integer, OnItemClickListener<H>> itemClickListenersMap = new HashMap<>();
+
+    public void setOnItemClickListener(int viewId, OnItemClickListener<H> itemClickListener){
+        if (itemClickListenersMap.containsKey(viewId))
+            itemClickListenersMap.remove(viewId);
+        itemClickListenersMap.put(viewId, itemClickListener);
+    }
+
+    interface OnItemClickListener<H extends BaseItem & Parcelable> {
+        void onItemClicked(View v, H item);
+    }
+
+    @Override
+    public void onBindViewHolder(T holder, int position) {
+        for (Map.Entry<Integer, OnItemClickListener<H>> entry : itemClickListenersMap.entrySet()){
+            int viewId = entry.getKey();
+            View v = holder.itemView.findViewById(viewId);
+            if (v != null && !ViewCompat.hasOnClickListeners(v)) {
+                v.setOnClickListener(new InternalOnClickListener(holder));
+            }
+        }
+    }
+
+    @Override
+    public void onViewRecycled(T holder) {
+        holder.itemView.setOnClickListener(null);
+        super.onViewRecycled(holder);
+    }
+
+    private class InternalOnClickListener implements View.OnClickListener {
+
+        private final RecyclerView.ViewHolder viewHolder;
+
+        public InternalOnClickListener(RecyclerView.ViewHolder viewHolder){
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public void onClick(View v) {
+            int viewId = v.getId();
+            if (itemClickListenersMap.containsKey(viewId)) {
+                OnItemClickListener<H> listener = itemClickListenersMap.get(viewId);
+                listener.onItemClicked(v, getItemAtPosition(viewHolder.getAdapterPosition()));
+            }
+        }
     }
 
 }

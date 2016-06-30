@@ -26,6 +26,9 @@ package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -160,6 +163,11 @@ public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> exte
             }
         }
         return false;
+    }
+
+    public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Photo>{
+        @Override
+        void onItemClicked(View v, Photo photo);
     }
 
 }

@@ -38,6 +38,7 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
+import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
@@ -72,10 +73,10 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        photoAdapter = new PhotoAdapter(new PhotoAdapter.OnPhotoClickListener() {
+        photoAdapter = new PhotoAdapter();
+        photoAdapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
             @Override
-            public void onPhotoClick(int position) {
-                Photo photo = photoAdapter.getItemAtPosition(position);
+            public void onItemClicked(View v, Photo photo) {
                 Toast.makeText(SearchActivity.this, String.format("Photo Id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
             }
         });

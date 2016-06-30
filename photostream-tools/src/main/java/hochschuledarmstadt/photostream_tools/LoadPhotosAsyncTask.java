@@ -25,6 +25,8 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.google.gson.Gson;
 import com.squareup.okhttp.HttpUrl;
@@ -85,7 +87,12 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             }
             return photoQueryResult;
         }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){
-            callback.onNoNewPhotosAvailable();
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onNoNewPhotosAvailable();
+                }
+            });
         }
         return null;
     }

@@ -34,26 +34,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
+import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 
-public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
-
-    private final OnPhotoClickListener photoClickListener;
-
-    public PhotoAdapter(OnPhotoClickListener photoClickListener){
-        this.photoClickListener = photoClickListener;
-    }
+public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        return new PhotoViewHolder(layoutInflater.inflate(R.layout.photo_item, parent, false), photoClickListener);
+        return new PhotoViewHolder(layoutInflater.inflate(R.layout.photo_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
         BitmapUtils.recycleBitmapFromImageView(holder.imageView);
         Photo photo = getItemAtPosition(position);
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
@@ -72,21 +68,11 @@ public class PhotoAdapter extends hochschuledarmstadt.photostream_tools.adapter.
         public final TextView textView;
         public final ImageView imageView;
 
-        public PhotoViewHolder(View itemView, final OnPhotoClickListener photoClickListener) {
+        public PhotoViewHolder(View itemView) {
             super(itemView);
             textView = (TextView) itemView.findViewById(R.id.textView);
             imageView = (ImageView) itemView.findViewById(R.id.imageView);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    photoClickListener.onPhotoClick(getAdapterPosition());
-                }
-            });
         }
-    }
-
-    public interface OnPhotoClickListener {
-        void onPhotoClick(int position);
     }
 
 }

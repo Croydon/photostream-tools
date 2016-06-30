@@ -180,6 +180,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
             @Override
             public void onNoNewPhotosAvailable() {
+
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnNoNewPhotosAvailable();
             }

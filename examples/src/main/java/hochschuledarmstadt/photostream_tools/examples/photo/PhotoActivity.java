@@ -41,6 +41,7 @@ import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
+import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
@@ -98,10 +99,10 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
             }
         });
 
-        adapter = new PhotoAdapter(new PhotoAdapter.OnPhotoClickListener() {
+        adapter = new PhotoAdapter();
+        adapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
             @Override
-            public void onPhotoClick(int position) {
-                Photo photo = adapter.getItemAtPosition(position);
+            public void onItemClicked(View v, Photo photo) {
                 Toast.makeText(PhotoActivity.this, String.format("photo id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
             }
         });

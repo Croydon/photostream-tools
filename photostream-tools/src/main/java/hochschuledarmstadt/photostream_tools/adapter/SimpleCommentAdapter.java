@@ -26,6 +26,7 @@ package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.util.Collection;
 
@@ -117,5 +118,10 @@ public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> ex
     @Override
     public void restoreInstanceState(Bundle bundle) {
         super.restoreInstanceState(bundle);
+    }
+
+    public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Comment>{
+        @Override
+        void onItemClicked(View v, Comment comment);
     }
 }
