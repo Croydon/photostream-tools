@@ -158,26 +158,41 @@ public class Photo extends BaseItem implements Parcelable{
         return new File(context.getFilesDir(), imageFileName);
     }
 
-    public boolean saveToImageToCache(Context context) throws IOException {
+    public boolean cacheImage(Context context)throws IOException{
+        if (isCached(context)) {
+            File filePath = getImageFilePathForPhotoId(context, id);
+            this.imageFilePath = filePath.getAbsolutePath();
+            return true;
+        }
+        else
+            return cacheImage(context, Base64.decode(imageFilePath, Base64.DEFAULT));
+    }
+
+    public boolean cacheImage(Context context, byte[] data) throws IOException {
 
         boolean inCache = false;
-
+        boolean error = false;
         String filename = getImageFileName(id);
         if (!imageExistsOnFileSystem(context, filename)) {
             FileOutputStream outputStream = null;
             try {
                 outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-                byte[] data = Base64.decode(imageFilePath, Base64.DEFAULT);
+                //byte[] data = Base64.decode(imageFilePath, Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
                 imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
                 inCache = true;
             } catch (Exception e) {
-
+                error = true;
             } finally {
                 if (outputStream != null)
                     outputStream.close();
+            }
+            if (error){
+                File file = getImageFilePathForPhotoId(context, id);
+                if (file.exists())
+                    file.delete();
             }
         }else{
             inCache = true;
@@ -198,5 +213,9 @@ public class Photo extends BaseItem implements Parcelable{
 
     public static File getImageFilePathForPhotoId(Context context, int photoId) {
         return concatImageFilePath(context, getImageFileName(photoId));
+    }
+
+    public boolean isCached(Context context) {
+        return imageExistsOnFileSystem(context, getImageFileName(id));
     }
 }

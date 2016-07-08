@@ -29,8 +29,6 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
@@ -77,7 +75,7 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
         PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
         final List<Photo> photos = photoQueryResult.getPhotos();
         for (Photo photo : photos){
-            photo.saveToImageToCache(context);
+            photo.cacheImage(context);
         }
         return photoQueryResult;
     }

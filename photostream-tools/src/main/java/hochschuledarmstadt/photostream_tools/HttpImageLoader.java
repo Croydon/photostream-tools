@@ -24,10 +24,39 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
 
-class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
-    public LoadMorePhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback) {
-        super(executor, imageLoader, context, callback);
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+class HttpImageLoader {
+
+    private final String formatPhotoContentUrl;
+
+    public HttpImageLoader(String formatPhotoContentUrl){
+        this.formatPhotoContentUrl = formatPhotoContentUrl;
     }
+
+    public byte[] execute(int photoId) {
+        try {
+            String u = String.format(formatPhotoContentUrl, photoId);
+            URL url = new URL(u);
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+            byte[] data = os.toByteArray();
+            os.close();
+            return data;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

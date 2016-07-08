@@ -24,10 +24,14 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
+public class HttpImageLoaderStub extends HttpImageLoader {
 
-class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
-    public LoadMorePhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback) {
-        super(executor, imageLoader, context, callback);
+    public HttpImageLoaderStub() {
+        super(null);
+    }
+
+    @Override
+    public byte[] execute(int photoId) {
+        return null;
     }
 }

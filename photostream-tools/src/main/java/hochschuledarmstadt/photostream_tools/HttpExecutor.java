@@ -28,6 +28,9 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,9 +41,9 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 abstract class HttpExecutor {
 
     protected static final int CONNECT_TIMEOUT = 6000;
-    protected static final String UTF_8 = "UTF-8";
     private final String installationId;
     private final String url;
+    private Charset encoding = Charset.forName("UTF-8");
 
     protected String getInstallationId() {
         return installationId;
@@ -57,7 +60,7 @@ abstract class HttpExecutor {
 
     @NonNull
     protected String convertStreamToString(InputStream is) throws IOException {
-        InputStreamReader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
+        InputStreamReader reader = new InputStreamReader(is, encoding);
         char[] buffer = new char[4096];
         StringBuilder stringBuilder = new StringBuilder();
         int read;
@@ -76,4 +79,11 @@ abstract class HttpExecutor {
         }
     }
 
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
+    }
 }

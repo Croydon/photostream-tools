@@ -153,14 +153,16 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public void loadPhotos() {
 
         String url = urlBuilder.getLoadPhotosApiUrl();
+        String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
 
         if (loadPhotosETag != null)
             executor.addHeaderField("if-modified-since", loadPhotosETag);
 
         final RequestType requestType = RequestType.LOAD_PHOTOS;
+        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
 
-        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
+        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -198,9 +200,11 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void loadMorePhotos() {
         String url = urlBuilder.getLoadMorePhotosApiUrl();
+        String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.LOAD_PHOTOS;
-        LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(executor, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
+        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
+        LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
                 removeOpenRequest(requestType);
@@ -529,7 +533,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
             @Override
             public void onNewETag(String eTag) {
-
+                loadPhotosETag = eTag;
             }
 
         });
@@ -552,7 +556,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void onNewPhoto(Photo photo) {
         try {
-            photo.saveToImageToCache(context);
+            photo.cacheImage(context);
             callbackContainer.notifyOnNewPhoto(context, photo);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());

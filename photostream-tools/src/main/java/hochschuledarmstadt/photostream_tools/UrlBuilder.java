@@ -84,4 +84,8 @@ class UrlBuilder {
         }
     }
 
+    public String getFormatPhotoContentApiUrl(){
+        return String.format("%s/photostream/api/image/%s/content", baseUrl, "%s");
+    }
+
 }

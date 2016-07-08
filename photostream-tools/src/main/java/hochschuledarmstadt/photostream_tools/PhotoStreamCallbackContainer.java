@@ -71,7 +71,7 @@ class PhotoStreamCallbackContainer {
     private List<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
 
     private final HashMap<RequestType, List<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
-    private List<PhotoStreamActivity> activities = new ArrayList<>();
+    private List<ActivityInfo> activityInfos = new ArrayList<>();
 
     public PhotoStreamCallbackContainer(){
         addListenerToMap();
@@ -334,7 +334,11 @@ class PhotoStreamCallbackContainer {
     }
 
     public boolean appIsInBackground() {
-        return activities.size() > 0;
+        for (ActivityInfo activityInfo : activityInfos){
+            if (activityInfo.isInForeground())
+                return false;
+        }
+        return true;
     }
 
     public void notifyOnPhotosFailed(HttpResult httpResult) {
@@ -379,13 +383,17 @@ class PhotoStreamCallbackContainer {
     }
 
     public void registerActivity(PhotoStreamActivity activity) {
-        if (!activities.contains(activity))
-            activities.add(activity);
+        ActivityInfo ai = new ActivityInfo(activity.getClass(), true);
+        if (activityInfos.contains(ai))
+            activityInfos.remove(ai);
+        activityInfos.add(ai);
     }
 
     public void unregisterActivity(PhotoStreamActivity activity) {
-        if (activities.contains(activity))
-            activities.remove(activity);
+        ActivityInfo ai = new ActivityInfo(activity.getClass(), false);
+        if (activityInfos.contains(ai))
+            activityInfos.remove(ai);
+        activityInfos.add(ai);
     }
 
 }

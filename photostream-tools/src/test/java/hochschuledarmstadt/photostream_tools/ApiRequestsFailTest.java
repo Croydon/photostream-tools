@@ -65,7 +65,7 @@ public class ApiRequestsFailTest {
     private static final int INVALID_COMMENT_ID = -1;
 
     private Context context;
-
+    private HttpImageLoaderStub imageLoader = new HttpImageLoaderStub();
     @Before
     public void setUp() {
         context = RuntimeEnvironment.application.getApplicationContext();
@@ -80,7 +80,7 @@ public class ApiRequestsFailTest {
     public void loadPhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = createMockHttpGetExecutor();
         LoadPhotosAsyncTask.GetPhotosCallback callback = mock(LoadPhotosAsyncTask.GetPhotosCallback.class);
-        LoadPhotosAsyncTask streamAsyncTask = new LoadPhotosAsyncTask(executor, context, callback);
+        LoadPhotosAsyncTask streamAsyncTask = new LoadPhotosAsyncTask(executor, imageLoader, context, callback);
         streamAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -97,7 +97,7 @@ public class ApiRequestsFailTest {
     public void loadMorePhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = createMockHttpGetExecutor();
         LoadMorePhotosAsyncTask.GetPhotosCallback callback = mock(LoadMorePhotosAsyncTask.GetPhotosCallback.class);
-        LoadMorePhotosAsyncTask streamAsyncTask = new LoadMorePhotosAsyncTask(executor, context, callback);
+        LoadMorePhotosAsyncTask streamAsyncTask = new LoadMorePhotosAsyncTask(executor, imageLoader, context, callback);
         streamAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {

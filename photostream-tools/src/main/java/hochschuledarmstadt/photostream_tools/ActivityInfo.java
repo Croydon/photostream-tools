@@ -24,10 +24,35 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
+import android.app.Activity;
 
-class LoadMorePhotosAsyncTask extends LoadPhotosAsyncTask {
-    public LoadMorePhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback) {
-        super(executor, imageLoader, context, callback);
+class ActivityInfo {
+
+    private final Class<? extends Activity> clazz;
+    private final boolean isResumed;
+
+    public ActivityInfo(Class<? extends Activity> clazz, boolean resumed){
+        this.clazz = clazz;
+        this.isResumed = resumed;
+    }
+
+    public Class<? extends Activity> getClazz() {
+        return clazz;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ActivityInfo))
+            return false;
+        return clazz.equals(((ActivityInfo) o).clazz);
+    }
+
+    @Override
+    public int hashCode() {
+        return clazz.hashCode();
+    }
+
+    public boolean isInForeground() {
+        return isResumed;
     }
 }

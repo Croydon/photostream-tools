@@ -54,12 +54,13 @@ class HttpPostExecutor extends HttpExecutor {
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", getInstallationId());
         urlConnection.addRequestProperty("Content-Type", "application/json");
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), Charset.forName(UTF_8)));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), getEncoding()));
         writer.write(message, 0, message.length());
         writer.flush();
         writer.close();
         final int status = urlConnection.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK) {
+            eTag = urlConnection.getHeaderField("ETag");
             String result = convertStreamToString(urlConnection.getInputStream());
             return new HttpResponse(status, result);
         }else{

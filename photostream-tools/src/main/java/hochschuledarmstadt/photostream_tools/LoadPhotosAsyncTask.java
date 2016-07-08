@@ -25,15 +25,19 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.google.gson.Gson;
-import com.squareup.okhttp.HttpUrl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
@@ -46,10 +50,12 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     private final GetPhotosCallback callback;
     private final HttpGetExecutor executor;
     private final Context context;
+    private final HttpImageLoader imageLoader;
 
-    public LoadPhotosAsyncTask(HttpGetExecutor executor, Context context, GetPhotosCallback callback){
+    public LoadPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback){
         super();
         this.executor = executor;
+        this.imageLoader = imageLoader;
         this.context = context;
         this.callback = callback;
     }
@@ -83,7 +89,13 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
             final List<Photo> photos = photoQueryResult.getPhotos();
             for (Photo photo : photos) {
-                photo.saveToImageToCache(context);
+                if (!photo.isCached(context)) {
+                    byte[] data = imageLoader.execute(photo.getId());
+                    if (data != null)
+                        photo.cacheImage(context, data);
+                }else{
+                    photo.cacheImage(context);
+                }
             }
             return photoQueryResult;
         }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){
@@ -116,6 +128,10 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
         void onPhotosError(HttpResult httpResult);
         void onNewETag(String eTag);
         void onNoNewPhotosAvailable();
+    }
+
+    protected static class QueryResult {
+
     }
 
 }
