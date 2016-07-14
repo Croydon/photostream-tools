@@ -43,6 +43,7 @@ import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
+import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
@@ -68,7 +69,8 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
                 if (!photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD_PHOTO)) {
                     byte[] imageBytes = BitmapUtils.bitmapToBytes(bitmap);
                     try {
-                        photoStreamClient.uploadPhoto(imageBytes, editText.getText().toString().trim());
+                        String description = editText.getText().toString().trim();
+                        photoStreamClient.uploadPhoto(imageBytes, description);
                     } catch (IOException e) {
                         Log.e(TAG, "error while sending photo to server", e);
                     } catch (JSONException e) {
@@ -108,7 +110,7 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
 
     @Override
     public void onPhotoUploadFailed(HttpResult httpResult) {
-        Toast.makeText(this, String.format("Photo Upload failed: %s", httpResult.getMessage()), Toast.LENGTH_LONG).show();
+        Utils.showErrorInAlertDialog(this, "Photo Upload failed", httpResult);
     }
 
     @Override

@@ -50,4 +50,5 @@ public interface OnCommentsReceivedListener extends OnRequestListener {
      * @param httpResult enthält den HTTP Status Code, sowie die Fehlernachricht
      */
     void onReceiveCommentsFailed(int photoId, HttpResult httpResult);
+
 }

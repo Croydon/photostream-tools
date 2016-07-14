@@ -24,6 +24,8 @@
 
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -31,12 +33,17 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.List;
 
+import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
@@ -51,7 +58,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnPhotoDeletedListener, OnNewPhotoReceivedListener {
+public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener {
 
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
@@ -100,10 +107,11 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
         });
 
         adapter = new PhotoAdapter();
+
         adapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Photo photo) {
-                Toast.makeText(PhotoActivity.this, String.format("photo id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(PhotoActivity.this, String.format("Click: photo id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -169,6 +177,11 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     }
 
     @Override
+    public void onNewCommentCount(int photoId, int comment_count) {
+        adapter.updateCommentCount(photoId, comment_count);
+    }
+
+    @Override
     public void onShowProgressDialog() {
         findViewById(R.id.progressCircle).setVisibility(View.VISIBLE);
     }
@@ -181,16 +194,6 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     @Override
     public void onNewPhotoReceived(Photo photo) {
         adapter.add(photo);
-    }
-
-    @Override
-    public void onPhotoDeleted(int photoId) {
-        adapter.remove(photoId);
-    }
-
-    @Override
-    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
-
     }
 
     @Override

@@ -32,11 +32,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
@@ -50,6 +54,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.LoadCommentsQueryResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -60,7 +65,9 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     private final HttpExecutorFactory httpExecutorFactory;
     private final Context context;
-    private DbConnection dbConnection;
+    private final HttpImageLoader imageLoader;
+    private final CommentTable commentTable;
+    private final LikeTable likeTable;
     private String lastSearchQuery;
     private String loadPhotosETag;
     private BroadcastReceiver internetAvailableBroadcastReceiver;
@@ -68,13 +75,15 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     private WebSocketClient webSocketClient;
     private PhotoStreamCallbackContainer callbackContainer;
 
-    public PhotoStreamClient(Context context, UrlBuilder urlBuilder, DbConnection dbConnection, WebSocketClient webSocketClient, PhotoStreamCallbackContainer callbackContainer, HttpExecutorFactory httpExecutorFactory){
+    public PhotoStreamClient(Context context, UrlBuilder urlBuilder, HttpImageLoader imageLoader, DbConnection dbConnection, WebSocketClient webSocketClient, PhotoStreamCallbackContainer callbackContainer, HttpExecutorFactory httpExecutorFactory){
         this.context = context;
         this.urlBuilder = urlBuilder;
+        this.imageLoader = imageLoader;
         this.webSocketClient = webSocketClient;
         this.callbackContainer = callbackContainer;
-        this.dbConnection = dbConnection;
         this.httpExecutorFactory = httpExecutorFactory;
+        this.commentTable = new CommentTable(dbConnection);
+        this.likeTable = new LikeTable(dbConnection);
     }
 
     void destroy() {
@@ -153,14 +162,12 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     public void loadPhotos() {
 
         String url = urlBuilder.getLoadPhotosApiUrl();
-        String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
 
         if (loadPhotosETag != null)
             executor.addHeaderField("if-modified-since", loadPhotosETag);
 
         final RequestType requestType = RequestType.LOAD_PHOTOS;
-        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
 
         LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
@@ -200,10 +207,8 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void loadMorePhotos() {
         String url = urlBuilder.getLoadMorePhotosApiUrl();
-        String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.LOAD_PHOTOS;
-        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
         LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
@@ -237,7 +242,6 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getLikePhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
         final RequestType requestType = RequestType.LIKE_PHOTO;
-        LikeTable likeTable = new LikeTable(DbConnection.getInstance(context));
         LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(executor, likeTable, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
 
             @Override
@@ -265,7 +269,6 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     @Override
     public boolean hasUserLikedPhoto(int photoId){
-        LikeTable likeTable = new LikeTable(dbConnection);
         likeTable.openDatabase();
         boolean hasLiked = likeTable.hasUserLikedPhoto(photoId);
         likeTable.closeDatabase();
@@ -277,12 +280,38 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getLoadCommentsApiUrl(photoId);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.LOAD_COMMENTS;
+        commentTable.openDatabase();
+        String eTag = commentTable.loadEtag(photoId);
+        commentTable.closeDatabase();
+        if (eTag != null)
+            executor.addHeaderField("if-modified-since", eTag);
         LoadCommentsAsyncTask task = new LoadCommentsAsyncTask(executor, photoId, new LoadCommentsAsyncTask.OnCommentsResultListener() {
 
             @Override
             public void onGetComments(int photoId, List<Comment> comments) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnComments(photoId, comments);
+            }
+
+            @Override
+            public void onNewEtag(int photoId, LoadCommentsQueryResult result, String eTag) {
+                commentTable.openDatabase();
+                boolean isNew = commentTable.areNewComments(photoId, eTag);
+                if (isNew){
+                    Gson gson = new Gson();
+                    String comments = gson.toJson(result);
+                    commentTable.insertOrReplaceComments(photoId, comments, eTag);
+                }
+                commentTable.closeDatabase();
+            }
+
+            @Override
+            public LoadCommentsQueryResult onCommentsNotModified(int photoId) {
+                commentTable.openDatabase();
+                Gson gson = new Gson();
+                String comments = commentTable.loadComments(photoId);
+                commentTable.closeDatabase();
+                return gson.fromJson(comments, LoadCommentsQueryResult.class);
             }
 
             @Override
@@ -301,7 +330,6 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getResetLikeForPhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
         final RequestType requestType = RequestType.LIKE_PHOTO;
-        LikeTable likeTable = new LikeTable(DbConnection.getInstance(context));
         LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(executor, likeTable, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
             @Override
             public void onPhotoLiked(int photoId) {
@@ -464,7 +492,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getSearchMorePhotosApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.SEARCH_PHOTOS;
-        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchMorePhotosAsyncTask searchMorePhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 removeOpenRequest(requestType);
@@ -478,7 +506,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
         });
         addOpenRequest(requestType);
-        searchPhotosAsyncTask.execute();
+        searchMorePhotosAsyncTask.execute();
     }
 
     @Override
@@ -486,7 +514,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getSearchPhotosApiUrl(query);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.SEARCH_PHOTOS;
-        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, context, query, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 lastSearchQuery = query;
@@ -510,6 +538,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
         if (imageBytes == null || description == null)
             throw new NullPointerException(imageBytes == null ? "imageBytes is null!" : "description is null!");
+
+        if (!BitmapUtils.isJPEG(imageBytes)){
+            throw new IOException("invalid picture");
+        }
 
         String url = urlBuilder.getUploadPhotoApiUrl();
         HttpPostExecutor httpPostExecutor = httpExecutorFactory.createHttpPostExecutor(url);
@@ -592,6 +624,11 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void onDisconnect() {
         unregisterInternetAvailableBroadcastReceiver();
+    }
+
+    @Override
+    public void onNewCommentCount(int photoId, int comment_count) {
+        callbackContainer.notifyOnNewCommentCount(photoId, comment_count);
     }
 
     private void unregisterInternetAvailableBroadcastReceiver() {

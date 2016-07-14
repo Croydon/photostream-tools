@@ -25,6 +25,7 @@
 package hochschuledarmstadt.photostream_tools;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
@@ -71,7 +73,7 @@ class PhotoStreamCallbackContainer {
     private List<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
 
     private final HashMap<RequestType, List<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
-    private List<ActivityInfo> activityInfos = new ArrayList<>();
+    private List<PhotoStreamActivity> activities = new ArrayList<>();
 
     public PhotoStreamCallbackContainer(){
         addListenerToMap();
@@ -334,11 +336,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public boolean appIsInBackground() {
-        for (ActivityInfo activityInfo : activityInfos){
-            if (activityInfo.isInForeground())
-                return false;
-        }
-        return true;
+        return !activities.isEmpty();
     }
 
     public void notifyOnPhotosFailed(HttpResult httpResult) {
@@ -383,17 +381,18 @@ class PhotoStreamCallbackContainer {
     }
 
     public void registerActivity(PhotoStreamActivity activity) {
-        ActivityInfo ai = new ActivityInfo(activity.getClass(), true);
-        if (activityInfos.contains(ai))
-            activityInfos.remove(ai);
-        activityInfos.add(ai);
+        if (!activities.contains(activity))
+            activities.add(activity);
     }
 
     public void unregisterActivity(PhotoStreamActivity activity) {
-        ActivityInfo ai = new ActivityInfo(activity.getClass(), false);
-        if (activityInfos.contains(ai))
-            activityInfos.remove(ai);
-        activityInfos.add(ai);
+        if (activities.contains(activity))
+            activities.remove(activity);
     }
 
+    public void notifyOnNewCommentCount(int photoId, int comment_count) {
+        for (OnPhotosReceivedListener listener : onPhotosReceivedListeners){
+            listener.onNewCommentCount(photoId, comment_count);
+        }
+    }
 }

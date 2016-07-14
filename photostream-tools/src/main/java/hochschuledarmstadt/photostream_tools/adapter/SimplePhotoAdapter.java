@@ -27,9 +27,11 @@ package hochschuledarmstadt.photostream_tools.adapter;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -165,9 +167,38 @@ public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> exte
         return false;
     }
 
+    public void updateCommentCount(int photoId, int comment_count) {
+        int itemCount = getItemCount();
+        for (int position = 0; position < itemCount; position++) {
+            Photo photo = getItemAtPosition(position);
+            if (itemHasEqualId(photoId, photo)) {
+                try {
+                    Field f = photo.getClass().getDeclaredField("commentCount");
+                    f.setAccessible(true);
+                    f.set(photo, comment_count);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                notifyItemChanged(position);
+            }
+        }
+    }
+
     public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Photo>{
         @Override
         void onItemClicked(View v, Photo photo);
+    }
+
+    public interface OnItemLongClickListener extends BaseAdapter.OnItemLongClickListener<Photo>{
+        @Override
+        boolean onItemLongClicked(View v, Photo photo);
+    }
+
+    public interface OnItemTouchListener extends BaseAdapter.OnItemTouchListener<Photo>{
+        @Override
+        boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo);
     }
 
 }

@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,24 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
     public void addAll(List<Photo> photos){
         this.photos.addAll(photos);
         notifyDataSetChanged();
+    }
+
+    public void updateCommentCount(int photoId, int commentCount){
+        for (Photo photo : photos){
+            if (photo.getId() == photoId){
+                try {
+                    Field f = photo.getClass().getDeclaredField("commentCount");
+                    f.setAccessible(true);
+                    f.set(photo, commentCount);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }finally {
+                    notifyDataSetChanged();
+                }
+            }
+        }
     }
 
     @Override

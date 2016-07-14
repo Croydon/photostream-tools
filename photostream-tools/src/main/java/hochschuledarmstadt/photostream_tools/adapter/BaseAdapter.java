@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -42,7 +43,9 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
 
     protected static final String KEY_ITEMS = "KEY_ITEMS";
     protected ArrayList<H> items = new ArrayList<>();
-
+    private Map<Integer, OnItemClickListener<H>> itemClickListenersMap = new HashMap<>();
+    private Map<Integer, OnItemLongClickListener<H>> itemLongClickListenersMap = new HashMap<>();
+    private Map<Integer, OnItemTouchListener<H>> itemTouchListenersMap = new HashMap<>();
     public BaseAdapter(){
         this(new ArrayList<H>());
     }
@@ -145,20 +148,75 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         items = bundle.getParcelableArrayList(KEY_ITEMS);
     }
 
-    private Map<Integer, OnItemClickListener<H>> itemClickListenersMap = new HashMap<>();
-
+    /**
+     * Fügt einen {@code itemClickListener} für eine View mit der id {@code viewId} hinzu.
+     * Wenn für diese View bereits ein {@link OnItemClickListener} existiert, wird dieser zuerst entfernt.
+     * @param viewId
+     * @param itemClickListener
+     */
     public void setOnItemClickListener(int viewId, OnItemClickListener<H> itemClickListener){
-        if (itemClickListenersMap.containsKey(viewId))
+        boolean shouldRepopulateViews = false;
+        if (itemClickListenersMap.containsKey(viewId)) {
             itemClickListenersMap.remove(viewId);
+            shouldRepopulateViews = true;
+        }
         itemClickListenersMap.put(viewId, itemClickListener);
+        if (shouldRepopulateViews)
+            notifyDataSetChanged();
     }
 
-    interface OnItemClickListener<H extends BaseItem & Parcelable> {
+    public void setOnItemLongClickListener(int viewId, OnItemLongClickListener<H> itemLongClickListener){
+        boolean shouldRepopulateViews = false;
+        if (itemLongClickListenersMap.containsKey(viewId)) {
+            itemLongClickListenersMap.remove(viewId);
+            shouldRepopulateViews = true;
+        }
+        itemLongClickListenersMap.put(viewId, itemLongClickListener);
+        if (shouldRepopulateViews)
+            notifyDataSetChanged();
+    }
+
+    public void setOnItemTouchListener(int viewId, OnItemTouchListener<H> itemTouchListener){
+        boolean shouldRepopulateViews = false;
+        if (itemTouchListenersMap.containsKey(viewId)) {
+            itemTouchListenersMap.remove(viewId);
+            shouldRepopulateViews = true;
+        }
+        itemTouchListenersMap.put(viewId, itemTouchListener);
+        if (shouldRepopulateViews)
+            notifyDataSetChanged();
+    }
+
+    protected interface OnItemLongClickListener<H> {
+        boolean onItemLongClicked(View v, H item);
+    }
+
+    protected interface OnItemClickListener<H extends BaseItem & Parcelable> {
         void onItemClicked(View v, H item);
+    }
+
+    protected interface OnItemTouchListener<H extends BaseItem & Parcelable> {
+        boolean onItemTouched(View v, MotionEvent motionEvent, H item);
     }
 
     @Override
     public void onBindViewHolder(T holder, int position) {
+        applyOnItemClickListeners(holder);
+        applyOnItemLongClickListeners(holder);
+        applyOnItemTouchListeners(holder);
+    }
+
+    private void applyOnItemLongClickListeners(T holder) {
+        for (Map.Entry<Integer, OnItemLongClickListener<H>> entry : itemLongClickListenersMap.entrySet()){
+            int viewId = entry.getKey();
+            View v = holder.itemView.findViewById(viewId);
+            if (v != null) {
+                v.setOnLongClickListener(new InternalOnLongClickListener(holder));
+            }
+        }
+    }
+
+    private void applyOnItemClickListeners(T holder) {
         for (Map.Entry<Integer, OnItemClickListener<H>> entry : itemClickListenersMap.entrySet()){
             int viewId = entry.getKey();
             View v = holder.itemView.findViewById(viewId);
@@ -168,9 +226,21 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         }
     }
 
+    private void applyOnItemTouchListeners(T holder) {
+        for (Map.Entry<Integer, OnItemTouchListener<H>> entry : itemTouchListenersMap.entrySet()){
+            int viewId = entry.getKey();
+            View v = holder.itemView.findViewById(viewId);
+            if (v != null) {
+                v.setOnTouchListener(new InternalOnTouchListener(holder));
+            }
+        }
+    }
+
     @Override
     public void onViewRecycled(T holder) {
         holder.itemView.setOnClickListener(null);
+        holder.itemView.setOnLongClickListener(null);
+        holder.itemView.setOnTouchListener(null);
         super.onViewRecycled(holder);
     }
 
@@ -187,9 +257,52 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
             int viewId = v.getId();
             if (itemClickListenersMap.containsKey(viewId)) {
                 OnItemClickListener<H> listener = itemClickListenersMap.get(viewId);
-                listener.onItemClicked(v, getItemAtPosition(viewHolder.getAdapterPosition()));
+                int position = viewHolder.getAdapterPosition();
+                H item = (position >= 0) ? getItemAtPosition(position) : null;
+                listener.onItemClicked(v, item);
             }
         }
     }
 
+    private class InternalOnTouchListener implements View.OnTouchListener{
+
+        private final RecyclerView.ViewHolder viewHolder;
+
+        public InternalOnTouchListener(RecyclerView.ViewHolder viewHolder){
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int viewId = v.getId();
+            if (itemTouchListenersMap.containsKey(viewId)) {
+                OnItemTouchListener<H> listener = itemTouchListenersMap.get(viewId);
+                int position = viewHolder.getAdapterPosition();
+                H item = (position >= 0) ? getItemAtPosition(position) : null;
+                return listener.onItemTouched(v, event, item);
+            }
+            return false;
+        }
+    }
+
+    private class InternalOnLongClickListener implements View.OnLongClickListener {
+
+        private final RecyclerView.ViewHolder viewHolder;
+
+        public InternalOnLongClickListener(RecyclerView.ViewHolder viewHolder) {
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            int viewId = v.getId();
+            if (itemLongClickListenersMap.containsKey(viewId)) {
+                OnItemLongClickListener<H> listener = itemLongClickListenersMap.get(viewId);
+                int position = viewHolder.getAdapterPosition();
+                H item = (position >= 0) ? getItemAtPosition(position) : null;
+                return listener.onItemLongClicked(v, item);
+            }
+            return false;
+        }
+    }
 }

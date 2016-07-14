@@ -169,6 +169,11 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     @Override
+    public void onNewCommentCount(int photoId, int comment_count) {
+        adapter.updateCommentCount(photoId, comment_count);
+    }
+
+    @Override
     public void onShowProgressDialog() {
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }

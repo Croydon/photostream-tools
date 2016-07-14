@@ -24,12 +24,15 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +42,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 
 import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -61,9 +66,11 @@ public class PhotoAdapterTest {
         }
     }
 
-    private SimplePhotoAdapter<TestViewHolder> simplePhotoAdapter;
+    private PhotoAdapter simplePhotoAdapter;
 
     private static class PhotoAdapter extends SimplePhotoAdapter<TestViewHolder> {
+
+        private Context context = RuntimeEnvironment.application.getApplicationContext();
 
         PhotoAdapter() {
             super();
@@ -71,12 +78,14 @@ public class PhotoAdapterTest {
 
         @Override
         public TestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+            LinearLayout itemView = new LinearLayout(context);
+            itemView.setId(R.id.adapter_test_view_id);
+            return new TestViewHolder(itemView);
         }
 
         @Override
         public void onBindViewHolder(TestViewHolder holder, int position) {
-
+            super.onBindViewHolder(holder, position);
         }
     }
 
@@ -154,6 +163,64 @@ public class PhotoAdapterTest {
         simplePhotoAdapter.add(mock(Photo.class));
         simplePhotoAdapter.set(Arrays.asList(mock(Photo.class), mock(Photo.class), mock(Photo.class), mock(Photo.class)));
         assertEquals(4, simplePhotoAdapter.getItemCount());
+    }
+
+    @Test
+    public void testOnClickIsWorking() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClicked(View v, Photo photo) {
+                latch.countDown();
+            }
+        });
+        TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        viewHolder.itemView.performClick();
+        assertTrue(latch.getCount() == 0);
+    }
+
+    @Test
+    public void testOnLongClickIsWorking() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClicked(View v, Photo photo) {
+                latch.countDown();
+                return true;
+            }
+        });
+        TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        viewHolder.itemView.performLongClick();
+        assertTrue(latch.getCount() == 0);
+    }
+
+    @Test
+    public void testOnTouchIsWorking() {
+        final CountDownLatch latch = new CountDownLatch(2);
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemTouchListener() {
+            @Override
+            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+                if (MotionEvent.ACTION_DOWN == motionEvent.getAction()){
+                    latch.countDown();
+                    return true;
+                }else if(MotionEvent.ACTION_UP == motionEvent.getAction()){
+                    latch.countDown();
+                    return true;
+                }
+                return false;
+            }
+        });
+        TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        boolean result = viewHolder.itemView.dispatchTouchEvent(MotionEvent.obtain(2,2,MotionEvent.ACTION_DOWN,0,null,null,0,0,0,0,0,0,0,0));
+        if (result)
+            viewHolder.itemView.dispatchTouchEvent(MotionEvent.obtain(2,2,MotionEvent.ACTION_UP,0,null,null,0,0,0,0,0,0,0,0));
+        assertTrue(latch.getCount() == 0);
     }
 
 }

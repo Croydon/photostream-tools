@@ -35,7 +35,10 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,13 +53,13 @@ import java.net.URISyntaxException;
  */
 public final class BitmapUtils {
 
-    private BitmapUtils() { }
-
     private static final String TAG = BitmapUtils.class.getName();
-
+    private static final int JPEG_QUALITY = 80;
     private static final int TYPE_ASSET = -1;
     private static final int TYPE_FILE = -2;
     private static final int TYPE_OTHER = -3;
+
+    private BitmapUtils() { }
 
     /**
      * Entfernt ein zur ImageView zugeordnetes Bitmap aus dem Speicher
@@ -108,6 +111,7 @@ public final class BitmapUtils {
      * @throws FileNotFoundException wird geworfen, wenn die Resource nicht vorhanden ist
      */
     public static Bitmap decodeBitmapFromUri(Context context, Uri uri) throws FileNotFoundException {
+        if (uri == null) throw new NullPointerException("uri is null");
         return internalDecodeBitmap(context, uri, TYPE_OTHER);
     }
 
@@ -131,16 +135,16 @@ public final class BitmapUtils {
     private static Bitmap internalDecodeBitmap(Context context, Uri uri, int type) throws FileNotFoundException {
         Bitmap bm = null;
         try {
-            BitmapFactory.Options options = lessResolution(createInputStream(context, uri, type), 400, 400);
+            BitmapFactory.Options options = lessResolution(createInputStream(context, uri, type), 600, 600);
             bm = BitmapFactory.decodeStream(createInputStream(context, uri, type), null, options);
             ExifInterface exif = new ExifInterface(getRealPathFromURI(context, uri));
             String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
             int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;
 
             int rotationAngle = 0;
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90)       rotationAngle = 90;
+            else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+            else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
 
             if (rotationAngle != 0) {
                 Matrix matrix = new Matrix();
@@ -153,11 +157,8 @@ public final class BitmapUtils {
         return bm;
     }
 
-    private static BitmapFactory.Options lessResolution (InputStream is, int width, int height) {
-        int reqHeight = height;
-        int reqWidth = width;
+    private static BitmapFactory.Options lessResolution (InputStream is, int reqWidth, int reqHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-
         // First decode with inJustDecodeBounds=true to check dimensions
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeStream(is, null, options);
@@ -190,7 +191,7 @@ public final class BitmapUtils {
     private static String getRealPathFromURI(Context context, Uri contentURI) {
         String result;
         Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
+        if (cursor == null) {
             result = contentURI.getPath();
         } else {
             cursor.moveToFirst();
@@ -203,14 +204,32 @@ public final class BitmapUtils {
 
     /**
      * Konvertiert ein Bitmap {@code bitmap} in ein Byte Array
-     * @param bitmap das zu konvertierende Bitmap
-     * @return Byte Array
+     * @param bitmap
+     * @return byte[]
      */
     public static byte[] bitmapToBytes(Bitmap bitmap) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, bos);
         bitmap.recycle();
         return bos.toByteArray();
+    }
+
+    public static boolean isJPEG(byte[] data) throws IOException {
+        return internalIsJPEG(new DataInputStream(new ByteArrayInputStream(data)));
+    }
+
+    public static Boolean isJPEG(File file) throws IOException {
+        return internalIsJPEG(new DataInputStream(new BufferedInputStream(new FileInputStream(file))));
+    }
+
+    private static boolean internalIsJPEG(DataInputStream in) throws IOException {
+        boolean result = false;
+        try {
+            result = in.readInt() == 0xffd8ffe0;
+        } finally {
+            in.close();
+        }
+        return result;
     }
 
 }

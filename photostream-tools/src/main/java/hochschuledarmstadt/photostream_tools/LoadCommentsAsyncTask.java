@@ -67,20 +67,30 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
 
     private LoadCommentsQueryResult getComments() throws IOException, HttpPhotoStreamException {
         HttpResponse httpResponse = executor.execute();
-        LoadCommentsQueryResult loadCommentsQueryResult = new Gson().fromJson(httpResponse.getResult(), LoadCommentsQueryResult.class);
-        final List<Comment> comments = loadCommentsQueryResult.getComments();
-        final Integer photoId = loadCommentsQueryResult.getPhotoId();
-        for (Comment comment : comments) {
-            try {
-                Field field = comment.getClass().getDeclaredField("photoId");
-                field.setAccessible(true);
-                field.set(comment, photoId);
-            } catch (IllegalAccessException e) {
-                Logger.log(TAG, LogLevel.ERROR, e.toString());
-            } catch (NoSuchFieldException e) {
-                Logger.log(TAG, LogLevel.ERROR, e.toString());
+        LoadCommentsQueryResult loadCommentsQueryResult = null;
+        if (httpResponse.getStatusCode() == HttpResponse.STATUS_OK) {
+            loadCommentsQueryResult = new Gson().fromJson(httpResponse.getResult(), LoadCommentsQueryResult.class);
+            final List<Comment> comments = loadCommentsQueryResult.getComments();
+            final Integer photoId = loadCommentsQueryResult.getPhotoId();
+            for (Comment comment : comments) {
+                try {
+                    Field field = comment.getClass().getDeclaredField("photoId");
+                    field.setAccessible(true);
+                    field.set(comment, photoId);
+                } catch (IllegalAccessException e) {
+                    Logger.log(TAG, LogLevel.ERROR, e.toString());
+                } catch (NoSuchFieldException e) {
+                    Logger.log(TAG, LogLevel.ERROR, e.toString());
+                }
             }
+            String newEtag = executor.getEtag();
+            if (newEtag != null)
+                callback.onNewEtag(photoId, loadCommentsQueryResult, newEtag);
+
+        }else if(httpResponse.getStatusCode() == HttpResponse.STATUS_CONTENT_NOT_MODIFIED){
+            loadCommentsQueryResult = callback.onCommentsNotModified(photoId);
         }
+
         return loadCommentsQueryResult;
     }
 
@@ -100,6 +110,8 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
 
     interface OnCommentsResultListener {
         void onGetComments(int photoId, List<Comment> comments);
+        void onNewEtag(int photoId, LoadCommentsQueryResult result, String eTag);
+        LoadCommentsQueryResult onCommentsNotModified(int photoId);
         void onGetCommentsFailed(int photoId, HttpResult httpResult);
     }
 

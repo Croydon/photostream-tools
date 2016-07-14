@@ -28,6 +28,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import hochschuledarmstadt.photostream_tools.model.Comment;
+
 class DbConnection extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "photostream";
@@ -44,6 +46,7 @@ class DbConnection extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(LikeTable.TABLE_CREATE);
+        db.execSQL(CommentTable.TABLE_CREATE);
     }
 
     @Override

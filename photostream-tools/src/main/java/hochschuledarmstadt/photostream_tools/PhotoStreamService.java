@@ -62,12 +62,13 @@ public final class PhotoStreamService extends Service {
         final String uniqueAndroidId = getUniqueAndroidId();
 
         UrlBuilder urlBuilder = new UrlBuilder(photoStreamUrl);
+        String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
+        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
         DbConnection dbConnection = DbConnection.getInstance(context);
         WebSocketClient webSocketClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId);
         PhotoStreamCallbackContainer container = new PhotoStreamCallbackContainer();
         HttpExecutorFactory httpExecutorFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
-
-        photoStreamClient = new PhotoStreamClient(context, urlBuilder, dbConnection, webSocketClient, container, httpExecutorFactory);
+        photoStreamClient = new PhotoStreamClient(context, urlBuilder, imageLoader, dbConnection, webSocketClient, container, httpExecutorFactory);
         photoStreamClient.bootstrap();
 
     }

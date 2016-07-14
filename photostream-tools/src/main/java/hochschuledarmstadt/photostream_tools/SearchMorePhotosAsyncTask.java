@@ -26,12 +26,9 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 
-/**
- * Created by Andreas Schattney on 15.03.2016.
- */
 class SearchMorePhotosAsyncTask extends SearchPhotosAsyncTask {
-    public SearchMorePhotosAsyncTask(HttpGetExecutor executor, Context context, OnSearchPhotosResultCallback callback) {
-        super(executor, context, null, callback);
+    public SearchMorePhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, OnSearchPhotosResultCallback callback) {
+        super(executor, imageLoader, context, callback);
     }
 
 }

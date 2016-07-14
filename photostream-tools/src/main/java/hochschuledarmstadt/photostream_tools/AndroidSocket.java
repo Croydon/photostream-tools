@@ -29,6 +29,7 @@ import android.os.Looper;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -55,6 +56,7 @@ class AndroidSocket {
     private static final String NEW_COMMENT = "new_comment";
     private static final String COMMENT_DELETED = "comment_deleted";
     private static final String PHOTO_DELETED = "photo_deleted";
+    private static final String NEW_COMMENT_COUNT = "new_comment_count";
 
     private IO.Options options;
     private Socket socket;
@@ -200,6 +202,25 @@ class AndroidSocket {
             }
         });
 
+        socket.on(NEW_COMMENT_COUNT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                JSONObject jsonObject = (JSONObject) args[0];
+                try {
+                    final int photoId = jsonObject.getInt("photo_id");
+                    final int comment_count = jsonObject.getInt("comment_count");
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onMessageListener.onNewCommentCount(photoId, comment_count);
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     public boolean isConnected() {
@@ -213,5 +234,6 @@ class AndroidSocket {
         void onPhotoDeleted(int photoId);
         void onConnect();
         void onDisconnect();
+        void onNewCommentCount(int photoId, int comment_count);
     }
 }

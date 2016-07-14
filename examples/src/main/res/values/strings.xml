@@ -38,4 +38,5 @@
     <string name="upload">Photo senden</string>
     <string name="the_comment">Der Kommentar zu dem Photo</string>
     <string name="title_activity_view_pager">ViewPagerActivity</string>
+    <string name="search">Suche</string>
 </resources>

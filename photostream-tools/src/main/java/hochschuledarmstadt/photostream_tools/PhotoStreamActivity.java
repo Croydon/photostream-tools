@@ -62,6 +62,14 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
      */
     protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState);
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!isFinishing() && isConnectedToService()) {
+            photoStreamClient.registerActivity(this);
+        }
+    }
+
     /**
      * Wird aufgerufen, <b>kurz bevor</b> die Activity die Verbindung zu dem Service trennt <br>
      * Nach dieser Methode ist die Verbindung zum Service getrennt.
@@ -75,14 +83,11 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         if (!bound)
             bindService(new Intent(this, PhotoStreamService.class), this, Context.BIND_AUTO_CREATE);
         if (isConnectedToService())
-            photoStreamClient.registerActivity(this);
+            photoStreamClient.unregisterActivity(this);
     }
 
     @Override
     protected void onStop() {
-        if (isConnectedToService()) {
-            photoStreamClient.unregisterActivity(this);
-        }
         super.onStop();
         if (isConnectedToService()){
             if (isFinishing() && this instanceof OnPhotosReceivedListener) {
@@ -126,7 +131,6 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         photoStreamClient = ((PhotoStreamService.PhotoStreamServiceBinder)service).getClient();
-        photoStreamClient.registerActivity(this);
         bound = true;
         onPhotoStreamServiceConnected(photoStreamClient, refSavedInstanceState);
     }

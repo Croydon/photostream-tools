@@ -53,4 +53,11 @@ public interface OnPhotosReceivedListener extends OnRequestListener {
      * Wird aufgerufen, wenn keine neuen Photos im Stream vorhanden sind.
      */
     void onNoNewPhotosAvailable();
+
+    /**
+     * Wird aufgerufen, wenn sich die Anzahl der Kommentare zu einem Photo geändert hat.
+     * @param photoId id des Photos zu der die Kommentare zugeordnet sind
+     * @param comment_count Absolute Anzahl der Kommentare zu dem Photo
+     */
+    void onNewCommentCount(int photoId, int comment_count);
 }
