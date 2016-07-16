@@ -28,8 +28,9 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadFailedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -157,19 +158,19 @@ public interface IPhotoStreamClient {
     void removeOnNewCommentReceivedListener(OnNewCommentReceivedListener onNewCommentReceivedListener);
 
     /**
-     * Registriert einen Listener des Typs {@link OnCommentUploadListener}. <br>
+     * Registriert einen Listener des Typs {@link OnCommentUploadFailedListener}. <br>
      * Schlägt das Veröffentlichen des Kommentars über den Methodenaufruf {@link IPhotoStreamClient#uploadComment(int, String)} fehl, <br>
-     * dann wird über die Methoden des Interfaces {@link OnCommentUploadListener} der Fehler zurück geliefert. <br>
+     * dann wird über die Methoden des Interfaces {@link OnCommentUploadFailedListener} der Fehler zurück geliefert. <br>
      * Wurde der Kommentar veröffentlicht, dann liefert das Interface {@link OnNewCommentReceivedListener} den Kommentar zurück.
-     * @param onCommentUploadListener listener
+     * @param onCommentUploadFailedListener listener
      */
-    void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener);
+    void addOnUploadCommentFailedListener(OnCommentUploadFailedListener onCommentUploadFailedListener);
 
     /**
      * Entfernt den Listener {@code onCommentUploadListener}
-     * @param onCommentUploadListener listener
+     * @param onCommentUploadFailedListener listener
      */
-    void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener);
+    void removeOnUploadCommentFailedListener(OnCommentUploadFailedListener onCommentUploadFailedListener);
 
     /**
      * Registriert einen Listener des Typs {@link OnCommentDeletedListener}. <br>
@@ -184,6 +185,20 @@ public interface IPhotoStreamClient {
      * @param onCommentDeletedListener listener
      */
     void removeOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener);
+
+    /**
+     * Registriert einen Listeners des Typs {@link OnCommentCountChangedListener}. <br>
+     * Wenn sich die Anzahl der Kommentare zu einem Photo ändert, dann wird die neue Anzahl der Kommentare an die <br>
+     * Methode {@link OnCommentCountChangedListener#onCommentCountChanged(int, int) übergeben.
+     * @param onCommentCountChangedListener listener
+     */
+    void addOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener);
+
+    /**
+     * Entfernt den Listener {@code onCommentCountChangedListener}
+     * @param onCommentCountChangedListener listener
+     */
+    void removeOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener);
 
     /**
      * Asynchroner Aufruf. <br>
@@ -253,14 +268,6 @@ public interface IPhotoStreamClient {
     void resetLikeForPhoto(int photoId);
 
     /**
-     * Synchroner Aufruf. <br>
-     * Diese Methode liefert zurück, ob der Nutzer das Photo mit der id {@code photoId} aktuell geliked hat <br>
-     * @param photoId id des Photos
-     * @return {@code true}, wenn der Nutzer das Photo aktuell geliked hat, ansonsten {@code false}
-     */
-    boolean hasUserLikedPhoto(int photoId);
-
-    /**
      * Asynchroner Aufruf. <br>
      * Fragt alle Kommentare zu dem Photo mit der id {@code photoId} von dem Server ab. <br>
      * Das Ergebnis wird über den Listener {@link OnCommentsReceivedListener} zurück geliefert.
@@ -271,7 +278,7 @@ public interface IPhotoStreamClient {
     /**
      * Asynchroner Aufruf. <br>
      * Sendet einen Kommentar an den Server. Der Kommentar {@code comment} wird zum Photo mit der id {@code photoId} gespeichert. <br>
-     * Das Ergebnis wird über den Listener {@link OnCommentUploadListener} zurück geliefert.
+     * Das Ergebnis wird über den Listener {@link OnCommentUploadFailedListener} zurück geliefert.
      * @param photoId id des Photos
      * @param comment Kommentar zu dem Photo
      */

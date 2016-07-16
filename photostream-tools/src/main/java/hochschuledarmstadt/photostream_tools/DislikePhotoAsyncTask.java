@@ -26,15 +26,8 @@ package hochschuledarmstadt.photostream_tools;
 
 class DislikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
 
-    public DislikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, likeTable, photoId, callback);
-    }
-
-    @Override
-    protected void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId) {
-        likeTable.openDatabase();
-        likeTable.resetLike(photoId);
-        likeTable.closeDatabase();
+    public DislikePhotoAsyncTask(HttpPutExecutor executor, int photoId, OnVotePhotoResultListener callback) {
+        super(executor, photoId, callback);
     }
 
     @Override

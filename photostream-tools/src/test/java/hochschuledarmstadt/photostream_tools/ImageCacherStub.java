@@ -24,15 +24,36 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
+import android.content.Context;
 
-    public LikePhotoAsyncTask(HttpPutExecutor executor, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, photoId, callback);
+import java.io.File;
+import java.io.IOException;
+
+import hochschuledarmstadt.photostream_tools.model.Photo;
+
+public class ImageCacherStub extends ImageCacher{
+
+    public ImageCacherStub() {
+        super(null);
     }
 
     @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
+    boolean cacheImage(Photo photo) throws IOException {
+        return true;
     }
 
+    @Override
+    boolean cacheImage(Photo photo, byte[] data) throws IOException {
+        return true;
+    }
+
+    @Override
+    boolean isCached(int photoId) {
+        return true;
+    }
+
+    @Override
+    File getImageFilePathForPhotoId(int photoId) {
+        return null;
+    }
 }

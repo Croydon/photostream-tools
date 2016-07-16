@@ -25,7 +25,6 @@
 package hochschuledarmstadt.photostream_tools;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -35,10 +34,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadFailedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -69,8 +68,9 @@ class PhotoStreamCallbackContainer {
     private List<OnSearchedPhotosReceivedListener> onSearchPhotosListeners = new ArrayList<>();
     private List<OnCommentsReceivedListener> onCommentsReceivedListeners = new ArrayList<>();
     private List<OnCommentDeletedListener> onCommentDeletedListeners = new ArrayList<>();
-    private List<OnCommentUploadListener> onCommentUploadListeners = new ArrayList<>();
+    private List<OnCommentUploadFailedListener> onCommentUploadFailedListeners = new ArrayList<>();
     private List<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
+    private List<OnCommentCountChangedListener> onCommentCountChangedListeners = new ArrayList<>();
 
     private final HashMap<RequestType, List<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
     private List<PhotoStreamActivity> activities = new ArrayList<>();
@@ -86,7 +86,7 @@ class PhotoStreamCallbackContainer {
         requestListenerMap.put(RequestType.LIKE_PHOTO, onPhotoLikeListeners);
         requestListenerMap.put(RequestType.SEARCH_PHOTOS, onSearchPhotosListeners);
         requestListenerMap.put(RequestType.LOAD_COMMENTS, onCommentsReceivedListeners);
-        requestListenerMap.put(RequestType.UPLOAD_COMMENT, onCommentUploadListeners);
+        requestListenerMap.put(RequestType.UPLOAD_COMMENT, onCommentUploadFailedListeners);
         requestListenerMap.put(RequestType.DELETE_COMMENT, onCommentDeletedListeners);
     }
 
@@ -101,16 +101,24 @@ class PhotoStreamCallbackContainer {
         return false;
     }
 
-    private <T extends OnRequestListener> void addListener(List<T> listeners, T listener, RequestType requestType){
+    private <T> void addListener(List<T> listeners, T listener, RequestType requestType){
         if (!listeners.contains(listener))
             listeners.add(listener);
-        if (hasOpenRequestsOfType(requestType))
-            listener.onShowProgressDialog();
+        if (listener instanceof OnRequestListener && hasOpenRequestsOfType(requestType))
+            ((OnRequestListener)listener).onShowProgressDialog();
     }
 
-    private <T extends OnRequestListener> void removeListener(List<T> listeners, T listener){
+    private <T> void removeListener(List<T> listeners, T listener){
         if (listeners.contains(listener))
             listeners.remove(listener);
+    }
+
+    public void addOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener){
+        addListener(onCommentCountChangedListeners, onCommentCountChangedListener, null);
+    }
+
+    public void removeOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener){
+        removeListener(onCommentCountChangedListeners, onCommentCountChangedListener);
     }
 
     public void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
@@ -145,12 +153,12 @@ class PhotoStreamCallbackContainer {
         removeListener(onNewCommentReceivedListeners, onNewCommentReceivedListener);
     }
 
-    public void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
-        addListener(onCommentUploadListeners, onCommentUploadListener, RequestType.UPLOAD_COMMENT);
+    public void addOnUploadCommentListener(OnCommentUploadFailedListener onCommentUploadFailedListener) {
+        addListener(onCommentUploadFailedListeners, onCommentUploadFailedListener, RequestType.UPLOAD_COMMENT);
     }
 
-    public void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener){
-        removeListener(onCommentUploadListeners, onCommentUploadListener);
+    public void removeOnUploadCommentListener(OnCommentUploadFailedListener onCommentUploadFailedListener){
+        removeListener(onCommentUploadFailedListeners, onCommentUploadFailedListener);
     }
 
     public void addOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener) {
@@ -307,9 +315,7 @@ class PhotoStreamCallbackContainer {
         }
     }
 
-    public void notifyOnPhotoDeleted(File imageFile, int photoId) {
-        if (imageFile.exists())
-            imageFile.delete();
+    public void notifyOnPhotoDeleted(int photoId) {
         for (OnPhotoDeletedListener listener : onPhotoDeletedListeners){
             listener.onPhotoDeleted(photoId);
         }
@@ -361,7 +367,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void notifyOnCommentSentFailed(HttpResult httpResult) {
-        for (OnCommentUploadListener listener : onCommentUploadListeners)
+        for (OnCommentUploadFailedListener listener : onCommentUploadFailedListeners)
             listener.onCommentUploadFailed(httpResult);
     }
 
@@ -390,9 +396,9 @@ class PhotoStreamCallbackContainer {
             activities.remove(activity);
     }
 
-    public void notifyOnNewCommentCount(int photoId, int comment_count) {
-        for (OnPhotosReceivedListener listener : onPhotosReceivedListeners){
-            listener.onNewCommentCount(photoId, comment_count);
+    public void notifyOnCommentCountChanged(int photoId, int commentCount) {
+        for (OnCommentCountChangedListener listener : onCommentCountChangedListeners){
+            listener.onCommentCountChanged(photoId, commentCount);
         }
     }
 }

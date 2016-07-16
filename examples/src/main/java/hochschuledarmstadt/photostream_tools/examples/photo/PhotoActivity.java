@@ -49,6 +49,7 @@ import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
@@ -58,7 +59,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener {
+public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnCommentCountChangedListener {
 
     private static final int COLUMNS_PER_ROW = 2;
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
@@ -73,6 +74,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         Log.d(TAG, "onPhotoStreamServiceConnected()");
         photoStreamClient.addOnPhotosReceivedListener(this);
+        photoStreamClient.addOnCommentCountChangedListener(this);
         if (savedInstanceState == null)
             photoStreamClient.loadPhotos();
     }
@@ -81,6 +83,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         Log.d(TAG, "onPhotoStreamServiceDisconnected()");
         photoStreamClient.removeOnPhotosReceivedListener(this);
+        photoStreamClient.removeOnCommentCountChangedListener(this);
     }
 
     @Override
@@ -177,8 +180,9 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     }
 
     @Override
-    public void onNewCommentCount(int photoId, int comment_count) {
-        adapter.updateCommentCount(photoId, comment_count);
+    public void onCommentCountChanged(int photoId, int commentCount) {
+        adapter.updateCommentCount(photoId, commentCount);
+        Toast.makeText(this, String.format("Photo mit der Id \"%d\" hat jetzt %d Kommentare",photoId, commentCount), Toast.LENGTH_SHORT).show();
     }
 
     @Override

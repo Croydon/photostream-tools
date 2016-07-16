@@ -74,7 +74,7 @@ public class ContentFragment extends PhotoStreamFragment {
         imageView = (ImageView) getView().findViewById(R.id.imageView);
         Photo photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
         try {
-            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(getContext(), new File(photo.getImageFilePath()));
+            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
             if (bitmap != null)
                 imageView.setImageBitmap(bitmap);
         } catch (FileNotFoundException e) {

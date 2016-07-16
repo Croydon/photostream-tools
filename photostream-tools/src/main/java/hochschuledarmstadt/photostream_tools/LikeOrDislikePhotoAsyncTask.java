@@ -37,13 +37,11 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
     private static final String TAG = LikeOrDislikePhotoAsyncTask.class.getName();
     private final OnVotePhotoResultListener callback;
     private final int photoId;
-    private final LikeTable likeTable;
     private final HttpPutExecutor executor;
 
-    public LikeOrDislikePhotoAsyncTask(HttpPutExecutor executor, LikeTable likeTable, int photoId, OnVotePhotoResultListener callback){
+    public LikeOrDislikePhotoAsyncTask(HttpPutExecutor executor, int photoId, OnVotePhotoResultListener callback){
         super();
         this.executor = executor;
-        this.likeTable = likeTable;
         this.photoId = photoId;
         this.callback = callback;
     }
@@ -69,14 +67,12 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
         executor.execute();
     }
 
-    protected abstract void saveUserLikedOrDislikedPhoto(LikeTable likeTable, int photoId);
     protected abstract void sendResult(OnVotePhotoResultListener callback, int photoId);
 
     @Override
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
         if(result){
-            saveUserLikedOrDislikedPhoto(likeTable, photoId);
             sendResult(callback, photoId);
         }
     }

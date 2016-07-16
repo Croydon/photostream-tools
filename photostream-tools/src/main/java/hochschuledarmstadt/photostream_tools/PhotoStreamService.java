@@ -64,11 +64,11 @@ public final class PhotoStreamService extends Service {
         UrlBuilder urlBuilder = new UrlBuilder(photoStreamUrl);
         String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
-        DbConnection dbConnection = DbConnection.getInstance(context);
-        WebSocketClient webSocketClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId);
-        PhotoStreamCallbackContainer container = new PhotoStreamCallbackContainer();
-        HttpExecutorFactory httpExecutorFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
-        photoStreamClient = new PhotoStreamClient(context, urlBuilder, imageLoader, dbConnection, webSocketClient, container, httpExecutorFactory);
+        DbConnection db = DbConnection.getInstance(context);
+        WebSocketClient wsClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId);
+        HttpExecutorFactory httpFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
+        ImageCacher imageCacher = new ImageCacher(context);
+        photoStreamClient = new PhotoStreamClient(context, urlBuilder, imageLoader, imageCacher, db, wsClient, httpFactory);
         photoStreamClient.bootstrap();
 
     }

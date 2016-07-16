@@ -5,7 +5,7 @@ apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.github.kt3k.coveralls'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.50'
+version = '0.0.55'
 
 android {
     compileSdkVersion 23

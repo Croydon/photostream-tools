@@ -88,13 +88,14 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             callback.onNewETag(executor.getEtag());
             PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
             final List<Photo> photos = photoQueryResult.getPhotos();
+            final ImageCacher imageCacher = new ImageCacher(context);
             for (Photo photo : photos) {
-                if (!photo.isCached(context)) {
+                if (!imageCacher.isCached(photo.getId())) {
                     byte[] data = imageLoader.execute(photo.getId());
                     if (data != null)
-                        photo.cacheImage(context, data);
+                        imageCacher.cacheImage(photo, data);
                 }else{
-                    photo.cacheImage(context);
+                    imageCacher.cacheImage(photo);
                 }
             }
             return photoQueryResult;

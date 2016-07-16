@@ -45,7 +45,6 @@ import java.io.IOException;
 public class Photo extends BaseItem implements Parcelable{
 
     private static final String TAG = Photo.class.getName();
-    public static final String FILENAME_FORMAT = "%s.jpg";
 
     @SerializedName("image")
     @Expose
@@ -68,10 +67,18 @@ public class Photo extends BaseItem implements Parcelable{
 
     /**
      * Liefert den absoluten Dateipfad zurück, an dem das Photo abgespeichert ist
-     * @return absoluten Dateipfad
+     * @return {@link String} absoluten Dateipfad
      */
     public String getImageFilePath() {
         return imageFilePath;
+    }
+
+    /**
+     * Liefert den absoluten Dateipfad des Photos als {@link File}
+     * @return {@link File}
+     */
+    public File getImageFile() {
+        return new File(imageFilePath);
     }
 
     /**
@@ -90,10 +97,6 @@ public class Photo extends BaseItem implements Parcelable{
         return liked == 1;
     }
 
-    public void setLiked(boolean liked) {
-        this.liked = liked ? 1 : 0;
-    }
-
     /**
      * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist das Photo zu löschen.
      * @return {@code true}, wenn das Photo von dem aktuellen Gerät veröffentlicht wurde, ansonsten {@code false}
@@ -108,6 +111,10 @@ public class Photo extends BaseItem implements Parcelable{
      */
     public int getCommentCount() {
         return commentCount;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked ? 1 : 0;
     }
 
     /**
@@ -150,72 +157,4 @@ public class Photo extends BaseItem implements Parcelable{
         }
     };
 
-    private static String getImageFileName(int id){
-        return String.format(FILENAME_FORMAT, id);
-    }
-
-    private static File concatImageFilePath(Context context, String imageFileName){
-        return new File(context.getFilesDir(), imageFileName);
-    }
-
-    public boolean cacheImage(Context context)throws IOException{
-        if (isCached(context)) {
-            File filePath = getImageFilePathForPhotoId(context, id);
-            this.imageFilePath = filePath.getAbsolutePath();
-            return true;
-        }
-        else
-            return cacheImage(context, Base64.decode(imageFilePath, Base64.DEFAULT));
-    }
-
-    public boolean cacheImage(Context context, byte[] data) throws IOException {
-
-        boolean inCache = false;
-        boolean error = false;
-        String filename = getImageFileName(id);
-        if (!imageExistsOnFileSystem(context, filename)) {
-            FileOutputStream outputStream = null;
-            try {
-                outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-                //byte[] data = Base64.decode(imageFilePath, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                bitmap.recycle();
-                imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
-                inCache = true;
-            } catch (Exception e) {
-                error = true;
-            } finally {
-                if (outputStream != null)
-                    outputStream.close();
-            }
-            if (error){
-                File file = getImageFilePathForPhotoId(context, id);
-                if (file.exists())
-                    file.delete();
-            }
-        }else{
-            inCache = true;
-            imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
-        }
-
-        return inCache;
-
-    }
-
-    private boolean imageExistsOnFileSystem(Context context, String filename) {
-        File file = context.getFileStreamPath(filename);
-        if(file == null || !file.exists()) {
-            return false;
-        }
-        return true;
-    }
-
-    public static File getImageFilePathForPhotoId(Context context, int photoId) {
-        return concatImageFilePath(context, getImageFileName(photoId));
-    }
-
-    public boolean isCached(Context context) {
-        return imageExistsOnFileSystem(context, getImageFileName(id));
-    }
 }

@@ -37,10 +37,11 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadFailedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -82,9 +83,10 @@ public class PhotoStreamClientTest {
         context = RuntimeEnvironment.application.getApplicationContext();
         webSocketClient = new WebSocketClientStub();
         dbDelegate = new DbTestConnectionDelegate(context);
-        container = new PhotoStreamCallbackContainer();
         UrlBuilder urlBuilder = new UrlBuilder(PHOTO_STREAM_URL);
-        photoStreamClient = new PhotoStreamClient(context, urlBuilder , dbDelegate, webSocketClient, container, factory);
+        HttpImageLoader imageLoader = new HttpImageLoaderStub();
+        final ImageCacher imageCacher = new ImageCacherStub();
+        photoStreamClient = new PhotoStreamClient(context, urlBuilder , imageLoader,  imageCacher, dbDelegate, webSocketClient, factory);
         photoStreamClient.bootstrap();
     }
 
@@ -263,7 +265,7 @@ public class PhotoStreamClientTest {
         OnNewPhotoReceivedListener c = mock(OnNewPhotoReceivedListener.class);
         photoStreamClient.addOnNewPhotoReceivedListener(c);
         photoStreamClient.addOnPhotoUploadListener(callback);
-        photoStreamClient.uploadPhoto(new byte[1024], "description");
+        photoStreamClient.uploadPhoto(createFakeJPGBytes(), "description");
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnNewPhotoReceivedListener(c);
         photoStreamClient.removeOnPhotoUploadListener(callback);
@@ -277,12 +279,16 @@ public class PhotoStreamClientTest {
         verify(c, times(0)).onDismissProgressDialog();
     }
 
+    private byte[] createFakeJPGBytes() {
+        return ByteBuffer.allocate(4).putInt(0xffd8ffe0).array();
+    }
+
     @Test
     public void uploadPhotoError() throws IOException, JSONException {
         createPhotoStreamClient(new HttpErrorExecutorFactoryStub());
         OnPhotoUploadListener callback = mock(OnPhotoUploadListener.class);
         photoStreamClient.addOnPhotoUploadListener(callback);
-        photoStreamClient.uploadPhoto(new byte[1024], "description");
+        photoStreamClient.uploadPhoto(createFakeJPGBytes(), "description");
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoUploadListener(callback);
         verify(callback, times(1)).onShowProgressDialog();
@@ -295,17 +301,17 @@ public class PhotoStreamClientTest {
 
         createPhotoStreamClient(new HttpCommentExecutorFactoryStub());
         OnNewCommentReceivedListener callback = mock(OnNewCommentReceivedListener.class);
-        OnCommentUploadListener c = mock(OnCommentUploadListener.class);
+        OnCommentUploadFailedListener c = mock(OnCommentUploadFailedListener.class);
 
         photoStreamClient.addOnNewCommentReceivedListener(callback);
-        photoStreamClient.addOnUploadCommentListener(c);
+        photoStreamClient.addOnUploadCommentFailedListener(c);
 
         photoStreamClient.uploadComment(PHOTO_ID, "comment");
 
         Robolectric.flushBackgroundThreadScheduler();
 
         photoStreamClient.removeOnNewCommentReceivedListener(callback);
-        photoStreamClient.removeOnUploadCommentListener(c);
+        photoStreamClient.removeOnUploadCommentFailedListener(c);
 
         verify(callback, times(0)).onShowProgressDialog();
         verify(callback, times(1)).onNewCommentReceived(any(Comment.class));
@@ -322,17 +328,17 @@ public class PhotoStreamClientTest {
         createPhotoStreamClient(new HttpErrorExecutorFactoryStub());
 
         OnNewCommentReceivedListener callback = mock(OnNewCommentReceivedListener.class);
-        OnCommentUploadListener c = mock(OnCommentUploadListener.class);
+        OnCommentUploadFailedListener c = mock(OnCommentUploadFailedListener.class);
 
         photoStreamClient.addOnNewCommentReceivedListener(callback);
-        photoStreamClient.addOnUploadCommentListener(c);
+        photoStreamClient.addOnUploadCommentFailedListener(c);
 
         photoStreamClient.uploadComment(1, "comment");
 
         Robolectric.flushBackgroundThreadScheduler();
 
         photoStreamClient.removeOnNewCommentReceivedListener(callback);
-        photoStreamClient.removeOnUploadCommentListener(c);
+        photoStreamClient.removeOnUploadCommentFailedListener(c);
 
         verify(callback, times(0)).onShowProgressDialog();
         verify(callback, times(0)).onNewCommentReceived(any(Comment.class));

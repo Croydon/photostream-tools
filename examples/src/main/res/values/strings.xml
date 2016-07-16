@@ -25,7 +25,7 @@
 <resources>
     <string name="app_name">PhotoStream Examples</string>
     <string name="action_refresh">Refresh</string>
-    <string name="header_comments">Comments for Photo With ID = 3</string>
+    <string name="header_comments">Comments for Photo With ID = 1</string>
     <string name="comment_example">CommentExample</string>
     <string name="photo_example">PhotoExample</string>
     <string name="title_activity_menu">MenuActivity</string>

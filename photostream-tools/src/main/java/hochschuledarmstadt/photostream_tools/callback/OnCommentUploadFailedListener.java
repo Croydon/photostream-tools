@@ -27,10 +27,10 @@ package hochschuledarmstadt.photostream_tools.callback;
 import hochschuledarmstadt.photostream_tools.model.HttpResult;
 
 /**
- * {@link OnCommentUploadListener#onCommentUploadFailed(HttpResult)}<br>
+ * {@link OnCommentUploadFailedListener#onCommentUploadFailed(HttpResult)}<br>
  * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
  */
-public interface OnCommentUploadListener extends OnRequestListener {
+public interface OnCommentUploadFailedListener extends OnRequestListener {
     /**
      * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
      * @param httpResult enthält HTTP Status Code sowie die Fehlernachricht

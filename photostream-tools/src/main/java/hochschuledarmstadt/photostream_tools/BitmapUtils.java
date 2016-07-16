@@ -94,13 +94,12 @@ public final class BitmapUtils {
 
     /**
      * Lädt ein Bitmap anhand eines Dateipfads
-     * @param context android context
      * @param file dateipfad
      * @return Bitmap
      * @throws FileNotFoundException wird geworfen, wenn die Resource nicht vorhanden ist
      */
-    public static Bitmap decodeBitmapFromFile(Context context, File file) throws FileNotFoundException {
-        return internalDecodeBitmap(context, Uri.fromFile(file), TYPE_FILE);
+    public static Bitmap decodeBitmapFromFile(File file) throws FileNotFoundException {
+        return internalDecodeBitmap(null, Uri.fromFile(file), TYPE_FILE);
     }
 
     /**
@@ -137,19 +136,23 @@ public final class BitmapUtils {
         try {
             BitmapFactory.Options options = lessResolution(createInputStream(context, uri, type), 600, 600);
             bm = BitmapFactory.decodeStream(createInputStream(context, uri, type), null, options);
-            ExifInterface exif = new ExifInterface(getRealPathFromURI(context, uri));
-            String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-            int orientation = orientString != null ? Integer.parseInt(orientString) :  ExifInterface.ORIENTATION_NORMAL;
+            if (context != null) {
+                ExifInterface exif = new ExifInterface(getRealPathFromURI(context, uri));
+                String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
 
-            int rotationAngle = 0;
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_90)       rotationAngle = 90;
-            else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-            else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+                int rotationAngle = 0;
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
 
-            if (rotationAngle != 0) {
-                Matrix matrix = new Matrix();
-                matrix.postRotate(rotationAngle);
-                bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+                if (rotationAngle != 0) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(rotationAngle);
+                    Bitmap bmCopy = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+                    bm.recycle();
+                    bm = bmCopy;
+                }
             }
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());

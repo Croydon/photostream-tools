@@ -113,9 +113,8 @@ public class ApiRequestsFailTest {
     @Test
     public void searchPhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = createMockHttpGetExecutor();
-        String query = "query";
         SearchPhotosAsyncTask.OnSearchPhotosResultCallback callback = mock(SearchPhotosAsyncTask.OnSearchPhotosResultCallback.class);
-        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, context, query, callback);
+        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, imageLoader, context, callback);
         searchPhotosAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -132,7 +131,7 @@ public class ApiRequestsFailTest {
     public void searchMorePhotos() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = createMockHttpGetExecutor();
         SearchMorePhotosAsyncTask.OnSearchPhotosResultCallback callback = mock(SearchMorePhotosAsyncTask.OnSearchPhotosResultCallback.class);
-        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, context, callback);
+        SearchMorePhotosAsyncTask searchPhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, imageLoader, context, callback);
         searchPhotosAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -202,9 +201,8 @@ public class ApiRequestsFailTest {
     public void likePhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPutExecutor executor = createMockHttpPutExecutor();
         final int photoId = INVALID_PHOTO_ID;
-        LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         LikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(LikePhotoAsyncTask.OnVotePhotoResultListener.class);
-        LikePhotoAsyncTask votePhotoAsyncTask = new LikePhotoAsyncTask(executor, voteTable, photoId, callback);
+        LikePhotoAsyncTask votePhotoAsyncTask = new LikePhotoAsyncTask(executor, photoId, callback);
         votePhotoAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {
@@ -221,9 +219,8 @@ public class ApiRequestsFailTest {
     public void resetLikeForPhoto() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPutExecutor executor = createMockHttpPutExecutor();
         final int photoId = INVALID_PHOTO_ID;
-        LikeTable voteTable = new LikeTable(DbConnection.getInstance(context));
         DislikePhotoAsyncTask.OnVotePhotoResultListener callback = mock(DislikePhotoAsyncTask.OnVotePhotoResultListener.class);
-        DislikePhotoAsyncTask votePhotoAsyncTask = new DislikePhotoAsyncTask(executor, voteTable, photoId, callback);
+        DislikePhotoAsyncTask votePhotoAsyncTask = new DislikePhotoAsyncTask(executor, photoId, callback);
         votePhotoAsyncTask.execute();
         Robolectric.flushBackgroundThreadScheduler();
         try {

@@ -212,7 +212,7 @@ class AndroidSocket {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            onMessageListener.onNewCommentCount(photoId, comment_count);
+                            onMessageListener.onCommentCountChanged(photoId, comment_count);
                         }
                     });
                 } catch (JSONException e) {
@@ -234,6 +234,6 @@ class AndroidSocket {
         void onPhotoDeleted(int photoId);
         void onConnect();
         void onDisconnect();
-        void onNewCommentCount(int photoId, int comment_count);
+        void onCommentCountChanged(int photoId, int comment_count);
     }
 }

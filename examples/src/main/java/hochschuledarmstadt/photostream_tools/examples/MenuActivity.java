@@ -43,7 +43,6 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity;
-import hochschuledarmstadt.photostream_tools.examples.like.LikeActivity;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 import hochschuledarmstadt.photostream_tools.examples.search.SearchActivity;
 import hochschuledarmstadt.photostream_tools.examples.upload.PhotoUploadActivity;
@@ -56,15 +55,14 @@ public class MenuActivity extends AppCompatActivity {
     private static final String MENU_LIKE = "Like";
     private static final String MENU_UPLOAD_PHOTO = "Upload Photo";
     private static final String MENU_SEARCH = "Search Photos";
-    private static final String MENU_VIEW_PAGER = "View Pager";
+    private static final String MENU_VIEW_PAGER = "Photos in View Pager";
 
-    private static final MenuItemWrapper[] menu = new MenuItemWrapper[]{
-            new MenuItemWrapper(MENU_PHOTOS, PhotoActivity.class),
-            new MenuItemWrapper(MENU_COMMENTS, CommentActivity.class),
-            new MenuItemWrapper(MENU_LIKE, LikeActivity.class),
-            new MenuItemWrapper(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
-            new MenuItemWrapper(MENU_SEARCH, SearchActivity.class),
-            new MenuItemWrapper(MENU_VIEW_PAGER, ViewPagerActivity.class)
+    private static final MenuItem[] menu = new MenuItem[]{
+            new MenuItem(MENU_PHOTOS, PhotoActivity.class),
+            new MenuItem(MENU_COMMENTS, CommentActivity.class),
+            new MenuItem(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
+            new MenuItem(MENU_SEARCH, SearchActivity.class),
+            new MenuItem(MENU_VIEW_PAGER, ViewPagerActivity.class)
     };
 
     private MenuAdapter menuAdapter;
@@ -82,7 +80,7 @@ public class MenuActivity extends AppCompatActivity {
         menuAdapter = new MenuAdapter(this, Arrays.asList(menu), new MenuAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                final MenuItemWrapper menuItem = menuAdapter.getItemAtPosition(position);
+                final MenuItem menuItem = menuAdapter.getItemAtPosition(position);
                 Class<? extends PhotoStreamActivity> clazz = menuItem.getActivityClass();
                 Intent intent = new Intent(MenuActivity.this, clazz);
                 startActivity(intent);
@@ -91,18 +89,18 @@ public class MenuActivity extends AppCompatActivity {
         recyclerView.setAdapter(menuAdapter);
     }
 
-    private static class MenuItemWrapper {
+    private static class MenuItem {
 
         private final Class<? extends PhotoStreamActivity> activityClass;
-        private final String menuTitle;
+        private final String title;
 
-        MenuItemWrapper(String menuTitle, Class<? extends PhotoStreamActivity> activityClass){
-            this.menuTitle = menuTitle;
+        MenuItem(String title, Class<? extends PhotoStreamActivity> activityClass){
+            this.title = title;
             this.activityClass = activityClass;
         }
 
-        public String getMenuTitle() {
-            return menuTitle;
+        public String getTitle() {
+            return title;
         }
 
         public Class<? extends PhotoStreamActivity> getActivityClass() {
@@ -112,11 +110,11 @@ public class MenuActivity extends AppCompatActivity {
 
     private static class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder>{
 
-        private final List<MenuItemWrapper> menu;
+        private final List<MenuItem> menu;
         private final Context context;
         private final OnItemClickListener itemClickListener;
 
-        public MenuAdapter(Context context, List<MenuItemWrapper> menu, OnItemClickListener itemClickListener){
+        public MenuAdapter(Context context, List<MenuItem> menu, OnItemClickListener itemClickListener){
             this.context = context;
             this.menu = menu;
             this.itemClickListener = itemClickListener;
@@ -129,7 +127,7 @@ public class MenuActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MenuViewHolder holder, int position) {
-            holder.textView.setText(menu.get(position).getMenuTitle());
+            holder.textView.setText(menu.get(position).getTitle());
         }
 
         @Override
@@ -137,7 +135,7 @@ public class MenuActivity extends AppCompatActivity {
             return menu.size();
         }
 
-        public MenuItemWrapper getItemAtPosition(int position) {
+        public MenuItem getItemAtPosition(int position) {
             return menu.get(position);
         }
 

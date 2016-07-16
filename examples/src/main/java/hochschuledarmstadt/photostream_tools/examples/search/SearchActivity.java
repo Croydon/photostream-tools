@@ -57,6 +57,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     public static final String KEY_SEARCHVIEW_QUERY = "KEY_SEARCHVIEW_QUERY";
     public static final String KEY_SEARCHVIEW_EXPANDED = "KEY_SEARCHVIEW_EXPANDED";
     public static final String KEY_SEARCHVIEW_FOCUSED = "KEY_SEARCHVIEW_FOCUSED";
+    private static final String KEY_PHOTOS = "KEY_PHOTOS";
 
     private PhotoAdapter photoAdapter;
     private RecyclerView recyclerView;
@@ -77,6 +78,12 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         photoAdapter = new PhotoAdapter();
+
+        if (savedInstanceState != null){
+            Bundle bundle = savedInstanceState.getBundle(KEY_PHOTOS);
+            photoAdapter.restoreInstanceState(bundle);
+        }
+
         photoAdapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Photo photo) {
@@ -184,6 +191,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putBundle(KEY_PHOTOS, photoAdapter.saveInstanceState());
         outState.putBoolean(KEY_SEARCHVIEW_EXPANDED, searchViewExpanded);
         outState.putBoolean(KEY_SEARCHVIEW_FOCUSED, searchViewFocused);
         outState.putString(KEY_SEARCHVIEW_QUERY, searchView.getQuery().toString());

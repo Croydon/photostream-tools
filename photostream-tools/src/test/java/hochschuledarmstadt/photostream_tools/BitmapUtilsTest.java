@@ -110,7 +110,7 @@ public class BitmapUtilsTest {
             FileOutputStream fs = context.openFileOutput(UNIT_TEST_JPG, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fs);
             File file = new File(context.getFilesDir(), UNIT_TEST_JPG);
-            Bitmap result = BitmapUtils.decodeBitmapFromFile(context, file);
+            Bitmap result = BitmapUtils.decodeBitmapFromFile(file);
             if (file.exists())
                 file.delete();
             assertNotNull(result);

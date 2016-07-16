@@ -38,6 +38,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
@@ -57,7 +60,13 @@ public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolde
         super.onBindViewHolder(holder, position);
         BitmapUtils.recycleBitmapFromImageView(holder.imageView);
         Photo photo = getItemAtPosition(position);
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageFilePath());
+        File imageFile = photo.getImageFile();
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapUtils.decodeBitmapFromFile(imageFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         holder.imageView.setImageBitmap(bitmap);
         holder.textView.setText(photo.getDescription());
     }

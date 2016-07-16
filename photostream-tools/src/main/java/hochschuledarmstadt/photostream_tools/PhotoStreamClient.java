@@ -28,6 +28,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
@@ -37,13 +38,13 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadFailedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -67,23 +68,22 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     private final Context context;
     private final HttpImageLoader imageLoader;
     private final CommentTable commentTable;
-    private final LikeTable likeTable;
+    private final ImageCacher imageCacher;
     private String lastSearchQuery;
     private String loadPhotosETag;
     private BroadcastReceiver internetAvailableBroadcastReceiver;
     private final UrlBuilder urlBuilder;
     private WebSocketClient webSocketClient;
-    private PhotoStreamCallbackContainer callbackContainer;
+    private PhotoStreamCallbackContainer callbackContainer = new PhotoStreamCallbackContainer();
 
-    public PhotoStreamClient(Context context, UrlBuilder urlBuilder, HttpImageLoader imageLoader, DbConnection dbConnection, WebSocketClient webSocketClient, PhotoStreamCallbackContainer callbackContainer, HttpExecutorFactory httpExecutorFactory){
+    public PhotoStreamClient(Context context, UrlBuilder urlBuilder, HttpImageLoader imageLoader, ImageCacher imageCacher, DbConnection dbConnection, WebSocketClient webSocketClient, HttpExecutorFactory httpExecutorFactory){
         this.context = context;
         this.urlBuilder = urlBuilder;
         this.imageLoader = imageLoader;
         this.webSocketClient = webSocketClient;
-        this.callbackContainer = callbackContainer;
         this.httpExecutorFactory = httpExecutorFactory;
+        this.imageCacher = imageCacher;
         this.commentTable = new CommentTable(dbConnection);
-        this.likeTable = new LikeTable(dbConnection);
     }
 
     void destroy() {
@@ -242,7 +242,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getLikePhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
         final RequestType requestType = RequestType.LIKE_PHOTO;
-        LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(executor, likeTable, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
+        LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(executor, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
 
             @Override
             public void onPhotoLiked(int photoId) {
@@ -265,14 +265,6 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         });
         addOpenRequest(requestType);
         task.execute();
-    }
-
-    @Override
-    public boolean hasUserLikedPhoto(int photoId){
-        likeTable.openDatabase();
-        boolean hasLiked = likeTable.hasUserLikedPhoto(photoId);
-        likeTable.closeDatabase();
-        return hasLiked;
     }
 
     @Override
@@ -330,7 +322,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getResetLikeForPhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
         final RequestType requestType = RequestType.LIKE_PHOTO;
-        LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(executor, likeTable, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
+        LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(executor, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
             @Override
             public void onPhotoLiked(int photoId) {
                 removeOpenRequest(requestType);
@@ -386,7 +378,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             @Override
             public void onPhotoDeleted(int photoId) {
                 removeOpenRequest(requestType);
-                callbackContainer.notifyOnPhotoDeleted(Photo.getImageFilePathForPhotoId(context, photoId), photoId);
+                File imageFile = imageCacher.getImageFilePathForPhotoId(photoId);
+                if (imageFile != null && imageFile.exists())
+                    imageFile.delete();
+                callbackContainer.notifyOnPhotoDeleted(photoId);
             }
 
             @Override
@@ -463,13 +458,13 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public void addOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
-        callbackContainer.addOnUploadCommentListener(onCommentUploadListener);
+    public void addOnUploadCommentFailedListener(OnCommentUploadFailedListener onCommentUploadFailedListener) {
+        callbackContainer.addOnUploadCommentListener(onCommentUploadFailedListener);
     }
 
     @Override
-    public void removeOnUploadCommentListener(OnCommentUploadListener onCommentUploadListener) {
-        callbackContainer.removeOnUploadCommentListener(onCommentUploadListener);
+    public void removeOnUploadCommentFailedListener(OnCommentUploadFailedListener onCommentUploadFailedListener) {
+        callbackContainer.removeOnUploadCommentListener(onCommentUploadFailedListener);
     }
 
     @Override
@@ -480,6 +475,16 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void removeOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener) {
         callbackContainer.removeOnCommentDeletedListener(onCommentDeletedListener);
+    }
+
+    @Override
+    public void addOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener) {
+        callbackContainer.addOnCommentCountChangedListener(onCommentCountChangedListener);
+    }
+
+    @Override
+    public void removeOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener) {
+        callbackContainer.removeOnCommentCountChangedListener(onCommentCountChangedListener);
     }
 
     @Override
@@ -588,7 +593,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     @Override
     public void onNewPhoto(Photo photo) {
         try {
-            photo.cacheImage(context);
+            imageCacher.cacheImage(photo);
             callbackContainer.notifyOnNewPhoto(context, photo);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
@@ -607,7 +612,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     @Override
     public void onPhotoDeleted(int photoId) {
-        callbackContainer.notifyOnPhotoDeleted(Photo.getImageFilePathForPhotoId(context, photoId), photoId);
+        File imageFile = imageCacher.getImageFilePathForPhotoId(photoId);
+        if (imageFile != null && imageFile.exists())
+            imageFile.delete();
+        callbackContainer.notifyOnPhotoDeleted(photoId);
     }
 
     @Override
@@ -627,8 +635,8 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public void onNewCommentCount(int photoId, int comment_count) {
-        callbackContainer.notifyOnNewCommentCount(photoId, comment_count);
+    public void onCommentCountChanged(int photoId, int commentCount) {
+        callbackContainer.notifyOnCommentCountChanged(photoId, commentCount);
     }
 
     private void unregisterInternetAvailableBroadcastReceiver() {

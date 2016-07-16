@@ -36,7 +36,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 public interface OnSearchedPhotosReceivedListener extends OnRequestListener {
     /**
      * Wird aufgerufen, wenn eine Seite von gesuchten Photos geladen werden konnte
-     * @param result enthält die geladene Seite, sowie die Photos aus der Seite
+     * @param result enthält die gefundenen Photos aus der Seite
      */
     void onSearchedPhotosReceived(PhotoQueryResult result);
 

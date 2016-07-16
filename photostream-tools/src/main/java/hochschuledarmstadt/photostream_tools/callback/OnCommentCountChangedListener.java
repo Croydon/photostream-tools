@@ -22,17 +22,17 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools;
+package hochschuledarmstadt.photostream_tools.callback;
 
-class LikePhotoAsyncTask extends LikeOrDislikePhotoAsyncTask {
-
-    public LikePhotoAsyncTask(HttpPutExecutor executor, int photoId, OnVotePhotoResultListener callback) {
-        super(executor, photoId, callback);
-    }
-
-    @Override
-    protected void sendResult(OnVotePhotoResultListener callback, int photoId) {
-        callback.onPhotoLiked(photoId);
-    }
-
+/**
+ * {@link OnCommentCountChangedListener#onCommentCountChanged(int, int)}<br>
+ * Wird aufgerufen, wenn sich die Anzahl der Kommentare zu einem Photo geändert hat.
+ */
+public interface OnCommentCountChangedListener {
+    /**
+     * Wird aufgerufen, wenn sich die Anzahl der Kommentare zu dem Photo mit der id {@code photoId} geändert hat.
+     * @param photoId id des Photos zu der die Kommentare zugeordnet sind
+     * @param commentCount Absolute Anzahl der Kommentare zu dem Photo
+     */
+    void onCommentCountChanged(int photoId, int commentCount);
 }

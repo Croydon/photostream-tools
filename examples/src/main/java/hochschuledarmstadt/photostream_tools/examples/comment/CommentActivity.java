@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
+import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
@@ -83,20 +85,28 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
         setContentView(R.layout.activity_comment);
         // RecyclerView referenzieren
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        // LinearLayoutManager setzen (Elemente in der angezeigten Liste werden sequentiell dargestellt)
+        // LinearLayoutManager setzen (Elemente in der angezeigten Liste werden vertikal sequentiell dargestellt)
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         // Visuellen Begrenzer setzen für Kommentare in der Liste
         recyclerView.addItemDecoration(new DividerItemDecoration(this));
-        // Standard Animationen aktivieren
+        // Standard Animationen setzen
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter();
         // Wenn die Activity neu aufgebaut wird
         if (savedInstanceState != null) {
-            // dann die Kommentare aus der vorherigen Activity Instanz wiederherstellen
+            // dann die Kommentare aus der vorherigen Activity Instanz wiederherstellen/referenzieren
             Bundle bundle = savedInstanceState.getBundle(KEY_ADAPTER);
+            // und an den Adapter übergeben
             adapter.restoreInstanceState(bundle);
         }
-        // Der RecyclerView den Adapter zuweisen
+        adapter.setOnItemClickListener(R.id.textView, new SimpleCommentAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClicked(View v, Comment comment) {
+                String message = String.format("Comment Id: %d", comment.getId());
+                Toast.makeText(CommentActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+        // Als letztes den Adapter der RecyclerView zuweisen
         recyclerView.setAdapter(adapter);
     }
 

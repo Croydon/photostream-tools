@@ -32,6 +32,7 @@ import android.widget.ProgressBar;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
@@ -41,7 +42,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class ViewPagerActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnPhotoDeletedListener {
+public class ViewPagerActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnPhotoDeletedListener, OnCommentCountChangedListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
 
@@ -132,6 +133,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         photoStreamClient.addOnPhotosReceivedListener(this);
         photoStreamClient.addOnPhotoDeletedListener(this);
         photoStreamClient.addOnNewPhotoReceivedListener(this);
+        photoStreamClient.addOnCommentCountChangedListener(this);
         if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)){
             photoStreamClient.loadPhotos();
         }
@@ -147,6 +149,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         photoStreamClient.removeOnPhotosReceivedListener(this);
         photoStreamClient.removeOnPhotoDeletedListener(this);
         photoStreamClient.removeOnNewPhotoReceivedListener(this);
+        photoStreamClient.removeOnCommentCountChangedListener(this);
     }
 
     @Override
@@ -166,11 +169,6 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     @Override
     public void onNoNewPhotosAvailable() {
 
-    }
-
-    @Override
-    public void onNewCommentCount(int photoId, int comment_count) {
-        adapter.updateCommentCount(photoId, comment_count);
     }
 
     @Override
@@ -210,5 +208,10 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     @Override
     public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
         Utils.showErrorInAlertDialog(this, String.format("Couldn't delete photo with id: %s", photoId), httpResult);
+    }
+
+    @Override
+    public void onCommentCountChanged(int photoId, int commentCount) {
+        adapter.updateCommentCount(photoId, commentCount);
     }
 }
