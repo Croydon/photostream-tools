@@ -24,12 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 /**
  * {@link OnCommentDeletedListener#onCommentDeleted(int)}<br>
  * Wird aufgerufen wenn ein eigener Kommentar gelöscht wurde, oder ein Kommentar von einem anderen Gerät gelöscht wurde <br> <br>
- * {@link OnCommentDeletedListener#onCommentDeleteFailed(int, HttpResult)} <br>
+ * {@link OnCommentDeletedListener#onCommentDeleteFailed(int, HttpError)} <br>
  * Wird aufgerufen wenn beim Löschen eines eigenen Kommentars ein Fehler aufgetreten ist <br> <br>
  */
 public interface OnCommentDeletedListener extends OnRequestListener{
@@ -43,7 +43,7 @@ public interface OnCommentDeletedListener extends OnRequestListener{
     /**
      * Wird aufgerufen wenn beim Löschen eines eigenen Kommentars ein Fehler aufgetreten ist <br>
      * @param commentId entspricht der id des gelöschten Kommentars
-     * @param httpResult enthält den HTTP Status Code, sowie die Fehlernachricht
+     * @param httpError enthält den HTTP Status Code, sowie die Fehlernachricht
      */
-    void onCommentDeleteFailed(int commentId, HttpResult httpResult);
+    void onCommentDeleteFailed(int commentId, HttpError httpError);
 }

@@ -25,10 +25,8 @@
 package hochschuledarmstadt.photostream_tools;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
 
@@ -51,10 +49,10 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
             return true;
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return false;
     }
@@ -71,13 +69,13 @@ class DeletePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onPhotoDeleteFailed(photoId, httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onPhotoDeleteFailed(photoId, httpError);
     }
 
     interface OnDeletePhotoResultListener {
         void onPhotoDeleted(int photoId);
-        void onPhotoDeleteFailed(int photoId, HttpResult httpResult);
+        void onPhotoDeleteFailed(int photoId, HttpError httpError);
     }
 
 }

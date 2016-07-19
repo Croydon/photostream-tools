@@ -22,42 +22,28 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.model;
+package hochschuledarmstadt.photostream_tools.examples.notification;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 
 /**
- * Repräsentiert das Ergebnis zu der Abfrage von allen Kommentaren zu einem Photo
+ * Deklaration für Starten des BroadcastReceivers im Manifest deklariert (AndroidManifest.xml)
  */
-public class LoadCommentsQueryResult {
-
-    @SerializedName("photo_id")
-    @Expose
-    private int photoId;
-
-    @SerializedName("comments")
-    @Expose
-    private List<Comment> comments = new ArrayList<>();
-
-    /**
-     * Liefert die photo id zurück, zu der die Kommentare zugeordnet sind
-     * @return photo id
-     */
-    public int getPhotoId() {
-        return photoId;
+public class NotificationBroadcastReceiver extends BroadcastReceiver{
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (isNewPhotoIntent(intent)){
+            // Würde also bedeuten, dass ein neues Photo durch ein anderes Android Gerät hochgeladen wurde.
+            Toast.makeText(context, "Intent erhalten im BroadcastReceiver!", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    /**
-     * Lieferte alle Kommentare zu dem Photo zurück
-     * @return Liste von Kommentaren
-     */
-    public List<Comment> getComments() {
-        return comments;
+    private boolean isNewPhotoIntent(Intent intent) {
+        return intent.getAction().equals(IPhotoStreamClient.INTENT_ACTION_NEW_PHOTO_AVAILABLE);
     }
-
-
 }

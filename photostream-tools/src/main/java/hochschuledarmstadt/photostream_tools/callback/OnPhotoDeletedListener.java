@@ -24,12 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 /**
  * {@link OnPhotoDeletedListener#onPhotoDeleted(int)}<br>
  * Wird aufgerufen wenn ein Photo gelöscht wurde <br> <br>
- * {@link OnPhotoDeletedListener#onPhotoDeleteFailed(int, HttpResult)}<br>
+ * {@link OnPhotoDeletedListener#onPhotoDeleteFailed(int, HttpError)}<br>
  * Wird aufgerufen wenn ein Photo aufgrund eines Fehlers nicht gelöscht werden konnte. <br> <br>
  * entspricht der id des Photos das nicht gelöscht werden konnte.
  */
@@ -43,7 +43,7 @@ public interface OnPhotoDeletedListener extends OnRequestListener {
     /**
      * Wird aufgerufen wenn ein Photo aufgrund eines Fehlers nicht gelöscht werden konnte. <br>
      * @param photoId entspricht der id des Photos das nicht gelöscht werden konnte.
-     * @param httpResult enthält den HTTP Status Code sowie die Fehlernachricht
+     * @param httpError enthält den HTTP Status Code sowie die Fehlernachricht
      */
-    void onPhotoDeleteFailed(int photoId, HttpResult httpResult);
+    void onPhotoDeleteFailed(int photoId, HttpError httpError);
 }

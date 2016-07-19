@@ -27,13 +27,19 @@ package hochschuledarmstadt.photostream_tools.examples;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 public class Utils {
 
-    public static void showErrorInAlertDialog(Context context, String title, HttpResult httpResult){
-        int responseCode = httpResult.getResponseCode();
-        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpResult.getMessage());
+    /**
+     * Zeigt einen AlertDialog an
+     * @param context activity context
+     * @param title Titel des Dialogs
+     * @param httpError http error
+     */
+    public static void showErrorInAlertDialog(Context context, String title, HttpError httpError){
+        int responseCode = httpError.getResponseCode();
+        String message = String.format("Response Code: %s\nMessage:%s", responseCode, httpError.getMessage());
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);

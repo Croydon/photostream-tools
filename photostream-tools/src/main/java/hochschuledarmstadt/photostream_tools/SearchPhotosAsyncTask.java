@@ -31,7 +31,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -62,10 +62,10 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
             return searchPhotos();
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return null;
     }
@@ -96,13 +96,13 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onSearchPhotosError(httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onSearchPhotosError(httpError);
     }
 
     interface OnSearchPhotosResultCallback {
         void onSearchPhotosResult(PhotoQueryResult photoQueryResult);
-        void onSearchPhotosError(HttpResult httpResult);
+        void onSearchPhotosError(HttpError httpError);
     }
 
 }

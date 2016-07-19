@@ -29,13 +29,23 @@
             android:name="PHOTOSTREAM_URL"
             android:value="http://5.45.97.155:8082" />
 
-        <activity android:name=".like.LikeActivity" />
         <activity android:name=".upload.PhotoUploadActivity" />
         <activity android:name=".search.SearchActivity" />
         <activity
             android:name=".viewpager.ViewPagerActivity"
             android:label="@string/title_activity_view_pager"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".notification.NotificationActivity"/>
+
+        <activity android:name=".photo.FullscreenActivity" android:theme="@style/AppTheme.NoActionBar"/>
+
+        <receiver android:name=".notification.NotificationBroadcastReceiver">
+            <intent-filter>
+                <action android:name="hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

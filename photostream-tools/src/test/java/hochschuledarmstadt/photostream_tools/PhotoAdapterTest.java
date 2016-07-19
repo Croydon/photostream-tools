@@ -26,9 +26,7 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,11 +40,10 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
-import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 import static org.junit.Assert.assertEquals;
@@ -68,7 +65,7 @@ public class PhotoAdapterTest {
 
     private PhotoAdapter simplePhotoAdapter;
 
-    private static class PhotoAdapter extends SimplePhotoAdapter<TestViewHolder> {
+    private static class PhotoAdapter extends BasePhotoAdapter<TestViewHolder> {
 
         private Context context = RuntimeEnvironment.application.getApplicationContext();
 
@@ -168,7 +165,7 @@ public class PhotoAdapterTest {
     @Test
     public void testOnClickIsWorking() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemClickListener() {
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Photo photo) {
                 latch.countDown();
@@ -184,7 +181,7 @@ public class PhotoAdapterTest {
     @Test
     public void testOnLongClickIsWorking() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemLongClickListener() {
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClicked(View v, Photo photo) {
                 latch.countDown();
@@ -201,7 +198,7 @@ public class PhotoAdapterTest {
     @Test
     public void testOnTouchIsWorking() {
         final CountDownLatch latch = new CountDownLatch(2);
-        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new SimplePhotoAdapter.OnItemTouchListener() {
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
             @Override
             public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
                 if (MotionEvent.ACTION_DOWN == motionEvent.getAction()){

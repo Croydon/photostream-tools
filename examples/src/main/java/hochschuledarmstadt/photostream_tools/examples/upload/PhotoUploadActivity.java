@@ -44,7 +44,7 @@ import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoUploadListener{
@@ -109,8 +109,8 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
     }
 
     @Override
-    public void onPhotoUploadFailed(HttpResult httpResult) {
-        Utils.showErrorInAlertDialog(this, "Photo Upload failed", httpResult);
+    public void onPhotoUploadFailed(HttpError httpError) {
+        Utils.showErrorInAlertDialog(this, "Photo Upload failed", httpError);
     }
 
     @Override

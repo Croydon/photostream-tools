@@ -28,14 +28,9 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
@@ -61,10 +56,10 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
             return uploadPhoto(params[0]);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return null;
     }
@@ -86,13 +81,13 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onPhotoStoreError(httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onPhotoStoreError(httpError);
     }
 
     interface OnPhotoStoredCallback {
         void onPhotoStoreSuccess(Photo photo);
-        void onPhotoStoreError(HttpResult httpResult);
+        void onPhotoStoreError(HttpError httpError);
         void onNewETag(String eTag);
     }
 

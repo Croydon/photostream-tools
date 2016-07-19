@@ -29,15 +29,10 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
 
@@ -62,10 +57,10 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
             return sendComment();
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return null;
     }
@@ -92,12 +87,12 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onSendCommentFailed(httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onSendCommentFailed(httpError);
     }
 
     interface OnCommentSentListener {
         void onCommentSent(Comment comment);
-        void onSendCommentFailed(HttpResult httpResult);
+        void onSendCommentFailed(HttpError httpError);
     }
 }

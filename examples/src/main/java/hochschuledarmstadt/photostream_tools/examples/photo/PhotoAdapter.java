@@ -25,12 +25,6 @@
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,12 +36,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
-import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 
-public class PhotoAdapter extends SimplePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
+public class PhotoAdapter extends BasePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

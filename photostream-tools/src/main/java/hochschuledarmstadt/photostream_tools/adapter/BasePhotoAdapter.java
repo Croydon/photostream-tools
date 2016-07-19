@@ -39,16 +39,16 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
  * Mit dieser Klasse können Photos in einer RecyclerView angezeigt werden
  * @param <H> ViewHolder Klasse
  */
-public abstract class SimplePhotoAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Photo> {
+public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Photo> {
 
     private static final int LIKE = -10;
     private static final int DISLIKE = -11;
 
-    public SimplePhotoAdapter(ArrayList<Photo> photos){
+    public BasePhotoAdapter(ArrayList<Photo> photos){
         super(photos);
     }
 
-    public SimplePhotoAdapter(){
+    public BasePhotoAdapter(){
         super(new ArrayList<Photo>());
     }
 

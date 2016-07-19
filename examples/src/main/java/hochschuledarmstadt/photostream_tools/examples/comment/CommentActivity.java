@@ -37,41 +37,49 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BaseCommentAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 public class CommentActivity extends PhotoStreamActivity implements OnCommentsReceivedListener {
 
     /**
-     * Key für das Speichern der Kommentare in der Methode "onSaveInstanceState(...)"
+     * Key für das Speichern der Kommentare in der Methode {@link CommentActivity#onSaveInstanceState(Bundle)}"
      */
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
 
     /**
-     * Die Photo Id, für die Kommentare abgerufen werden
+     * Es werden beispielhaft die Kommentare zu dem Photo mit dieser ID abgerufen
      */
     private static final int PHOTO_ID = 1;
 
+    /**
+     * Widget für das Anzeigen der Kommentare in einer Liste
+     */
     private RecyclerView recyclerView;
+    /**
+     * Container, der die Kommentare enthält
+     */
     private CommentAdapter adapter;
 
-    // Methode wird von der Bibliothek "photostream-tools" automatisch aufgerufen,
-    // wenn die Activity an den Service gebunden wurde.
+    /*
+     * Methode wird von der Bibliothek automatisch aufgerufen, wenn die Activity an den Service gebunden wurde.
+     */
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnCommentsReceivedListener(this);
-        //Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
+        /*
+            Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
+         */
         if (savedInstanceState == null)
             photoStreamClient.loadComments(PHOTO_ID);
     }
 
     /*
-        Methode wird von der Bibliothek "photostream-tools" automatisch aufgerufen,
-        wenn die Activity vom Service entbunden wurde.
+     * Methode wird von der Bibliothek automatisch aufgerufen, wenn der Service von der Activity entbunden wurde.
      */
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
@@ -99,14 +107,15 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
             // und an den Adapter übergeben
             adapter.restoreInstanceState(bundle);
         }
-        adapter.setOnItemClickListener(R.id.textView, new SimpleCommentAdapter.OnItemClickListener() {
+        // Registriert einen OnItemClickListener für die View mit der id "textView"
+        adapter.setOnItemClickListener(R.id.textView, new BaseCommentAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Comment comment) {
                 String message = String.format("Comment Id: %d", comment.getId());
                 Toast.makeText(CommentActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
-        // Als letztes den Adapter der RecyclerView zuweisen
+        // Als Letztes den Adapter der RecyclerView zuweisen
         recyclerView.setAdapter(adapter);
     }
 
@@ -126,9 +135,9 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     }
 
     @Override
-    public void onReceiveCommentsFailed(int photoId, HttpResult httpResult) {
-        String title = "Could not load comments";
-        Utils.showErrorInAlertDialog(this, title, httpResult);
+    public void onReceiveCommentsFailed(int photoId, HttpError httpError) {
+        String title = String.format("Could not load comments for photo with id %d", photoId);
+        Utils.showErrorInAlertDialog(this, title, httpError);
     }
 
     @Override

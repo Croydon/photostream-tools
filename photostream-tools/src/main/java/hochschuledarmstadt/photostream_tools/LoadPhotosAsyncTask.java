@@ -25,22 +25,16 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.google.gson.Gson;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -71,12 +65,12 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             return getPhotos();
         }catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            final HttpResult httpResult = e.getHttpResult();
-            postError(httpResult);
+            final HttpError httpError = e.getHttpError();
+            postError(httpError);
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            final HttpResult httpResult = new HttpResult(-1, e.toString());
-            postError(httpResult);
+            final HttpError httpError = new HttpError(-1, e.toString());
+            postError(httpError);
         }
         return null;
     }
@@ -119,14 +113,14 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onPhotosError(httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onPhotosError(httpError);
     }
 
 
     interface GetPhotosCallback {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
-        void onPhotosError(HttpResult httpResult);
+        void onPhotosError(HttpError httpError);
         void onNewETag(String eTag);
         void onNoNewPhotosAvailable();
     }

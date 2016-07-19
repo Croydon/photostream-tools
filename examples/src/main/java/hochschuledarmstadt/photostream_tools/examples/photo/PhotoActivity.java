@@ -24,8 +24,7 @@
 
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -33,37 +32,43 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.List;
 
-import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnCommentCountChangedListener {
 
+    /**
+     * Anzahl von Spalten in der RecyclerView
+     */
     private static final int COLUMNS_PER_ROW = 2;
+
+    /**
+     * Key für das Zwischenspeichern der Photos in der Methode {@link PhotoActivity#onSaveInstanceState(Bundle)}"
+     */
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
+
+    /**
+     * Key für das Zwischenspeichern des Sichtbarkeitsstatus des Buttons {@code loadMoreButton}
+     */
     private static final String KEY_BUTTON_VISIBILITY = "KEY_BUTTON_VISIBILITY";
+
     private static final String TAG = PhotoActivity.class.getName();
 
     private RecyclerView recyclerView;
@@ -73,6 +78,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         Log.d(TAG, "onPhotoStreamServiceConnected()");
+        // Listener registrieren
         photoStreamClient.addOnPhotosReceivedListener(this);
         photoStreamClient.addOnCommentCountChangedListener(this);
         if (savedInstanceState == null)
@@ -82,6 +88,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         Log.d(TAG, "onPhotoStreamServiceDisconnected()");
+        // Alle registrierten Listener wieder entfernen
         photoStreamClient.removeOnPhotosReceivedListener(this);
         photoStreamClient.removeOnCommentCountChangedListener(this);
     }
@@ -111,10 +118,12 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
 
         adapter = new PhotoAdapter();
 
-        adapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Photo photo) {
-                Toast.makeText(PhotoActivity.this, String.format("Click: photo id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PhotoActivity.this, FullscreenActivity.class);
+                intent.putExtra(FullscreenActivity.KEY_PHOTO, photo);
+                startActivity(intent);
             }
         });
 
@@ -169,9 +178,9 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     }
 
     @Override
-    public void onReceivePhotosFailed(HttpResult httpResult) {
+    public void onReceivePhotosFailed(HttpError httpError) {
         String title = "Could not load photos";
-        Utils.showErrorInAlertDialog(this, title, httpResult);
+        Utils.showErrorInAlertDialog(this, title, httpError);
     }
 
     @Override

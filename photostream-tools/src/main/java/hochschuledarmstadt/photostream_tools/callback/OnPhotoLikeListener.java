@@ -24,14 +24,14 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 /**
  * {@link OnPhotoLikeListener#onPhotoLiked(int)}<br>
  * Wird aufgerufen wenn ein Photo geliked wurde <br><br>
  * {@link OnPhotoLikeListener#onPhotoDisliked(int)}<br>
  * Wird aufgerufen wenn ein Like von einem Photo entfernt wurde. <br><br>
- * {@link OnPhotoLikeListener#onPhotoLikeFailed(int, HttpResult)} <br>
+ * {@link OnPhotoLikeListener#onPhotoLikeFailed(int, HttpError)} <br>
  * Wird aufgerufen wenn beim Liken oder Disliken eines Photos ein Fehler aufgetreten ist
  *
  */
@@ -50,7 +50,7 @@ public interface OnPhotoLikeListener extends OnRequestListener {
     /**
      * Wird aufgerufen wenn beim Liken oder Disliken eines Photos ein Fehler aufgetreten ist
      * @param photoId id des Photos
-     * @param httpResult enthält HTTP Status Code sowie die Fehlernachricht
+     * @param httpError enthält HTTP Status Code sowie die Fehlernachricht
      */
-    void onPhotoLikeFailed(int photoId, HttpResult httpResult);
+    void onPhotoLikeFailed(int photoId, HttpError httpError);
 }

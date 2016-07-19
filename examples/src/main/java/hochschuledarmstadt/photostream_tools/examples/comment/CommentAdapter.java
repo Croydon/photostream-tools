@@ -30,11 +30,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BaseCommentAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 
-public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentViewHolder>{
+public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentViewHolder> {
 
     public CommentAdapter() { }
 
@@ -49,9 +49,23 @@ public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentV
 
     /*
         Wird aufgerufen, wenn ein neues Layout benötigt wird.
-        Es werden nur so viele ViewHolder instanziert wie Views in der Liste angezeigt werden können.
-        Sind also in der Liste beispielsweise immer nur 5 Elemente sichtbar, wird diese Methode 5x aufgerufen.
-        Anschließend werden die erzeugten ViewHolder, wenn möglich, für andere Elemente in der Liste wiederverwendet (z.B) beim scrollen)
+        Es werden nur so viele ViewHolder instanziert wie Elemente in der Liste angezeigt werden können.
+        Sind also beispielsweise auf einem Handy in der Liste immer nur 3 Elemente sichtbar, wird diese Methode 3x aufgerufen.
+        Anschließend werden die erzeugten ViewHolder, wenn möglich, für andere Elemente in der Liste wiederverwendet.
+        Beispielsweise beim Scrollen:
+
+        -----------------------------               -----------------------------
+        |        ViewHolder 1       |               |        ViewHolder 2       |
+        |         Element 1         |               |         Element 2         |
+        -----------------------------               -----------------------------
+        |        ViewHolder 2       |      =>       |        ViewHolder 3       |
+        |         Element 2         |  Scroll um    |         Element 3         |
+        -----------------------------  1 Element    -----------------------------
+        |        ViewHolder 3       |  nach unten   |        ViewHolder 1       |
+        |         Element 3         |               |         Element 4         |
+        -----------------------------               -----------------------------
+
+        ViewHolder 1 wird also für Element 4 wiederverwendet!
     */
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -61,8 +75,8 @@ public class CommentAdapter extends SimpleCommentAdapter<CommentAdapter.CommentV
     }
 
     /*
-        Wird aufgerufen, wenn ein Layout in der Liste aktualisiert werden muss.
-        Bedeutet, dass ein bestehender ViewHolder ein anderes Element an der "position" in der Liste repräsentieren soll.
+        Wird intern von der RecyclerView aufgerufen,
+        um den Inhalt einer View, mit Informationen aus dem Element an der "position", zu aktualisieren
      */
     @Override
     public void onBindViewHolder(CommentViewHolder holder, int position) {

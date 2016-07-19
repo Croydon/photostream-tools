@@ -40,6 +40,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> extends FragmentStatePagerAdapter{
 
+    public static final String KEY_POSITION = "KEY_POSITION";
     private List<Photo> photos = new ArrayList<>();
 
     public BaseFragmentPagerAdapter(FragmentManager fm) {
@@ -91,7 +92,7 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
     public Fragment getItem(int position) {
         PhotoStreamFragment fragment = createNewFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("position", position);
+        bundle.putInt(KEY_POSITION, position);
         fragment.setArguments(bundle);
         return fragment;
     }

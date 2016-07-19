@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,15 +47,13 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 class PhotoStreamCallbackContainer {
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
-
-    public static final String INTENT_NEW_PHOTO = "hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO";
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
 
@@ -276,7 +273,8 @@ class PhotoStreamCallbackContainer {
     public void notifyOnNewPhoto(Context context, Photo photo) {
         internalNotifyOnNewPhoto(photo);
         if (appIsInBackground() && photoIsNotFromThisUser(photo)) {
-            Intent newPhotoIntent = new Intent(INTENT_NEW_PHOTO);
+            Intent newPhotoIntent = new Intent(IPhotoStreamClient.INTENT_ACTION_NEW_PHOTO_AVAILABLE);
+            newPhotoIntent.putExtra(IPhotoStreamClient.INTENT_KEY_PHOTO, photo);
             newPhotoIntent.setPackage(context.getPackageName());
             context.sendBroadcast(newPhotoIntent);
         }
@@ -292,9 +290,9 @@ class PhotoStreamCallbackContainer {
         return !photo.isDeleteable();
     }
 
-    public void notifyOnPhotoLikeFailed(int photoId, HttpResult httpResult) {
+    public void notifyOnPhotoLikeFailed(int photoId, HttpError httpError) {
         for (OnPhotoLikeListener listener : onPhotoLikeListeners)
-            listener.onPhotoLikeFailed(photoId, httpResult);
+            listener.onPhotoLikeFailed(photoId, httpError);
     }
 
     public void notifyOnPhotoLiked(int photoId) {
@@ -309,9 +307,9 @@ class PhotoStreamCallbackContainer {
         }
     }
 
-    public void notifyOnDeletePhotoFailed(int photoId, HttpResult httpResult) {
+    public void notifyOnDeletePhotoFailed(int photoId, HttpError httpError) {
         for (OnPhotoDeletedListener listener : onPhotoDeletedListeners){
-            listener.onPhotoDeleteFailed(photoId, httpResult);
+            listener.onPhotoDeleteFailed(photoId, httpError);
         }
     }
 
@@ -326,14 +324,14 @@ class PhotoStreamCallbackContainer {
             listener.onCommentDeleted(commentId);
     }
 
-    public void notifyOnCommentDeleteFailed(int commentId, HttpResult httpResult) {
+    public void notifyOnCommentDeleteFailed(int commentId, HttpError httpError) {
         for (OnCommentDeletedListener listener : onCommentDeletedListeners)
-            listener.onCommentDeleteFailed(commentId, httpResult);
+            listener.onCommentDeleteFailed(commentId, httpError);
     }
 
-    public void notifyOnCommentsFailed(int photoId, HttpResult httpResult) {
+    public void notifyOnCommentsFailed(int photoId, HttpError httpError) {
         for (OnCommentsReceivedListener listener : onCommentsReceivedListeners)
-            listener.onReceiveCommentsFailed(photoId, httpResult);
+            listener.onReceiveCommentsFailed(photoId, httpError);
     }
 
     public void notifyOnComments(int photoId, List<Comment> comments) {
@@ -345,9 +343,9 @@ class PhotoStreamCallbackContainer {
         return !activities.isEmpty();
     }
 
-    public void notifyOnPhotosFailed(HttpResult httpResult) {
+    public void notifyOnPhotosFailed(HttpError httpError) {
         for (OnPhotosReceivedListener resultListener : onPhotosReceivedListeners)
-            resultListener.onReceivePhotosFailed(httpResult);
+            resultListener.onReceivePhotosFailed(httpError);
     }
 
     public void notifyOnPhotos(PhotoQueryResult photoQueryResult) {
@@ -356,9 +354,9 @@ class PhotoStreamCallbackContainer {
         }
     }
 
-    public void notifyOnSearchPhotosError(String query, HttpResult httpResult) {
+    public void notifyOnSearchPhotosError(String query, HttpError httpError) {
         for (OnSearchedPhotosReceivedListener listener : onSearchPhotosListeners)
-            listener.onReceiveSearchedPhotosFailed(query, httpResult);
+            listener.onReceiveSearchedPhotosFailed(query, httpError);
     }
 
     public void notifyOnSearchPhotosResult(PhotoQueryResult photoQueryResult) {
@@ -366,9 +364,9 @@ class PhotoStreamCallbackContainer {
             listener.onSearchedPhotosReceived(photoQueryResult);
     }
 
-    public void notifyOnCommentSentFailed(HttpResult httpResult) {
+    public void notifyOnCommentSentFailed(HttpError httpError) {
         for (OnCommentUploadFailedListener listener : onCommentUploadFailedListeners)
-            listener.onCommentUploadFailed(httpResult);
+            listener.onCommentUploadFailed(httpError);
     }
 
     public void notifyOnNewComment(Comment comment) {
@@ -376,9 +374,9 @@ class PhotoStreamCallbackContainer {
             listener.onNewCommentReceived(comment);
     }
 
-    public void notifyPhotoUploadFailed(HttpResult httpResult) {
+    public void notifyPhotoUploadFailed(HttpError httpError) {
         for (OnPhotoUploadListener onPhotoUploadListener : onPhotoUploadListeners)
-            onPhotoUploadListener.onPhotoUploadFailed(httpResult);
+            onPhotoUploadListener.onPhotoUploadFailed(httpError);
     }
 
     public void notifyPhotoUploadSucceeded(Photo photo) {

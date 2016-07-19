@@ -27,41 +27,33 @@ package hochschuledarmstadt.photostream_tools;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
     public BaseAsyncTask(){ }
 
-    protected void postError(final HttpResult httpResult) {
+    protected void postError(final HttpError httpError) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                sendError(httpResult);
+                sendError(httpError);
             }
         });
     }
 
-    protected abstract void sendError(HttpResult httpResult);
+    protected abstract void sendError(HttpError httpError);
 
     protected static class HttpPhotoStreamException extends Throwable {
 
-        private final HttpResult httpResult;
+        private final HttpError httpError;
 
-        public HttpPhotoStreamException(HttpResult httpResult) {
-            this.httpResult = httpResult;
+        public HttpPhotoStreamException(HttpError httpError) {
+            this.httpError = httpError;
         }
-        public HttpResult getHttpResult() {
-            return httpResult;
+        public HttpError getHttpError() {
+            return httpError;
         }
     }
 

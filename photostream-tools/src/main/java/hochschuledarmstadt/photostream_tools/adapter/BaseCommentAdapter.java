@@ -36,7 +36,7 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
  * Mit dieser Klasse können Kommentare in einer RecyclerView angezeigt werden
  * @param <H> ViewHolder Klasse
  */
-public abstract class SimpleCommentAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Comment>{
+public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Comment>{
 
     /**
      * Liefert den Kommentar ({@code Comment}) an der Position {@code position} zurück

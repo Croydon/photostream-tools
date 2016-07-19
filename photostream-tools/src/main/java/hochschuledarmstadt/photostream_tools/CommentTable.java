@@ -29,7 +29,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class CommentTable {
+class CommentTable {
     public static final String TABLE_NAME = "comment";
 
     public static final String COLUMN_PHOTO_ID = "photo_id";

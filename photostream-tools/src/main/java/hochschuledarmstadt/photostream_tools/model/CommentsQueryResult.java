@@ -27,37 +27,36 @@ package hochschuledarmstadt.photostream_tools.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Repräsentiert einen Fehler während eines Http Requests
+ * Repräsentiert das Ergebnis zu der Abfrage von allen Kommentaren zu einem Photo
  */
-public class HttpResult {
+public class CommentsQueryResult {
 
-    public HttpResult(int responseCode, String message){
-        this.responseCode = responseCode;
-        this.message = message;
-    }
+    @SerializedName("photo_id")
+    @Expose
+    private int photoId;
 
-    @SerializedName("response_code")
+    @SerializedName("comments")
     @Expose
-    private Integer responseCode;
-    @SerializedName("message")
-    @Expose
-    private String message;
+    private List<Comment> comments = new ArrayList<>();
 
     /**
-     * Liefert den HTTP Status Code zurück
-     * @return HTTP Status Code
+     * Liefert die photo id zurück, zu der die Kommentare zugeordnet sind
+     * @return photo id
      */
-    public Integer getResponseCode() {
-        return responseCode;
+    public int getPhotoId() {
+        return photoId;
     }
 
     /**
-     * Liefert die Fehlernachricht zurück.
-     * @return Fehlernachricht
+     * Lieferte alle Kommentare zu dem Photo zurück
+     * @return Liste von Kommentaren
      */
-    public String getMessage() {
-        return message;
+    public List<Comment> getComments() {
+        return comments;
     }
 
 

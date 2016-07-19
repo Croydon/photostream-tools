@@ -91,7 +91,7 @@ public class Photo extends BaseItem implements Parcelable{
 
     /**
      * Liefert zurück ob das Photo über das aktuelle Gerät geliked wurde.
-     * @return liked
+     * @return {@code true}, wenn das Photo geliked ist, ansonsten {@code false}
      */
     public boolean isLiked() {
         return liked == 1;
@@ -99,7 +99,7 @@ public class Photo extends BaseItem implements Parcelable{
 
     /**
      * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist das Photo zu löschen.
-     * @return {@code true}, wenn das Photo von dem aktuellen Gerät veröffentlicht wurde, ansonsten {@code false}
+     * @return {@code true}, wenn das Photo von dem aktuellen Gerät erzeugt wurde, ansonsten {@code false}
      */
     public boolean isDeleteable() {
         return deleteable;
@@ -107,7 +107,7 @@ public class Photo extends BaseItem implements Parcelable{
 
     /**
      * Liefert die Anzahl der Kommentare zu einem Photo
-     * @return Anzahl der Kommentare
+     * @return {@link Integer} Anzahl der Kommentare
      */
     public int getCommentCount() {
         return commentCount;
@@ -119,7 +119,7 @@ public class Photo extends BaseItem implements Parcelable{
 
     /**
      * Liefert die id des Photos zurück
-     * @return id
+     * @return {@code Integer} id des Photos
      */
     public int getId() {
         return id;

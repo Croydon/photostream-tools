@@ -48,15 +48,15 @@ public class PhotoQueryResult {
     private List<Photo> photos = new ArrayList<>();
 
     /**
-     * Liefert die Seite
-     * @return int
+     * Gibt die aktuelle Seite des Streams zurück
+     * @return {@link Integer} Seitenzahl
      */
     public int getPage() {
         return page;
     }
 
     /**
-     * Liefert {@code true} zurück, wenn die erste Seite aus dem Stream geladen wurde, ansonsten @code{false}
+     * Gibt an, ob die erste Seite aus dem Stream geladen wurde
      * @return {@code true}, wenn erste Seite, ansonsten {@code false}
      */
     public boolean isFirstPage(){
@@ -64,15 +64,15 @@ public class PhotoQueryResult {
     }
 
     /**
-     * Liefert die Photos aus der aktuellen Seite des Streams
-     * @return Liste von Photos
+     * Gibt die geladenen Photos zurück
+     * @return Liste der Photos
      */
     public List<Photo> getPhotos() {
         return photos;
     }
 
     /**
-     * Liefert zurück, ob noch weitere Photos im Stream vorhanden sind
+     * Gibt an, ob noch eine weitere Seite mit Photos vorhanden ist, und damit weitere Photos abgerufen werden können.
      * @return {@code true}, wenn noch weitere Photos abgerufen werden können, ansonsten {@code false}
      */
     public boolean hasNextPage() {

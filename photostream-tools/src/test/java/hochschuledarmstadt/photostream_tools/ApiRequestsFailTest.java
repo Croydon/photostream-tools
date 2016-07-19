@@ -27,8 +27,6 @@ package hochschuledarmstadt.photostream_tools;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.apache.tools.ant.taskdefs.condition.Http;
-import org.bouncycastle.util.Store;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -42,8 +40,7 @@ import org.robolectric.annotation.Config;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
-import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
@@ -85,7 +82,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             streamAsyncTask.get();
-            verify(callback, times(1)).onPhotosError(any(HttpResult.class));
+            verify(callback, times(1)).onPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -102,7 +99,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             streamAsyncTask.get();
-            verify(callback, times(1)).onPhotosError(any(HttpResult.class));
+            verify(callback, times(1)).onPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -119,7 +116,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             searchPhotosAsyncTask.get();
-            verify(callback, times(1)).onSearchPhotosError(any(HttpResult.class));
+            verify(callback, times(1)).onSearchPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -136,7 +133,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             searchPhotosAsyncTask.get();
-            verify(callback, times(1)).onSearchPhotosError(any(HttpResult.class));
+            verify(callback, times(1)).onSearchPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -154,7 +151,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             storeCommentAsyncTask.get();
-            verify(listener, times(1)).onSendCommentFailed(any(HttpResult.class));
+            verify(listener, times(1)).onSendCommentFailed(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -171,7 +168,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             storePhotoAsyncTask.get();
-            verify(listener, times(1)).onPhotoStoreError(any(HttpResult.class));
+            verify(listener, times(1)).onPhotoStoreError(any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -189,7 +186,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             loadCommentsAsyncTask.get();
-            verify(listener, times(1)).onGetCommentsFailed(eq(photoId), any(HttpResult.class));
+            verify(listener, times(1)).onGetCommentsFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -207,7 +204,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             votePhotoAsyncTask.get();
-            verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpResult.class));
+            verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -225,7 +222,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             votePhotoAsyncTask.get();
-            verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpResult.class));
+            verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -243,7 +240,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             deleteCommentAsyncTask.get();
-            verify(callback, times(1)).onCommentDeleteFailed(eq(commentId), any(HttpResult.class));
+            verify(callback, times(1)).onCommentDeleteFailed(eq(commentId), any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -261,7 +258,7 @@ public class ApiRequestsFailTest {
         Robolectric.flushBackgroundThreadScheduler();
         try {
             deletePhotoAsyncTask.get();
-            verify(callback, times(1)).onPhotoDeleteFailed(eq(photoId), any(HttpResult.class));
+            verify(callback, times(1)).onPhotoDeleteFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
             assertFalse(e.toString(), true);
         } catch (ExecutionException e) {
@@ -272,7 +269,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpPostExecutor createMockHttpPostExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPostExecutor executor = mock(HttpPostExecutor.class);
-        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+        HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -281,7 +278,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpDeleteExecutor createMockHttpDeleteExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpDeleteExecutor executor = mock(HttpDeleteExecutor.class);
-        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+        HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -289,7 +286,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpPutExecutor createMockHttpPutExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpPutExecutor executor = mock(HttpPutExecutor.class);
-        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+        HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }
@@ -297,7 +294,7 @@ public class ApiRequestsFailTest {
     @NonNull
     private HttpGetExecutor createMockHttpGetExecutor() throws IOException, BaseAsyncTask.HttpPhotoStreamException {
         HttpGetExecutor executor = mock(HttpGetExecutor.class);
-        HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+        HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
         when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
         return executor;
     }

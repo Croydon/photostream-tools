@@ -43,26 +43,31 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity;
+import hochschuledarmstadt.photostream_tools.examples.notification.NotificationActivity;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 import hochschuledarmstadt.photostream_tools.examples.search.SearchActivity;
 import hochschuledarmstadt.photostream_tools.examples.upload.PhotoUploadActivity;
 import hochschuledarmstadt.photostream_tools.examples.viewpager.ViewPagerActivity;
 
+/**
+ * Nur ein Auswahlmenü für die Anzeige der einzelnen Beispielactivities.
+ */
 public class MenuActivity extends AppCompatActivity {
 
-    public static final String MENU_PHOTOS = "Photos";
-    public static final String MENU_COMMENTS = "Comments";
-    private static final String MENU_LIKE = "Like";
-    private static final String MENU_UPLOAD_PHOTO = "Upload Photo";
-    private static final String MENU_SEARCH = "Search Photos";
-    private static final String MENU_VIEW_PAGER = "Photos in View Pager";
+    private static final String MENU_PHOTOS = "Photos anzeigen";
+    private static final String MENU_COMMENTS = "Kommentare anzeigen";
+    private static final String MENU_UPLOAD_PHOTO = "Neues Photo hochladen";
+    private static final String MENU_SEARCH = "Suche nach Photos anhand Beschreibung";
+    private static final String MENU_VIEW_PAGER = "Photos anzeigen in einem ViewPager Widget";
+    private static final String MENU_BROADCAST_RECEIVER = "Broadcast Receiver Beispiel";
 
     private static final MenuItem[] menu = new MenuItem[]{
             new MenuItem(MENU_PHOTOS, PhotoActivity.class),
             new MenuItem(MENU_COMMENTS, CommentActivity.class),
             new MenuItem(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
             new MenuItem(MENU_SEARCH, SearchActivity.class),
-            new MenuItem(MENU_VIEW_PAGER, ViewPagerActivity.class)
+            new MenuItem(MENU_VIEW_PAGER, ViewPagerActivity.class),
+            new MenuItem(MENU_BROADCAST_RECEIVER, NotificationActivity.class)
     };
 
     private MenuAdapter menuAdapter;

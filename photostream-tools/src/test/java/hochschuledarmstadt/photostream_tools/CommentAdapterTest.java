@@ -38,9 +38,8 @@ import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
 
-import hochschuledarmstadt.photostream_tools.adapter.SimpleCommentAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BaseCommentAdapter;
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.Photo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,7 +59,7 @@ public class CommentAdapterTest {
 
     private TestCommentAdapter simpleCommentAdapter;
 
-    private static class TestCommentAdapter extends SimpleCommentAdapter<TestViewHolder>{
+    private static class TestCommentAdapter extends BaseCommentAdapter<TestViewHolder> {
 
         TestCommentAdapter(){
             super();

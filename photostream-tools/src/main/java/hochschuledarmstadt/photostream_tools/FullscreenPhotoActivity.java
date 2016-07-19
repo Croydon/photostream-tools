@@ -26,21 +26,18 @@ package hochschuledarmstadt.photostream_tools;
 
 
 import android.annotation.TargetApi;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
-public abstract class FullscreenImageActivity extends PhotoStreamActivity{
+/**
+ * Bietet Unterstützung bei der Vollbildanzeige von Photos.
+ * Bei Berührung des Bildschirms werden die NavigationBar und die StatusBar versteckt bzw. angezeigt.
+ */
+public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     private static final String KEY_SYSTEM_UI_VISIBLE = "KEY_SYSTEM_UI_VISIBLE";
 
@@ -104,13 +101,20 @@ public abstract class FullscreenImageActivity extends PhotoStreamActivity{
         return super.dispatchTouchEvent(ev);
     }
 
-    private boolean isSystemUiVisible() {
+    /**
+     * Liefert zurück, ob Statusbar und Navigationbar sichtbar sind oder nicht
+     * @return {@code true, wenn beide Bars sichtbar sind, ansonsten {@code false}}
+     */
+    public boolean isSystemUiVisible() {
         int currentSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
-        int isVisible = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-
-        return currentSystemUiVisibility == isVisible;
+        if (Build.VERSION.SDK_INT >= 16) {
+            int isVisible = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            return currentSystemUiVisibility == isVisible;
+        }else {
+            return true;
+        }
     }
 
     private void watchForExitTransition(){

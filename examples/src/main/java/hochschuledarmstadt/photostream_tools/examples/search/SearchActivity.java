@@ -33,7 +33,6 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -42,12 +41,12 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
-import hochschuledarmstadt.photostream_tools.adapter.SimplePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoAdapter;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -84,7 +83,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
             photoAdapter.restoreInstanceState(bundle);
         }
 
-        photoAdapter.setOnItemClickListener(R.id.imageView, new SimplePhotoAdapter.OnItemClickListener() {
+        photoAdapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Photo photo) {
                 Toast.makeText(SearchActivity.this, String.format("Photo Id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
@@ -183,9 +182,9 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     }
 
     @Override
-    public void onReceiveSearchedPhotosFailed(String query, HttpResult httpResult) {
+    public void onReceiveSearchedPhotosFailed(String query, HttpError httpError) {
         String title = "Could not load photos";
-        Utils.showErrorInAlertDialog(this, title, httpResult);
+        Utils.showErrorInAlertDialog(this, title, httpError);
     }
 
     @Override

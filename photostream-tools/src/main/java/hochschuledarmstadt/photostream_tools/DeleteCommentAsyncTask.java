@@ -25,10 +25,8 @@
 package hochschuledarmstadt.photostream_tools;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
 
@@ -51,10 +49,10 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
             return true;
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return false;
     }
@@ -71,13 +69,13 @@ class DeleteCommentAsyncTask extends BaseAsyncTask<Void,Void, Boolean> {
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onCommentDeleteFailed(commentId, httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onCommentDeleteFailed(commentId, httpError);
     }
 
     interface OnDeleteCommentResultListener {
         void onCommentDeleted(int commentId);
-        void onCommentDeleteFailed(int commentId, HttpResult httpResult);
+        void onCommentDeleteFailed(int commentId, HttpError httpError);
     }
 
 }

@@ -32,7 +32,7 @@ public interface OnCommentCountChangedListener {
     /**
      * Wird aufgerufen, wenn sich die Anzahl der Kommentare zu dem Photo mit der id {@code photoId} geändert hat.
      * @param photoId id des Photos zu der die Kommentare zugeordnet sind
-     * @param commentCount Absolute Anzahl der Kommentare zu dem Photo
+     * @param commentCount Aktuelle Anzahl der Kommentare zu dem Photo
      */
     void onCommentCountChanged(int photoId, int commentCount);
 }

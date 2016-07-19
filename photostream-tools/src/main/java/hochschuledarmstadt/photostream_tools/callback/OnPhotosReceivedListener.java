@@ -24,13 +24,13 @@
 
 package hochschuledarmstadt.photostream_tools.callback;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
 /**
  * {@link OnPhotosReceivedListener#onPhotosReceived(PhotoQueryResult)}<br>
  * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream geladen werden konnte <br> <br>
- * {@link OnPhotosReceivedListener#onReceivePhotosFailed(HttpResult)}<br>
+ * {@link OnPhotosReceivedListener#onReceivePhotosFailed(HttpError)}<br>
  * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream aufgrund eines Fehlers nicht geladen werden konnte. <br> <br>
  * {@link OnPhotosReceivedListener#onNoNewPhotosAvailable()} <br>
  * Wird aufgerufen, wenn keine neuen Photos im Stream vorhanden sind.
@@ -45,9 +45,9 @@ public interface OnPhotosReceivedListener extends OnRequestListener {
 
     /**
      * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream aufgrund eines Fehlers nicht geladen werden konnte.
-     * @param httpResult enthält den HTTP Status Code sowie die Fehlernachricht
+     * @param httpError enthält den HTTP Status Code sowie die Fehlernachricht
      */
-    void onReceivePhotosFailed(HttpResult httpResult);
+    void onReceivePhotosFailed(HttpError httpError);
 
     /**
      * Wird aufgerufen, wenn keine neuen Photos im Stream vorhanden sind.

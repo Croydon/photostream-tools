@@ -68,6 +68,7 @@ public final class PhotoStreamService extends Service {
         WebSocketClient wsClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId);
         HttpExecutorFactory httpFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
         ImageCacher imageCacher = new ImageCacher(context);
+
         photoStreamClient = new PhotoStreamClient(context, urlBuilder, imageLoader, imageCacher, db, wsClient, httpFactory);
         photoStreamClient.bootstrap();
 

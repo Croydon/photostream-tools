@@ -27,10 +27,8 @@ package hochschuledarmstadt.photostream_tools;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boolean> {
 
@@ -53,12 +51,12 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
             return true;
         } catch (IOException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
         } catch (JSONException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
         }
         return false;
     }
@@ -78,13 +76,13 @@ abstract class LikeOrDislikePhotoAsyncTask extends BaseAsyncTask<Void, Void, Boo
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onPhotoLikeFailed(photoId, httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onPhotoLikeFailed(photoId, httpError);
     }
 
     interface OnVotePhotoResultListener {
         void onPhotoLiked(int photoId);
         void onPhotoDisliked(int photoId);
-        void onPhotoLikeFailed(int photoId, HttpResult httpResult);
+        void onPhotoLikeFailed(int photoId, HttpError httpError);
     }
 }

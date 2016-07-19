@@ -38,7 +38,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -49,8 +49,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     /**
      * Beschreibt wie früh weitere Photos nachgeladen werden sollen.
      * Wenn beispielsweise 5 Photos angezeigt werden und auf das dritte Photo gewechselt wird
-     * mit {@code PAGE_POSITION_OFFSET} = 2, dann wird die nächste Seite aus dem Stream geladen,
-     * weil 5 - 3 = 2 = {@code PAGE_POSITION_OFFSET}
+     * mit {@code PAGE_POSITION_OFFSET} = 2, dann werden weitere Photos geladen.
      */
     private static final int PAGE_POSITION_OFFSET = 2;
     private ViewPager viewPager;
@@ -162,8 +161,8 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     @Override
-    public void onReceivePhotosFailed(HttpResult httpResult) {
-        Utils.showErrorInAlertDialog(this, "Could not receive Photos", httpResult);
+    public void onReceivePhotosFailed(HttpError httpError) {
+        Utils.showErrorInAlertDialog(this, "Could not receive Photos", httpError);
     }
 
     @Override
@@ -206,8 +205,8 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     @Override
-    public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
-        Utils.showErrorInAlertDialog(this, String.format("Couldn't delete photo with id: %s", photoId), httpResult);
+    public void onPhotoDeleteFailed(int photoId, HttpError httpError) {
+        Utils.showErrorInAlertDialog(this, String.format("Couldn't delete photo with id: %s", photoId), httpError);
     }
 
     @Override

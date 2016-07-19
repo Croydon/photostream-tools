@@ -35,7 +35,8 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Diese Klasse bietet einen visuellen Begrenzer zwischen Items in einer RecyclerView
+ * Diese Klasse bietet einen visuellen Begrenzer zwischen Items in einer RecyclerView.
+ * Verwendung allerdings nur in Verbindung mit einem LinearLayoutManager möglich!
  */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -44,9 +45,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     private boolean mShowLastDivider = false;
 
 
-    public DividerItemDecoration(Context context, AttributeSet attrs) {
-        final TypedArray a = context
-                .obtainStyledAttributes(attrs, new int[]{android.R.attr.listDivider});
+    private DividerItemDecoration(Context context, AttributeSet attrs) {
+        final TypedArray a = context.obtainStyledAttributes(attrs, new int[]{android.R.attr.listDivider});
         mDivider = a.getDrawable(0);
         a.recycle();
     }
@@ -55,15 +55,15 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         this(context, null);
     }
 
-    public DividerItemDecoration(Context context, boolean showFirstDivider, boolean showLastDivider) {
-        this(context, null, showFirstDivider, showLastDivider);
-    }
-
-    public DividerItemDecoration(Context context, AttributeSet attrs, boolean showFirstDivider,
-                                 boolean showLastDivider) {
+    private DividerItemDecoration(Context context, AttributeSet attrs, boolean showFirstDivider,
+                                  boolean showLastDivider) {
         this(context, attrs);
         mShowFirstDivider = showFirstDivider;
         mShowLastDivider = showLastDivider;
+    }
+
+    public DividerItemDecoration(Context context, boolean showFirstDivider, boolean showLastDivider) {
+        this(context, null, showFirstDivider, showLastDivider);
     }
 
     public DividerItemDecoration(Drawable divider) {

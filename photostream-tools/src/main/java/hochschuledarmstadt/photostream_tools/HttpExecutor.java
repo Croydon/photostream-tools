@@ -28,15 +28,12 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 abstract class HttpExecutor {
 
@@ -70,12 +67,12 @@ abstract class HttpExecutor {
         return stringBuilder.toString();
     }
 
-    protected HttpResult getHttpErrorResult(InputStream errorStream) throws IOException {
+    protected HttpError getHttpErrorResult(InputStream errorStream) throws IOException {
         final String result = convertStreamToString(errorStream);
         try{
-            return new Gson().fromJson(result, HttpResult.class);
+            return new Gson().fromJson(result, HttpError.class);
         }catch(Exception e){
-            return new HttpResult(500, "Internal Server Error");
+            return new HttpError(500, "Internal Server Error");
         }
     }
 

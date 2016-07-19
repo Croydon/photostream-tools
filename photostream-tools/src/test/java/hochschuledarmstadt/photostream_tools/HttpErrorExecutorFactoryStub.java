@@ -26,7 +26,7 @@ package hochschuledarmstadt.photostream_tools;
 
 import java.io.IOException;
 
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -38,7 +38,7 @@ public class HttpErrorExecutorFactoryStub implements HttpExecutorFactory {
     public HttpPostExecutor createHttpPostExecutor(String url) {
         try {
             HttpPostExecutor executor = mock(HttpPostExecutor.class);
-            HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+            HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
             when(executor.execute(any(String.class))).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
             return executor;
         } catch (IOException e) {
@@ -53,7 +53,7 @@ public class HttpErrorExecutorFactoryStub implements HttpExecutorFactory {
     public HttpDeleteExecutor createHttpDeleteExecutor(String url) {
         try {
             HttpDeleteExecutor executor = mock(HttpDeleteExecutor.class);
-            HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+            HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
             when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
             return executor;
         } catch (IOException e) {
@@ -68,7 +68,7 @@ public class HttpErrorExecutorFactoryStub implements HttpExecutorFactory {
     public HttpPutExecutor createHttpPutExecutor(String url) {
         try {
             HttpPutExecutor executor = mock(HttpPutExecutor.class);
-            HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+            HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
             when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
             return executor;
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class HttpErrorExecutorFactoryStub implements HttpExecutorFactory {
     public HttpGetExecutor createHttpGetExecutor(String url) {
         try {
             HttpGetExecutor executor = mock(HttpGetExecutor.class);
-            HttpResult errorResult = new HttpResult(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
+            HttpError errorResult = new HttpError(HttpResponse.STATUS_INTERNAL_SERVER_ERROR, null);
             when(executor.execute()).thenThrow(new BaseAsyncTask.HttpPhotoStreamException(errorResult));
             return executor;
         } catch (IOException e) {

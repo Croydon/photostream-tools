@@ -28,7 +28,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
@@ -54,8 +53,8 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
-import hochschuledarmstadt.photostream_tools.model.LoadCommentsQueryResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
+import hochschuledarmstadt.photostream_tools.model.CommentsQueryResult;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
@@ -177,7 +176,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotosError(HttpResult httpResult) {
+            public void onPhotosError(HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotosFailed(httpResult);
             }
@@ -217,7 +216,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotosError(HttpResult httpResult) {
+            public void onPhotosError(HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotosFailed(httpResult);
             }
@@ -257,7 +256,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotoLikeFailed(int photoId, HttpResult httpResult) {
+            public void onPhotoLikeFailed(int photoId, HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotoLikeFailed(photoId, httpResult);
             }
@@ -286,7 +285,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onNewEtag(int photoId, LoadCommentsQueryResult result, String eTag) {
+            public void onNewEtag(int photoId, CommentsQueryResult result, String eTag) {
                 commentTable.openDatabase();
                 boolean isNew = commentTable.areNewComments(photoId, eTag);
                 if (isNew){
@@ -298,16 +297,16 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public LoadCommentsQueryResult onCommentsNotModified(int photoId) {
+            public CommentsQueryResult onCommentsNotModified(int photoId) {
                 commentTable.openDatabase();
                 Gson gson = new Gson();
                 String comments = commentTable.loadComments(photoId);
                 commentTable.closeDatabase();
-                return gson.fromJson(comments, LoadCommentsQueryResult.class);
+                return gson.fromJson(comments, CommentsQueryResult.class);
             }
 
             @Override
-            public void onGetCommentsFailed(int photoId, HttpResult httpResult) {
+            public void onGetCommentsFailed(int photoId, HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnCommentsFailed(photoId, httpResult);
             }
@@ -336,7 +335,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotoLikeFailed(int photoId, HttpResult httpResult) {
+            public void onPhotoLikeFailed(int photoId, HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotoLikeFailed(photoId, httpResult);
             }
@@ -358,7 +357,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onCommentDeleteFailed(int commentId, HttpResult httpResult) {
+            public void onCommentDeleteFailed(int commentId, HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnCommentDeleteFailed(commentId, httpResult);
             }
@@ -385,7 +384,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotoDeleteFailed(int photoId, HttpResult httpResult) {
+            public void onPhotoDeleteFailed(int photoId, HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnDeletePhotoFailed(photoId, httpResult);
             }
@@ -408,7 +407,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onSendCommentFailed(HttpResult httpResult) {
+            public void onSendCommentFailed(HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnCommentSentFailed(httpResult);
             }
@@ -505,7 +504,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onSearchPhotosError(HttpResult httpResult) {
+            public void onSearchPhotosError(HttpError httpResult) {
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnSearchPhotosError(lastSearchQuery, httpResult);
             }
@@ -515,23 +514,23 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public void searchPhotos(final String query) {
-        String url = urlBuilder.getSearchPhotosApiUrl(query);
+    public void searchPhotos(final String queryPhotoDescription) {
+        String url = urlBuilder.getSearchPhotosApiUrl(queryPhotoDescription);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.SEARCH_PHOTOS;
         SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
-                lastSearchQuery = query;
+                lastSearchQuery = queryPhotoDescription;
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnSearchPhotosResult(photoQueryResult);
             }
 
             @Override
-            public void onSearchPhotosError(HttpResult httpResult) {
-                lastSearchQuery = query;
+            public void onSearchPhotosError(HttpError httpResult) {
+                lastSearchQuery = queryPhotoDescription;
                 removeOpenRequest(requestType);
-                callbackContainer.notifyOnSearchPhotosError(query, httpResult);
+                callbackContainer.notifyOnSearchPhotosError(queryPhotoDescription, httpResult);
             }
         });
         addOpenRequest(requestType);
@@ -562,7 +561,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onPhotoStoreError(HttpResult httpResult) {
+            public void onPhotoStoreError(HttpError httpResult) {
                 removeOpenRequest(requestType);
                 Logger.log(TAG, LogLevel.INFO, "onPhotoStoreError()");
                 callbackContainer.notifyPhotoUploadFailed(httpResult);

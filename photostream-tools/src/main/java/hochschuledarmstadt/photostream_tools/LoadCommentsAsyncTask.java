@@ -28,15 +28,13 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Comment;
-import hochschuledarmstadt.photostream_tools.model.HttpResult;
-import hochschuledarmstadt.photostream_tools.model.LoadCommentsQueryResult;
+import hochschuledarmstadt.photostream_tools.model.HttpError;
+import hochschuledarmstadt.photostream_tools.model.CommentsQueryResult;
 
-class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryResult> {
+class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, CommentsQueryResult> {
 
     private final OnCommentsResultListener callback;
     private final HttpGetExecutor executor;
@@ -52,26 +50,26 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
     private static final String TAG = LoadCommentsAsyncTask.class.getName();
 
     @Override
-    protected LoadCommentsQueryResult doInBackground(Void... params) {
+    protected CommentsQueryResult doInBackground(Void... params) {
         try {
             return getComments();
         } catch (IOException e) {
-            postError(new HttpResult(-1, e.toString()));
+            postError(new HttpError(-1, e.toString()));
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         } catch (HttpPhotoStreamException e) {
-            postError(e.getHttpResult());
+            postError(e.getHttpError());
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         }
         return null;
     }
 
-    private LoadCommentsQueryResult getComments() throws IOException, HttpPhotoStreamException {
+    private CommentsQueryResult getComments() throws IOException, HttpPhotoStreamException {
         HttpResponse httpResponse = executor.execute();
-        LoadCommentsQueryResult loadCommentsQueryResult = null;
+        CommentsQueryResult commentsQueryResult = null;
         if (httpResponse.getStatusCode() == HttpResponse.STATUS_OK) {
-            loadCommentsQueryResult = new Gson().fromJson(httpResponse.getResult(), LoadCommentsQueryResult.class);
-            final List<Comment> comments = loadCommentsQueryResult.getComments();
-            final Integer photoId = loadCommentsQueryResult.getPhotoId();
+            commentsQueryResult = new Gson().fromJson(httpResponse.getResult(), CommentsQueryResult.class);
+            final List<Comment> comments = commentsQueryResult.getComments();
+            final Integer photoId = commentsQueryResult.getPhotoId();
             for (Comment comment : comments) {
                 try {
                     Field field = comment.getClass().getDeclaredField("photoId");
@@ -85,34 +83,34 @@ class LoadCommentsAsyncTask extends BaseAsyncTask<Void, Void, LoadCommentsQueryR
             }
             String newEtag = executor.getEtag();
             if (newEtag != null)
-                callback.onNewEtag(photoId, loadCommentsQueryResult, newEtag);
+                callback.onNewEtag(photoId, commentsQueryResult, newEtag);
 
         }else if(httpResponse.getStatusCode() == HttpResponse.STATUS_CONTENT_NOT_MODIFIED){
-            loadCommentsQueryResult = callback.onCommentsNotModified(photoId);
+            commentsQueryResult = callback.onCommentsNotModified(photoId);
         }
 
-        return loadCommentsQueryResult;
+        return commentsQueryResult;
     }
 
     @Override
-    protected void onPostExecute(LoadCommentsQueryResult loadCommentsQueryResult) {
-        super.onPostExecute(loadCommentsQueryResult);
-        if (loadCommentsQueryResult != null) {
-            final int photoId = loadCommentsQueryResult.getPhotoId();
-            callback.onGetComments(photoId, loadCommentsQueryResult.getComments());
+    protected void onPostExecute(CommentsQueryResult commentsQueryResult) {
+        super.onPostExecute(commentsQueryResult);
+        if (commentsQueryResult != null) {
+            final int photoId = commentsQueryResult.getPhotoId();
+            callback.onGetComments(photoId, commentsQueryResult.getComments());
         }
     }
 
     @Override
-    protected void sendError(HttpResult httpResult) {
-        callback.onGetCommentsFailed(photoId, httpResult);
+    protected void sendError(HttpError httpError) {
+        callback.onGetCommentsFailed(photoId, httpError);
     }
 
     interface OnCommentsResultListener {
         void onGetComments(int photoId, List<Comment> comments);
-        void onNewEtag(int photoId, LoadCommentsQueryResult result, String eTag);
-        LoadCommentsQueryResult onCommentsNotModified(int photoId);
-        void onGetCommentsFailed(int photoId, HttpResult httpResult);
+        void onNewEtag(int photoId, CommentsQueryResult result, String eTag);
+        CommentsQueryResult onCommentsNotModified(int photoId);
+        void onGetCommentsFailed(int photoId, HttpError httpError);
     }
 
 }

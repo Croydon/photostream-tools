@@ -22,28 +22,43 @@
  * THE SOFTWARE.
  */
 
-package hochschuledarmstadt.photostream_tools.callback;
+package hochschuledarmstadt.photostream_tools.model;
 
-import hochschuledarmstadt.photostream_tools.model.HttpError;
-import hochschuledarmstadt.photostream_tools.model.Photo;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 /**
- * {@link OnPhotoUploadListener#onPhotoUploaded(Photo)}<br>
- * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde <br> <br>
- * {@link OnPhotoUploadListener#onPhotoUploadFailed(HttpError)}<br>
- * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
+ * Repräsentiert einen Fehler während eines Http Requests
  */
-public interface OnPhotoUploadListener extends OnRequestListener {
+public class HttpError {
+
+    public HttpError(int responseCode, String message){
+        this.responseCode = responseCode;
+        this.message = message;
+    }
+
+    @SerializedName("response_code")
+    @Expose
+    private Integer responseCode;
+    @SerializedName("message")
+    @Expose
+    private String message;
 
     /**
-     * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde
-     * @param photo das veröffentlichte Photo
+     * Liefert den HTTP Status Code zurück
+     * @return {@link Integer} {@code responseCode}
      */
-    void onPhotoUploaded(Photo photo);
+    public Integer getResponseCode() {
+        return responseCode;
+    }
 
     /**
-     * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
-     * @param httpError enthält den HTTP Status Code sowie die Fehlernachricht
+     * Liefert die Fehlernachricht zurück.
+     * @return {@link String} {@code message}
      */
-    void onPhotoUploadFailed(HttpError httpError);
+    public String getMessage() {
+        return message;
+    }
+
+
 }
