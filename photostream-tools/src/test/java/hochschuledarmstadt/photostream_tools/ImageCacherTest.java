@@ -56,7 +56,7 @@ public class ImageCacherTest {
     public static final String CURRENT_DIR = new File(System.getProperty("user.dir")).getAbsolutePath();
     private Context context;
     private ImageCacher imageCacher;
-    private File imageFile;
+    private Photo photo;
 
     private void educateMock(String fileName) {
         when(context.getFileStreamPath(fileName)).thenReturn(new File(CURRENT_DIR, fileName));
@@ -76,8 +76,11 @@ public class ImageCacherTest {
 
     @After
     public void tearDown() {
-        if (imageFile != null && imageFile.exists())
-            imageFile.delete();
+        if (photo != null) {
+            File imageFile = photo.getImageFile();
+            if (imageFile != null && imageFile.exists())
+                imageFile.delete();
+        }
     }
 
     @Test
@@ -87,7 +90,8 @@ public class ImageCacherTest {
 
     @Test
     public void cacheNewImage() {
-        Photo photo = buildPhotoForImageCacher();
+        photo = buildPhotoForImageCacher();
+        educateMock(String.format(photo.getId() + ".jpg"));
         try {
             assertTrue(imageCacher.cacheImage(photo));
             assertTrue(imageCacher.isCached(photo.getId()));
@@ -99,7 +103,8 @@ public class ImageCacherTest {
 
     @Test
     public void detectImageAlreadyCached() {
-        Photo photo = buildPhotoForImageCacher();
+        photo = buildPhotoForImageCacher();
+        educateMock(String.format(photo.getId() + ".jpg"));
         try {
             assertTrue(imageCacher.cacheImage(photo));
             assertTrue(imageCacher.cacheImage(photo));
@@ -110,7 +115,9 @@ public class ImageCacherTest {
 
     @Test
     public void cacheImageWithBytes() {
-        Photo photo = buildPhotoForImageCacher();
+        Gson gson = new Gson();
+        photo = gson.fromJson(Fakes.PHOTO_RESULT, Photo.class);
+        educateMock(String.format(photo.getId() + ".jpg"));
         String base64Bytes = photo.getImageFilePath();
         byte[] data = Base64.decode(base64Bytes, Base64.DEFAULT);
         try {
@@ -122,9 +129,9 @@ public class ImageCacherTest {
 
     private Photo buildPhotoForImageCacher() {
         Gson gson = new Gson();
-        Photo photo = gson.fromJson(Fakes.PHOTO_RESULT, Photo.class);
+        photo = gson.fromJson(Fakes.PHOTO_RESULT, Photo.class);
         String fileName = String.format("%s.jpg", photo.getId());
-        imageFile = new File(CURRENT_DIR, fileName);
+        File imageFile = new File(CURRENT_DIR, fileName);
         String imageFilePath = imageFile.getAbsolutePath();
         educateMock(fileName);
         photo = Fakes.buildFakePhoto(photo.getId(), imageFilePath, photo.getDescription(), photo.isLiked(), photo.isDeleteable(), photo.getCommentCount());
