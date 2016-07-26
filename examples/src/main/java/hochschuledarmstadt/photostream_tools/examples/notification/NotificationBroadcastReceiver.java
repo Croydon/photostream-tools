@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
+import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
  * Deklaration für Starten des BroadcastReceivers im Manifest deklariert (AndroidManifest.xml)
@@ -38,6 +39,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         if (isNewPhotoIntent(intent)){
+            // Das empfangene Photo ist im Intent enthalten
+            Photo receivedPhoto = intent.getParcelableExtra(IPhotoStreamClient.INTENT_KEY_PHOTO);
             // Würde also bedeuten, dass ein neues Photo durch ein anderes Android Gerät hochgeladen wurde.
             Toast.makeText(context, "Intent erhalten im BroadcastReceiver!", Toast.LENGTH_SHORT).show();
         }
