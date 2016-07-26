@@ -53,15 +53,15 @@ import static org.mockito.Mockito.when;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class ImageCacherTest {
 
-    public static final String ROOT = "";
+    public static final String CURRENT_DIR = new File(System.getProperty("user.dir")).getAbsolutePath();
     private Context context;
     private ImageCacher imageCacher;
     private File imageFile;
 
     private void educateMock(String fileName) {
-        when(context.getFileStreamPath(fileName)).thenReturn(new File(ROOT, fileName));
+        when(context.getFileStreamPath(fileName)).thenReturn(new File(CURRENT_DIR, fileName));
         try {
-            when(context.openFileOutput(fileName, Context.MODE_PRIVATE)).thenReturn(new FileOutputStream(new File(ROOT, fileName)));
+            when(context.openFileOutput(fileName, Context.MODE_PRIVATE)).thenReturn(new FileOutputStream(new File(CURRENT_DIR, fileName)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class ImageCacherTest {
     @Before
     public void setUp() {
         context = mock(Context.class);
-        when(context.getFilesDir()).thenReturn(new File(ROOT));
+        when(context.getFilesDir()).thenReturn(new File(CURRENT_DIR));
         imageCacher = new ImageCacher(context);
     }
 
@@ -124,7 +124,7 @@ public class ImageCacherTest {
         Gson gson = new Gson();
         Photo photo = gson.fromJson(Fakes.PHOTO_RESULT, Photo.class);
         String fileName = String.format("%s.jpg", photo.getId());
-        imageFile = new File(ROOT, fileName);
+        imageFile = new File(CURRENT_DIR, fileName);
         String imageFilePath = imageFile.getAbsolutePath();
         educateMock(fileName);
         photo = Fakes.buildFakePhoto(photo.getId(), imageFilePath, photo.getDescription(), photo.isLiked(), photo.isDeleteable(), photo.getCommentCount());

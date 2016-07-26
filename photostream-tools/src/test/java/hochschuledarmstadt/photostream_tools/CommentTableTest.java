@@ -37,6 +37,7 @@ import org.robolectric.annotation.Config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -93,6 +94,11 @@ public class CommentTableTest {
     public void loadComments(){
         internalInsertComments();
         assertEquals(DUMMY_COMMENT_STRING, commentTable.loadComments(1));
+    }
+
+    @Test
+    public void createsValidDbConnection(){
+        assertNotNull(DbConnection.getInstance(context));
     }
 
     @Test

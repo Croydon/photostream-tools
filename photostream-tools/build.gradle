@@ -118,6 +118,7 @@ cobertura {
                         '.*DividerItemDecoration',
                         '.*hochschuledarmstadt\\.photostream_tools\\.model.*',
                         '.*Http.*',
+                        '.*FullscreenPhotoActivity.*',
                         '.*PhotoStreamActivity.*',
                         '.*BaseFragmentPagerAdapter.*',
                         '.*BitmapUtils.*',
