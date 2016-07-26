@@ -130,6 +130,8 @@ public class Photo extends BaseItem implements Parcelable{
         imageFilePath = in.readString();
         description = in.readString();
         liked = in.readInt();
+        deleteable = in.readInt() == 1;
+        commentCount = in.readInt();
     }
 
     @Override
@@ -143,6 +145,8 @@ public class Photo extends BaseItem implements Parcelable{
         dest.writeString(imageFilePath);
         dest.writeString(description);
         dest.writeInt(liked);
+        dest.writeInt(deleteable ? 1 : 0);
+        dest.writeInt(commentCount);
     }
 
     public static final Creator<Photo> CREATOR = new Creator<Photo>() {

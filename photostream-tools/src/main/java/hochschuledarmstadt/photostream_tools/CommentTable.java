@@ -69,14 +69,14 @@ class CommentTable {
         return etag != null && !etag.equals(storedEtag);
     }
 
-    public void insertOrReplaceComments(int photoId, String comments, String etag){
+    public long insertOrReplaceComments(int photoId, String comments, String etag){
 
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_PHOTO_ID, photoId);
         cv.put(COLUMN_COMMENTS, comments);
         cv.put(COLUMN_ETAG, etag);
 
-        database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        return database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     public String loadEtag(int photoId) {

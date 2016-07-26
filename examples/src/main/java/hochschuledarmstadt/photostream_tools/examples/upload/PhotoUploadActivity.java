@@ -114,12 +114,12 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
     }
 
     @Override
-    public void onShowProgressDialog() {
+    public void onRequestStarted() {
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
-    public void onDismissProgressDialog() {
+    public void onRequestFinished() {
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
     }
 

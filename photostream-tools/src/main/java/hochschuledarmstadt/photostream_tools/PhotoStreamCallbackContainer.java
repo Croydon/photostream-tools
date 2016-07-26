@@ -102,7 +102,7 @@ class PhotoStreamCallbackContainer {
         if (!listeners.contains(listener))
             listeners.add(listener);
         if (listener instanceof OnRequestListener && hasOpenRequestsOfType(requestType))
-            ((OnRequestListener)listener).onShowProgressDialog();
+            ((OnRequestListener)listener).onRequestStarted();
     }
 
     private <T> void removeListener(List<T> listeners, T listener){
@@ -259,14 +259,14 @@ class PhotoStreamCallbackContainer {
     public void notifyShowProgressDialog(RequestType requestType) {
         List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
         for (OnRequestListener onRequestListener : onRequestListeners){
-            onRequestListener.onShowProgressDialog();
+            onRequestListener.onRequestStarted();
         }
     }
 
     public void notifyDismissProgressDialog(final RequestType requestType) {
        List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
         for (OnRequestListener onRequestListener : onRequestListeners) {
-            onRequestListener.onDismissProgressDialog();
+            onRequestListener.onRequestFinished();
         }
     }
 

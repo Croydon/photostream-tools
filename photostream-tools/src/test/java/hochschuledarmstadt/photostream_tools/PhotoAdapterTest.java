@@ -24,8 +24,10 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,6 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -163,6 +166,51 @@ public class PhotoAdapterTest {
     }
 
     @Test
+    public void testUpdateCommentCount() {
+        final int NEW_COMMENT_COUNT = 2;
+        final int photoId = 1;
+        final boolean isPhotoLiked = true;
+        final boolean deleteable = true;
+        final int commentCount = 1;
+        Photo photo = Fakes.buildFakePhoto(photoId, null, null, isPhotoLiked, deleteable, commentCount);
+        simplePhotoAdapter.add(photo);
+        simplePhotoAdapter.updateCommentCount(1, NEW_COMMENT_COUNT);
+        assertEquals(NEW_COMMENT_COUNT, photo.getCommentCount());
+    }
+
+    @Test
+    public void testSetLikeForPhoto() {
+        final int photoId = 1;
+        final boolean isPhotoLiked = false;
+        final boolean deleteable = true;
+        final int commentCount = 1;
+        Photo photo = Fakes.buildFakePhoto(photoId, null, null, isPhotoLiked, deleteable, commentCount);
+        assertFalse(photo.isLiked());
+        simplePhotoAdapter.add(photo);
+        if (simplePhotoAdapter.setLikeForPhoto(photoId)){
+            assertTrue(photo.isLiked());
+        }else{
+            fail("photo should be liked after method call");
+        }
+    }
+
+    @Test
+    public void testResetLikeForPhoto() {
+        final int photoId = 1;
+        final boolean isPhotoLiked = true;
+        final boolean deleteable = true;
+        final int commentCount = 1;
+        Photo photo = Fakes.buildFakePhoto(photoId, null, null, isPhotoLiked, deleteable, commentCount);
+        assertTrue(photo.isLiked());
+        simplePhotoAdapter.add(photo);
+        if (simplePhotoAdapter.resetLikeForPhoto(photoId)){
+            assertFalse(photo.isLiked());
+        }else{
+            fail("photo should be unliked after method call");
+        }
+    }
+
+    @Test
     public void testOnClickIsWorking() {
         final CountDownLatch latch = new CountDownLatch(1);
         simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
@@ -174,6 +222,28 @@ public class PhotoAdapterTest {
         TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
         simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
         simplePhotoAdapter.add(mock(Photo.class));
+        viewHolder.itemView.performClick();
+        assertTrue(latch.getCount() == 0);
+    }
+
+    @Test
+    public void testOnClickIsWorkingAfterReplacingListener() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClicked(View v, Photo photo) {
+
+            }
+        });
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClicked(View v, Photo photo) {
+                latch.countDown();
+            }
+        });
+        final TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
         viewHolder.itemView.performClick();
         assertTrue(latch.getCount() == 0);
     }
@@ -196,8 +266,62 @@ public class PhotoAdapterTest {
     }
 
     @Test
+    public void testOnLongClickIsWorkingAfterReplacingListener() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClicked(View v, Photo photo) {
+                return true;
+            }
+        });
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClicked(View v, Photo photo) {
+                latch.countDown();
+                return true;
+            }
+        });
+        TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        viewHolder.itemView.performLongClick();
+        assertTrue(latch.getCount() == 0);
+    }
+
+    @Test
     public void testOnTouchIsWorking() {
         final CountDownLatch latch = new CountDownLatch(2);
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
+            @Override
+            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+                if (MotionEvent.ACTION_DOWN == motionEvent.getAction()){
+                    latch.countDown();
+                    return true;
+                }else if(MotionEvent.ACTION_UP == motionEvent.getAction()){
+                    latch.countDown();
+                    return true;
+                }
+                return false;
+            }
+        });
+        TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
+        simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
+        simplePhotoAdapter.add(mock(Photo.class));
+        boolean result = viewHolder.itemView.dispatchTouchEvent(MotionEvent.obtain(2,2,MotionEvent.ACTION_DOWN,0,null,null,0,0,0,0,0,0,0,0));
+        if (result)
+            viewHolder.itemView.dispatchTouchEvent(MotionEvent.obtain(2,2,MotionEvent.ACTION_UP,0,null,null,0,0,0,0,0,0,0,0));
+        assertTrue(latch.getCount() == 0);
+    }
+
+    @Test
+    public void testOnTouchIsWorkingAfterReplacingListener() {
+        final CountDownLatch latch = new CountDownLatch(2);
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
+            @Override
+            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+                return false;
+            }
+        });
         simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
             @Override
             public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {

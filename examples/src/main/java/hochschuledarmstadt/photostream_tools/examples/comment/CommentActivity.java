@@ -141,13 +141,13 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     }
 
     @Override
-    public void onShowProgressDialog() {
+    public void onRequestStarted() {
         // ProgressBar anzeigen
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
-    public void onDismissProgressDialog() {
+    public void onRequestFinished() {
         // ProgressBar verstecken
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
     }

@@ -31,10 +31,10 @@ public interface OnRequestListener {
     /**
      * Wird aufgerufen, kurz bevor ein HTTP Request gesendet wird
      */
-    void onShowProgressDialog();
+    void onRequestStarted();
 
     /**
      * Wird aufgerufen, wenn ein HTTP Request beendet ist
      */
-    void onDismissProgressDialog();
+    void onRequestFinished();
 }

@@ -24,22 +24,48 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+import static org.junit.Assert.*;
 
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class LoggerTest {
 
-public class DbTestConnectionDelegate extends DbConnection {
+    @Before
+    public void setUp() {
 
-    public static final String DATABASE_NAME = "test.db";
-
-    public DbTestConnectionDelegate(Context context) {
-        super(context, DATABASE_NAME, null, 1);
     }
 
-    public void recreateTables(){
-        openDatabase();
-        database.execSQL(CommentTable.TABLE_DROP);
-        database.execSQL(CommentTable.TABLE_CREATE);
-        closeDatabase();
+    @After
+    public void tearDown() {
+
     }
+
+    @Test
+    public void canCreateLoggerInstance(){
+        Logger logger = Logger.getInstance();
+        assertNotNull(logger);
+    }
+
+    @Test
+    public void logInfo(){
+        Logger.log("", LogLevel.INFO, "log message");
+    }
+
+    @Test
+    public void logError(){
+        Logger.log("", LogLevel.ERROR, "log message");
+    }
+
+    @Test
+    public void logWarning(){
+        Logger.log("", LogLevel.WARNING, "log message");
+    }
+
 }

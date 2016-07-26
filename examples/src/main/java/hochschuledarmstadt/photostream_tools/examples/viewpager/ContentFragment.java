@@ -136,12 +136,12 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     }
 
     @Override
-    public void onShowProgressDialog() {
+    public void onRequestStarted() {
 
     }
 
     @Override
-    public void onDismissProgressDialog() {
+    public void onRequestFinished() {
 
     }
 }

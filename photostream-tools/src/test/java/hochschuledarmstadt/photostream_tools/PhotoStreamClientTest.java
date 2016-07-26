@@ -102,9 +102,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadPhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotosReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotosReceived(isNotNull(PhotoQueryResult.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -115,9 +115,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadPhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotosReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onNoNewPhotosAvailable();
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -128,9 +128,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadPhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotosReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onReceivePhotosFailed(isNotNull(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -140,9 +140,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadMorePhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotosReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotosReceived(isNotNull(PhotoQueryResult.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -153,9 +153,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadMorePhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotosReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onReceivePhotosFailed(isNotNull(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -165,9 +165,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.searchPhotos("query");
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnSearchPhotosResultListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onSearchedPhotosReceived(isNotNull(PhotoQueryResult.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -179,9 +179,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.searchPhotos(theQuery);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnSearchPhotosResultListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onReceiveSearchedPhotosFailed(eq(theQuery), isNotNull(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -191,9 +191,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.searchMorePhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnSearchPhotosResultListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onSearchedPhotosReceived(isNotNull(PhotoQueryResult.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -204,9 +204,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.searchMorePhotos();
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnSearchPhotosResultListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onReceiveSearchedPhotosFailed(any(String.class), isNotNull(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -216,9 +216,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.likePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoLikeListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoLiked(eq(1));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -229,9 +229,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.likePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoLikeListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoLikeFailed(eq(1), isNotNull(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -241,9 +241,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.resetLikeForPhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoLikeListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoDisliked(eq(1));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -254,9 +254,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.resetLikeForPhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoLikeListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoLikeFailed(eq(1), any(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -270,13 +270,13 @@ public class PhotoStreamClientTest {
         photoStreamClient.removeOnNewPhotoReceivedListener(c);
         photoStreamClient.removeOnPhotoUploadListener(callback);
 
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoUploaded(any(Photo.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
 
-        verify(c, times(0)).onShowProgressDialog();
+        verify(c, times(0)).onRequestStarted();
         verify(c, times(1)).onNewPhotoReceived(any(Photo.class));
-        verify(c, times(0)).onDismissProgressDialog();
+        verify(c, times(0)).onRequestFinished();
     }
 
     private byte[] createFakeJPGBytes() {
@@ -291,9 +291,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.uploadPhoto(createFakeJPGBytes(), "description");
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoUploadListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoUploadFailed(any(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -313,13 +313,13 @@ public class PhotoStreamClientTest {
         photoStreamClient.removeOnNewCommentReceivedListener(callback);
         photoStreamClient.removeOnUploadCommentFailedListener(c);
 
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(1)).onNewCommentReceived(any(Comment.class));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
 
-        verify(c, times(1)).onShowProgressDialog();
+        verify(c, times(1)).onRequestStarted();
         verify(c, times(0)).onCommentUploadFailed(any(HttpError.class));
-        verify(c, times(1)).onDismissProgressDialog();
+        verify(c, times(1)).onRequestFinished();
     }
 
     @Test
@@ -340,13 +340,13 @@ public class PhotoStreamClientTest {
         photoStreamClient.removeOnNewCommentReceivedListener(callback);
         photoStreamClient.removeOnUploadCommentFailedListener(c);
 
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(0)).onNewCommentReceived(any(Comment.class));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
 
-        verify(c, times(1)).onShowProgressDialog();
+        verify(c, times(1)).onRequestStarted();
         verify(c, times(1)).onCommentUploadFailed(any(HttpError.class));
-        verify(c, times(1)).onDismissProgressDialog();
+        verify(c, times(1)).onRequestFinished();
     }
 
     @Test
@@ -356,9 +356,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.deletePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoDeletedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoDeleted(eq(1));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -369,9 +369,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.deletePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnPhotoDeletedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onPhotoDeleteFailed(eq(1), any(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -382,9 +382,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadComments(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnCommentsReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onCommentsReceived(eq(1), any(List.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -395,9 +395,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.loadComments(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnCommentsReceivedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onReceiveCommentsFailed(eq(1), any(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -408,9 +408,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.deleteComment(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnCommentDeletedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onCommentDeleted(eq(1));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -421,9 +421,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.deleteComment(1);
         Robolectric.flushBackgroundThreadScheduler();
         photoStreamClient.removeOnCommentDeletedListener(callback);
-        verify(callback, times(1)).onShowProgressDialog();
+        verify(callback, times(1)).onRequestStarted();
         verify(callback, times(1)).onCommentDeleteFailed(eq(1), any(HttpError.class));
-        verify(callback, times(1)).onDismissProgressDialog();
+        verify(callback, times(1)).onRequestFinished();
     }
 
     @Test
@@ -433,9 +433,9 @@ public class PhotoStreamClientTest {
         Photo photo = mock(Photo.class);
         webSocketClient.getMessageListener().onNewPhoto(photo);
         photoStreamClient.removeOnNewPhotoReceivedListener(callback);
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(1)).onNewPhotoReceived(eq(photo));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
     }
 
     @Test
@@ -444,9 +444,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.addOnPhotoDeletedListener(callback);
         webSocketClient.getMessageListener().onPhotoDeleted(1);
         photoStreamClient.removeOnPhotoDeletedListener(callback);
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(1)).onPhotoDeleted(eq(1));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
     }
 
     @Test
@@ -455,9 +455,9 @@ public class PhotoStreamClientTest {
         photoStreamClient.addOnCommentDeletedListener(callback);
         webSocketClient.getMessageListener().onCommentDeleted(1);
         photoStreamClient.removeOnCommentDeletedListener(callback);
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(1)).onCommentDeleted(eq(1));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
     }
 
     @Test
@@ -467,9 +467,9 @@ public class PhotoStreamClientTest {
         Comment comment = mock(Comment.class);
         webSocketClient.getMessageListener().onNewComment(comment);
         photoStreamClient.removeOnNewCommentReceivedListener(callback);
-        verify(callback, times(0)).onShowProgressDialog();
+        verify(callback, times(0)).onRequestStarted();
         verify(callback, times(1)).onNewCommentReceived(eq(comment));
-        verify(callback, times(0)).onDismissProgressDialog();
+        verify(callback, times(0)).onRequestFinished();
     }
 
 }

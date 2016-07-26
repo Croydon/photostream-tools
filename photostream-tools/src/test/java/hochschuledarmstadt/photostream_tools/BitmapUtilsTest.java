@@ -49,6 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -85,14 +86,19 @@ public class BitmapUtilsTest {
 
     @Test
     public void testWontFailRecyclingBitmapIfPassedNull(){
-        Bitmap bitmap = null;
-        BitmapUtils.recycleBitmap(bitmap);
+        try{
+            Bitmap bitmap = null;
+            BitmapUtils.recycleBitmap(bitmap);
+        }catch(Exception e){
+            fail("no exception should be thrown");
+        }
     }
 
     @Test
     public void testRecycleBitmap(){
         Bitmap bitmap = createTestBitmap();
         BitmapUtils.recycleBitmap(bitmap);
+        assertTrue(bitmap.isRecycled());
     }
 
     @Test
@@ -116,7 +122,7 @@ public class BitmapUtilsTest {
             assertNotNull(result);
             assertTrue(!result.isRecycled());
         } catch (FileNotFoundException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -138,7 +144,7 @@ public class BitmapUtilsTest {
             assertTrue(!result.isRecycled());
             result.recycle();
         } catch (FileNotFoundException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
 
     }

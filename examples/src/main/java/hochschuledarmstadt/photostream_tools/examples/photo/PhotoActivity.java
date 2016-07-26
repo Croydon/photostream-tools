@@ -195,12 +195,12 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     }
 
     @Override
-    public void onShowProgressDialog() {
+    public void onRequestStarted() {
         findViewById(R.id.progressCircle).setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onDismissProgressDialog() {
+    public void onRequestFinished() {
         findViewById(R.id.progressCircle).setVisibility(View.GONE);
     }
 

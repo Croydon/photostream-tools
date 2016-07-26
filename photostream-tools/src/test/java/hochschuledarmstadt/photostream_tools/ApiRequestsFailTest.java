@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutionException;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -84,9 +85,9 @@ public class ApiRequestsFailTest {
             streamAsyncTask.get();
             verify(callback, times(1)).onPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -101,9 +102,9 @@ public class ApiRequestsFailTest {
             streamAsyncTask.get();
             verify(callback, times(1)).onPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -135,9 +136,9 @@ public class ApiRequestsFailTest {
             searchPhotosAsyncTask.get();
             verify(callback, times(1)).onSearchPhotosError(any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -153,9 +154,9 @@ public class ApiRequestsFailTest {
             storeCommentAsyncTask.get();
             verify(listener, times(1)).onSendCommentFailed(any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -170,9 +171,9 @@ public class ApiRequestsFailTest {
             storePhotoAsyncTask.get();
             verify(listener, times(1)).onPhotoStoreError(any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -188,9 +189,9 @@ public class ApiRequestsFailTest {
             loadCommentsAsyncTask.get();
             verify(listener, times(1)).onGetCommentsFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -206,9 +207,9 @@ public class ApiRequestsFailTest {
             votePhotoAsyncTask.get();
             verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -224,9 +225,9 @@ public class ApiRequestsFailTest {
             votePhotoAsyncTask.get();
             verify(callback, times(1)).onPhotoLikeFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -242,9 +243,9 @@ public class ApiRequestsFailTest {
             deleteCommentAsyncTask.get();
             verify(callback, times(1)).onCommentDeleteFailed(eq(commentId), any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -260,9 +261,9 @@ public class ApiRequestsFailTest {
             deletePhotoAsyncTask.get();
             verify(callback, times(1)).onPhotoDeleteFailed(eq(photoId), any(HttpError.class));
         } catch (InterruptedException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         } catch (ExecutionException e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
