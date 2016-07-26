@@ -32,6 +32,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.HttpError;
@@ -83,14 +84,24 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
             PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
             final List<Photo> photos = photoQueryResult.getPhotos();
             final ImageCacher imageCacher = new ImageCacher(context);
+            List<Photo> uncachedPhotos = new ArrayList<>();
             for (Photo photo : photos) {
-                if (!imageCacher.isCached(photo.getId())) {
-                    byte[] data = imageLoader.execute(photo.getId());
-                    if (data != null)
-                        imageCacher.cacheImage(photo, data);
+                int photoId = photo.getId();
+                if (!imageCacher.isCached(photoId)) {
+                    uncachedPhotos.add(photo);
                 }else{
                     imageCacher.cacheImage(photo);
                 }
+            }
+            if (uncachedPhotos.size() > 0) {
+                imageLoader.execute(uncachedPhotos);
+                while(imageLoader.isRunning()) {
+                    HttpImageLoader.HttpImage httpImage = imageLoader.take();
+                    if (httpImage != null) {
+                        imageCacher.cacheImage(httpImage.getPhoto(), httpImage.getImageData());
+                    }
+                }
+                uncachedPhotos.clear();
             }
             return photoQueryResult;
         }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){

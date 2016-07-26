@@ -24,33 +24,9 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import java.util.List;
-
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-public class HttpImageLoaderStub extends HttpImageLoader {
-
-    public HttpImageLoaderStub() {
-        super(null);
-    }
-
-    @Override
-    public void execute(List<Photo> photos) {
-        super.execute(photos);
-    }
-
-    @Override
-    public boolean isRunning() {
-        return super.isRunning();
-    }
-
-    @Override
-    public HttpImage take() {
-        return super.take();
-    }
-
-    @Override
-    public void onResponse(byte[] imageData, Photo photo) {
-        super.onResponse(imageData, photo);
-    }
+interface OnResponseListener {
+    void onResponse(byte[] imageData, Photo photo);
 }
+

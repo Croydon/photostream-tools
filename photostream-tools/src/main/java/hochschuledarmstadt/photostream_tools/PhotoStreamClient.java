@@ -88,6 +88,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     void destroy() {
         callbackContainer.clear();
         unregisterInternetAvailableBroadcastReceiver();
+        internetAvailableBroadcastReceiver = null;
         if (webSocketClient != null) {
             webSocketClient.setMessageListener(null);
             webSocketClient.disconnect();
@@ -150,7 +151,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
                 }
             }
         };
-
+        registerInternetAvailableBroadcastReceiver();
         if (webSocketClient != null) {
             webSocketClient.setMessageListener(this);
             webSocketClient.connect();
@@ -619,10 +620,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     @Override
     public void onConnect() {
-        registerInternetAvailableBroadcastReceiver();
+
     }
 
-    private void registerInternetAvailableBroadcastReceiver() {
+    private void unregisterInternetAvailableBroadcastReceiver() {
         try{
             context.unregisterReceiver(internetAvailableBroadcastReceiver);
         }catch(Exception e){ }
@@ -630,7 +631,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     @Override
     public void onDisconnect() {
-        unregisterInternetAvailableBroadcastReceiver();
+
     }
 
     @Override
@@ -638,7 +639,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         callbackContainer.notifyOnCommentCountChanged(photoId, commentCount);
     }
 
-    private void unregisterInternetAvailableBroadcastReceiver() {
+    private void registerInternetAvailableBroadcastReceiver() {
         try{
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(INTENT_CONNECTIVITY_CHANGE);

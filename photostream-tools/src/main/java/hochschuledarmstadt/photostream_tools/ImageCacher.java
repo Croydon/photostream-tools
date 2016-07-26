@@ -73,7 +73,7 @@ class ImageCacher {
         boolean inCache = false;
         boolean error = false;
         String filename = getImageFileName(photoId);
-        String imageFilePath = null;
+        String imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
         if (!imageExistsOnFileSystem(filename)) {
             FileOutputStream outputStream = null;
             try {
@@ -81,7 +81,6 @@ class ImageCacher {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
-                imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
                 inCache = true;
             } catch (Exception e) {
                 error = true;
@@ -96,7 +95,6 @@ class ImageCacher {
             }
         }else{
             inCache = true;
-            imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
         }
 
         injectImageFilePath(photo, imageFilePath);
