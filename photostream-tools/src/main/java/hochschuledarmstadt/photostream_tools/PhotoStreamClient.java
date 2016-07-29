@@ -62,18 +62,21 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
     private static final String TAG = PhotoStreamService.class.getName();
     public static final String INTENT_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+    public static final String HEADER_IF_MODIFIED_SINCE = "if-modified-since";
 
     private final HttpExecutorFactory httpExecutorFactory;
     private final Context context;
     private final HttpImageLoader imageLoader;
     private final CommentTable commentTable;
+    private final PhotoTable photoTable;
     private final ImageCacher imageCacher;
     private String lastSearchQuery;
-    private String loadPhotosETag;
     private BroadcastReceiver internetAvailableBroadcastReceiver;
     private final UrlBuilder urlBuilder;
     private WebSocketClient webSocketClient;
     private PhotoStreamCallbackContainer callbackContainer = new PhotoStreamCallbackContainer();
+    private int lastRequestedPage = 0;
+    private boolean shouldReloadFirstPageOfPhotosFromCache = true;
 
     public PhotoStreamClient(Context context, UrlBuilder urlBuilder, HttpImageLoader imageLoader, ImageCacher imageCacher, DbConnection dbConnection, WebSocketClient webSocketClient, HttpExecutorFactory httpExecutorFactory){
         this.context = context;
@@ -83,6 +86,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         this.httpExecutorFactory = httpExecutorFactory;
         this.imageCacher = imageCacher;
         this.commentTable = new CommentTable(dbConnection);
+        this.photoTable = new PhotoTable(dbConnection);
     }
 
     void destroy() {
@@ -164,14 +168,21 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getLoadPhotosApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
 
-        if (loadPhotosETag != null)
-            executor.addHeaderField("if-modified-since", loadPhotosETag);
+        int page = 1;
+        photoTable.openDatabase();
+        String eTag = photoTable.loadEtagFor(page);
+        photoTable.closeDatabase();
+
+        if (eTag != null)
+            executor.addHeaderField(HEADER_IF_MODIFIED_SINCE, eTag);
 
         final RequestType requestType = RequestType.LOAD_PHOTOS;
 
         LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
+                shouldReloadFirstPageOfPhotosFromCache = false;
+                resetLastRequestedPage();
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotos(queryResult);
             }
@@ -183,20 +194,33 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onNewETag(String eTag) {
-                loadPhotosETag = eTag;
+            public void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult) {
+                photoTable.openDatabase();
+                photoTable.insertPhotos(jsonStringPhotoQueryResult, page, eTag);
+                photoTable.closeDatabase();
             }
 
             @Override
-            public void onNoNewPhotosAvailable() {
-
+            public PhotoQueryResult onNoNewPhotosAvailable(int page) {
                 removeOpenRequest(requestType);
-                callbackContainer.notifyOnNoNewPhotosAvailable();
+                if (shouldReloadFirstPageOfPhotosFromCache) {
+                    photoTable.openDatabase();
+                    PhotoQueryResult photoQueryResult = photoTable.getCachedPhotoQueryResult(page);
+                    photoTable.closeDatabase();
+                    return photoQueryResult;
+                }else{
+                    callbackContainer.notifyOnNoNewPhotosAvailable();
+                    return null;
+                }
             }
 
         });
         addOpenRequest(requestType);
         task.execute();
+    }
+
+    private void resetLastRequestedPage() {
+        lastRequestedPage = 1;
     }
 
     private void removeOpenRequest(RequestType requestType) {
@@ -209,9 +233,18 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getLoadMorePhotosApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.LOAD_PHOTOS;
+
+        photoTable.openDatabase();
+        String eTag = photoTable.loadEtagFor(lastRequestedPage + 1);
+        photoTable.closeDatabase();
+
+        if (eTag != null)
+            executor.addHeaderField(HEADER_IF_MODIFIED_SINCE, eTag);
+
         LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(executor, imageLoader, context, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
+                incrementLastRequestedPage();
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotos(queryResult);
             }
@@ -223,18 +256,28 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
 
             @Override
-            public void onNewETag(String eTag) {
-
+            public void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult) {
+                photoTable.openDatabase();
+                photoTable.insertPhotos(jsonStringPhotoQueryResult, page, eTag);
+                photoTable.closeDatabase();
             }
 
             @Override
-            public void onNoNewPhotosAvailable() {
-
+            public PhotoQueryResult onNoNewPhotosAvailable(int page) {
+                incrementLastRequestedPage();
+                photoTable.openDatabase();
+                PhotoQueryResult photoQueryResult = photoTable.getCachedPhotoQueryResult(page);
+                photoTable.closeDatabase();
+                return photoQueryResult;
             }
 
         });
         addOpenRequest(requestType);
         task.execute();
+    }
+
+    private void incrementLastRequestedPage() {
+        lastRequestedPage += 1;
     }
 
     @Override
@@ -276,7 +319,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String eTag = commentTable.loadEtag(photoId);
         commentTable.closeDatabase();
         if (eTag != null)
-            executor.addHeaderField("if-modified-since", eTag);
+            executor.addHeaderField(HEADER_IF_MODIFIED_SINCE, eTag);
         LoadCommentsAsyncTask task = new LoadCommentsAsyncTask(executor, photoId, new LoadCommentsAsyncTask.OnCommentsResultListener() {
 
             @Override
@@ -570,8 +613,9 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
 
             @Override
             public void onNewETag(String eTag) {
-                loadPhotosETag = eTag;
+
             }
+
 
         });
         addOpenRequest(requestType);
@@ -668,6 +712,10 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     public void resetEtag() {
-        loadPhotosETag = null;
+        shouldReloadFirstPageOfPhotosFromCache = true;
+    }
+
+    void setShouldReloadFirstPageOfPhotosFromCache(boolean shouldReloadFirstPageOfPhotosFromCache) {
+        this.shouldReloadFirstPageOfPhotosFromCache = shouldReloadFirstPageOfPhotosFromCache;
     }
 }

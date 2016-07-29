@@ -59,6 +59,7 @@ public class HttpPhotoExecutorFactoryStub implements HttpExecutorFactory {
             json.put("has_next_page", false);
             HttpGetExecutor executor = mock(HttpGetExecutor.class);
             when(executor.execute()).thenReturn(new HttpResponse(HttpResponse.STATUS_OK, json.toString()));
+            when(executor.getEtag()).thenReturn("98e47u318rhn23uor8");
             return executor;
         } catch (JSONException e) {
             e.printStackTrace();

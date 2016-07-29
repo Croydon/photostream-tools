@@ -72,7 +72,6 @@ public class PhotoStreamClientTest {
     private PhotoStreamClient photoStreamClient;
     private DbTestConnectionDelegate dbDelegate;
     private WebSocketClientStub webSocketClient;
-    private PhotoStreamCallbackContainer container;
 
     @Before
     public void setUp() {
@@ -92,7 +91,7 @@ public class PhotoStreamClientTest {
 
     @After
     public void tearDown() {
-
+        dbDelegate.recreateTables();
     }
 
     @Test
@@ -111,6 +110,7 @@ public class PhotoStreamClientTest {
     public void loadPhotosNotModified(){
         createPhotoStreamClient(new HttpPhotoNotModifiedExecutorFactoryStub());
         OnPhotosReceivedListener callback = mock(OnPhotosReceivedListener.class);
+        photoStreamClient.setShouldReloadFirstPageOfPhotosFromCache(false);
         photoStreamClient.addOnPhotosReceivedListener(callback);
         photoStreamClient.loadPhotos();
         Robolectric.flushBackgroundThreadScheduler();

@@ -245,16 +245,4 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
         }
     }
 
-
-    @Override
-    protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-
-    }
-
-    @Override
-    protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-
-    }
-
-
 }

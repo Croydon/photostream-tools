@@ -46,6 +46,7 @@ class DbConnection extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CommentTable.TABLE_CREATE);
+        db.execSQL(PhotoTable.TABLE_CREATE);
     }
 
     @Override

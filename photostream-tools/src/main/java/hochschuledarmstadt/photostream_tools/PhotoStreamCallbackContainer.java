@@ -90,6 +90,7 @@ class PhotoStreamCallbackContainer {
     public void clear(){
         openRequests.clear();
         requestListenerMap.clear();
+        activities.clear();
     }
 
     public boolean hasOpenRequestsOfType(RequestType requestType) {
@@ -256,18 +257,28 @@ class PhotoStreamCallbackContainer {
         }
     }
 
-    public void notifyShowProgressDialog(RequestType requestType) {
-        List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
-        for (OnRequestListener onRequestListener : onRequestListeners){
-            onRequestListener.onRequestStarted();
-        }
+    public void notifyShowProgressDialog(final RequestType requestType) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+                for (OnRequestListener onRequestListener : onRequestListeners){
+                    onRequestListener.onRequestStarted();
+                }
+            }
+        });
     }
 
     public void notifyDismissProgressDialog(final RequestType requestType) {
-       List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
-        for (OnRequestListener onRequestListener : onRequestListeners) {
-            onRequestListener.onRequestFinished();
-        }
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+                for (OnRequestListener onRequestListener : onRequestListeners) {
+                    onRequestListener.onRequestFinished();
+                }
+            }
+        });
     }
 
     public void notifyOnNewPhoto(Context context, Photo photo) {

@@ -77,11 +77,12 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     }
 
     private PhotoQueryResult getPhotos() throws IOException, HttpPhotoStreamException {
-        HttpResponse httpResponse = executor.execute();
+        final HttpResponse httpResponse = executor.execute();
         int statusCode = httpResponse.getStatusCode();
         if (statusCode == HttpURLConnection.HTTP_OK){
-            callback.onNewETag(executor.getEtag());
-            PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
+            String jsonResult = httpResponse.getResult();
+            Gson gson = new Gson();
+            PhotoQueryResult photoQueryResult = gson.fromJson(jsonResult, PhotoQueryResult.class);
             final List<Photo> photos = photoQueryResult.getPhotos();
             final ImageCacher imageCacher = new ImageCacher(context);
             List<Photo> uncachedPhotos = new ArrayList<>();
@@ -103,15 +104,14 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
                 }
                 uncachedPhotos.clear();
             }
+            jsonResult = gson.toJson(photoQueryResult);
+            callback.onNewETag(executor.getEtag(), photoQueryResult.getPage(), jsonResult);
             return photoQueryResult;
         }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onNoNewPhotosAvailable();
-                }
-            });
+            int page = executor.getPage();
+            return callback.onNoNewPhotosAvailable(page);
         }
+
         return null;
     }
 
@@ -132,12 +132,8 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     interface GetPhotosCallback {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
         void onPhotosError(HttpError httpError);
-        void onNewETag(String eTag);
-        void onNoNewPhotosAvailable();
-    }
-
-    protected static class QueryResult {
-
+        void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult);
+        PhotoQueryResult onNoNewPhotosAvailable(int page);
     }
 
 }

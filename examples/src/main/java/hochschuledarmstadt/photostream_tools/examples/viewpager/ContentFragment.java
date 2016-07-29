@@ -69,7 +69,6 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
         }else {
             position = savedInstanceState.getInt(KEY_POSITION);
         }
-        photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
     }
 
     @Override
@@ -103,6 +102,8 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
 
         imageView = (ImageView) getView().findViewById(R.id.imageView);
 
+        photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
+
         try {
             Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
             if (bitmap != null)
@@ -115,19 +116,26 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient service, Bundle savedInstanceState) {
         service.addOnCommentsReceivedListener(this);
+        photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
         if (savedInstanceState == null)
             service.loadComments(photo.getId());
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient service) {
-        service.addOnCommentsReceivedListener(this);
+        service.removeOnCommentsReceivedListener(this);
     }
 
     @Override
     public void onCommentsReceived(int photoId, List<Comment> comments) {
         if (photoId == photo.getId())
             adapter.set(comments);
+    }
+
+    @Override
+    public void onDestroyView() {
+        BitmapUtils.recycleBitmapFromImageView(imageView);
+        super.onDestroyView();
     }
 
     @Override

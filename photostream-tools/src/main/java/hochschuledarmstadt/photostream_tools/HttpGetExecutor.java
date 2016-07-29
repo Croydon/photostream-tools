@@ -40,6 +40,7 @@ class HttpGetExecutor extends HttpExecutor {
 
     private HashMap<String,String> headerFields = new HashMap<>();
     private String etag;
+    private int page;
 
     public HttpGetExecutor(String url, String installationId) {
         super(url, installationId);
@@ -55,8 +56,13 @@ class HttpGetExecutor extends HttpExecutor {
         }
         final int responseCode = urlConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NOT_MODIFIED){
-            if (responseCode == HttpURLConnection.HTTP_OK)
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 etag = urlConnection.getHeaderField("ETag");
+            }else{
+                String pageFieldValue = urlConnection.getHeaderField("photo-page");
+                if (pageFieldValue != null)
+                    page = Integer.parseInt(pageFieldValue);
+            }
             String result = convertStreamToString(urlConnection.getInputStream());
             return new HttpResponse(responseCode, result);
         }else{
@@ -71,5 +77,9 @@ class HttpGetExecutor extends HttpExecutor {
 
     public String getEtag() {
         return etag;
+    }
+
+    public int getPage() {
+        return page;
     }
 }
