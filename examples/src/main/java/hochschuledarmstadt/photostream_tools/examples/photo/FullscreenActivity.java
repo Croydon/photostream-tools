@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.FullscreenPhotoActivity;
+import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
@@ -53,6 +54,16 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
+        
+    }
+
+    @Override
+    protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
+
     }
 
     @Override
