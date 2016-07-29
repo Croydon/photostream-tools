@@ -24,11 +24,21 @@
 
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.widget.ProgressBar;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
@@ -55,12 +65,13 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     private ViewPager viewPager;
     private PhotoFragmentPagerAdapter adapter;
     private ViewPager.OnPageChangeListener pageChangeListener;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_pager);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
@@ -72,9 +83,10 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
             @Override
             public void onPageSelected(int position) {
-                if (shouldLoadMorePhotos(position)){
+                updateColor(position);
+                if (shouldLoadMorePhotos(position)) {
                     IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
-                    if(photoStreamClient != null)
+                    if (photoStreamClient != null)
                         photoStreamClient.loadMorePhotos();
                 }
                 updateActionBarSubtitle();
@@ -94,7 +106,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
             // Photos aus vorheriger Activity wiederherstellen
             adapter.restoreInstanceState(savedInstanceState.getParcelable(KEY_ADAPTER));
             updateActionBarSubtitle();
-        }else{
+        } else {
             setDefaultActionBarSubtitle();
         }
 
@@ -102,9 +114,63 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
     }
 
+    private void updateColor(int position) {
+        Photo photo = adapter.getPhotoAtPosition(position);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                final Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
+                new Palette.Builder(bitmap).maximumColorCount(10).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        bitmap.recycle();
+                        Palette.Swatch swatch = getMostPopularColorFromPalette(palette);
+                        if (swatch != null)
+                            updateThemeColor(swatch);
+                    }
+                });
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Palette.Swatch getMostPopularColorFromPalette(Palette palette) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            List<Palette.Swatch> swatches = palette.getSwatches();
+            List<Palette.Swatch> modifiableList = new ArrayList<>(swatches);
+            Collections.sort(modifiableList, new Comparator<Palette.Swatch>() {
+                @Override
+                public int compare(Palette.Swatch lhs, Palette.Swatch rhs) {
+                    if (lhs.getPopulation() < rhs.getPopulation())
+                        return 1;
+                    else if (lhs.getPopulation() > rhs.getPopulation())
+                        return -1;
+                    else
+                        return 0;
+                }
+            });
+            return modifiableList.size() > 0 ? modifiableList.get(0) : null;
+        } else {
+            return null;
+        }
+    }
+
+    public void updateThemeColor(Palette.Swatch mostPopularColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(mostPopularColor.getRgb());
+            toolbar.setBackgroundColor(mostPopularColor.getRgb());
+            toolbar.setTitleTextColor(mostPopularColor.getBodyTextColor());
+            toolbar.setSubtitleTextColor(mostPopularColor.getBodyTextColor());
+        }
+    }
+
+    private ContentFragment getCurrentFragment(int position) {
+        return (ContentFragment) adapter.instantiateItem(viewPager, position);
+    }
+
     private boolean shouldLoadMorePhotos(int position) {
         int n = (position + PAGE_POSITION_OFFSET);
-        boolean couldFetchMorePhotos = isConnectedToService() &&  n >= adapter.getCount();
+        boolean couldFetchMorePhotos = isConnectedToService() && n >= adapter.getCount();
         return couldFetchMorePhotos && isNotAlreadyFetchingMorePhotos();
     }
 
@@ -113,11 +179,11 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     private void setDefaultActionBarSubtitle() {
-        getSupportActionBar().setSubtitle(String.format("%s/%s", 0, 0));
+        getSupportActionBar().setSubtitle(String.format("Photo %s von %s", 0, 0));
     }
 
     private void updateActionBarSubtitle() {
-        getSupportActionBar().setSubtitle(String.format("%s/%s", viewPager.getCurrentItem() + 1, adapter.getCount()));
+        getSupportActionBar().setSubtitle(String.format("Photo %s von %s", viewPager.getCurrentItem() + 1, adapter.getCount()));
     }
 
     @Override
@@ -133,7 +199,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         photoStreamClient.addOnPhotoDeletedListener(this);
         photoStreamClient.addOnNewPhotoReceivedListener(this);
         photoStreamClient.addOnCommentCountChangedListener(this);
-        if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)){
+        if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)) {
             photoStreamClient.loadPhotos();
         }
     }
@@ -153,9 +219,10 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
     @Override
     public void onPhotosReceived(PhotoQueryResult result) {
-        if (result.isFirstPage())
+        if (result.isFirstPage()) {
             adapter.set(result.getPhotos());
-        else
+            updateColor(0);
+        } else
             adapter.addAll(result.getPhotos());
         updateActionBarSubtitle();
     }
@@ -192,7 +259,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         updateActionBarSubtitle();
     }
 
-    public Photo getPhoto(int position){
+    public Photo getPhoto(int position) {
         return adapter.getPhotoAtPosition(position);
     }
 
@@ -200,7 +267,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     public void onPhotoDeleted(int photoId) {
         adapter.remove(photoId);
         updateActionBarSubtitle();
-        if(shouldLoadMorePhotos(viewPager.getCurrentItem()))
+        if (shouldLoadMorePhotos(viewPager.getCurrentItem()))
             getPhotoStreamClient().loadMorePhotos();
     }
 
@@ -212,5 +279,9 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     @Override
     public void onCommentCountChanged(int photoId, int commentCount) {
         adapter.updateCommentCount(photoId, commentCount);
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 }

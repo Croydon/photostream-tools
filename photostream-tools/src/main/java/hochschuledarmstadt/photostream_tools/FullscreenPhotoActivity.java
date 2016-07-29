@@ -47,6 +47,10 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null){
+            isFirstStart = false;
+            systemUiVisible = savedInstanceState.getBoolean(KEY_SYSTEM_UI_VISIBLE);
+        }
     }
 
     @Override
@@ -58,17 +62,9 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             }
             watchForExitTransition();
         }
-
-        if (savedInstanceState != null){
-            isFirstStart = false;
-            if (Build.VERSION.SDK_INT >= 16)
-                systemUiVisible = savedInstanceState.getBoolean(KEY_SYSTEM_UI_VISIBLE);
-        }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void handleSystemUi() {
         if (isFirstStart){
             hideSystemUI();
         }else if (!systemUiVisible){
@@ -76,7 +72,12 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
         }else{
             showSystemUI();
         }
-        isFirstStart = false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        handleSystemUi();
     }
 
     @Override
@@ -87,18 +88,15 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            boolean isVisible = isSystemUiVisible();
-            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                if (isVisible)
-                    hideSystemUI();
-                else
-                    showSystemUI();
-                return true;
-            }
+        boolean isVisible = isSystemUiVisible();
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            if (isVisible)
+                hideSystemUI();
+            else
+                showSystemUI();
             return true;
         }
-        return super.dispatchTouchEvent(ev);
+        return true;
     }
 
     /**
@@ -112,8 +110,10 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
             return currentSystemUiVisibility == isVisible;
-        }else {
+        }else if (currentSystemUiVisibility == 0){
             return true;
+        }else{
+            return false;
         }
     }
 
@@ -187,61 +187,47 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (Build.VERSION.SDK_INT >= 16)
-            outState.putBoolean(KEY_SYSTEM_UI_VISIBLE, isSystemUiVisible());
+        outState.putBoolean(KEY_SYSTEM_UI_VISIBLE, isSystemUiVisible());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
-            if (Build.VERSION.SDK_INT == 19){
-                getWindow().getDecorView().setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_IMMERSIVE);
-            }
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        showSystemUI();
-        super.onStop();
+        handleSystemUi();
+        isFirstStart = false;
     }
 
     // This snippet hides the system bars.
     private void hideSystemUI() {
-        // Set the IMMERSIVE flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
-        if (Build.VERSION.SDK_INT >= 16) {
+        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 19) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                             | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
+
     }
 
-    // This snippet shows the system bars. It does this by removing all the flags
-// except for the ones that make the content appear under the system bars.
     private void showSystemUI() {
         if (Build.VERSION.SDK_INT >= 16) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }else{
+            getWindow().getDecorView().setSystemUiVisibility(0);
         }
     }
 

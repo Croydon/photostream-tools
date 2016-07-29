@@ -58,7 +58,7 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
-        
+
     }
 
     @Override

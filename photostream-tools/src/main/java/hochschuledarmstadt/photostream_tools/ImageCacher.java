@@ -117,10 +117,7 @@ class ImageCacher {
 
     private boolean imageExistsOnFileSystem(String filename) {
         File file = context.getFileStreamPath(filename);
-        if(file == null || !file.exists()) {
-            return false;
-        }
-        return true;
+        return !(file == null || !file.exists());
     }
 
     File getImageFilePathForPhotoId(int photoId) {

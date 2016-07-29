@@ -34,7 +34,7 @@
         <activity
             android:name=".viewpager.ViewPagerActivity"
             android:label="@string/title_activity_view_pager"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.ViewPager"/>
 
         <activity android:name=".notification.NotificationActivity"/>
 

@@ -24,18 +24,27 @@
 
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
@@ -60,6 +69,7 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
     private Photo photo;
+    private Palette.Swatch mostPopularColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

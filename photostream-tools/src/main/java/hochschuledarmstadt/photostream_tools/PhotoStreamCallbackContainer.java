@@ -94,9 +94,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public boolean hasOpenRequestsOfType(RequestType requestType) {
-        if (openRequests.containsKey(requestType))
-            return openRequests.get(requestType) > 0;
-        return false;
+        return openRequests.containsKey(requestType) && openRequests.get(requestType) > 0;
     }
 
     private <T> void addListener(List<T> listeners, T listener, RequestType requestType){
