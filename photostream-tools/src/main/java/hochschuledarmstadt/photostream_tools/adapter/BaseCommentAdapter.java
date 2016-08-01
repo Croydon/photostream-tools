@@ -26,6 +26,7 @@ package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Collection;
@@ -123,5 +124,15 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
     public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Comment>{
         @Override
         void onItemClicked(View v, Comment comment);
+    }
+
+    public interface OnItemLongClickListener extends BaseAdapter.OnItemLongClickListener<Comment>{
+        @Override
+        boolean onItemLongClicked(View v, Comment comment);
+    }
+
+    public interface OnItemTouchListener extends BaseAdapter.OnItemTouchListener<Comment> {
+        @Override
+        boolean onItemTouched(View v, MotionEvent motionEvent, Comment comment);
     }
 }
