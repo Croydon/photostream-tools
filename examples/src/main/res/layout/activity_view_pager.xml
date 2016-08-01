@@ -42,6 +42,7 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:background="#000"
                 android:layout_weight="1"/>
 
             <android.support.design.widget.AppBarLayout
@@ -63,6 +64,16 @@
         </LinearLayout>
 
         <include layout="@layout/progress_circle" />
+
+        <TextView
+            android:id="@+id/textViewHintSwipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            android:text="@string/swipe"
+            android:visibility="visible"/>
 
     </RelativeLayout>
 

@@ -31,7 +31,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,7 +68,6 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
     private Photo photo;
-    private Palette.Swatch mostPopularColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,11 +101,6 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter();
 
-        if (savedInstanceState != null){
-            Bundle bundle = savedInstanceState.getBundle(KEY_COMMENTS);
-            adapter.restoreInstanceState(bundle);
-        }
-
         recyclerView.setAdapter(adapter);
 
         imageView = (ImageView) getView().findViewById(R.id.imageView);
@@ -120,6 +113,15 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
                 imageView.setImageBitmap(bitmap);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            Bundle bundle = savedInstanceState.getBundle(KEY_COMMENTS);
+            adapter.restoreInstanceState(bundle);
         }
     }
 

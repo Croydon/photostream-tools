@@ -24,21 +24,13 @@
 
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
-import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
@@ -66,6 +58,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     private PhotoFragmentPagerAdapter adapter;
     private ViewPager.OnPageChangeListener pageChangeListener;
     private Toolbar toolbar;
+    private TextView textViewSwipeHint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +67,8 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.pager);
-
+        viewPager.setPageTransformer(true, new FancyPageTransformer());
+        textViewSwipeHint = (TextView) findViewById(R.id.textViewHintSwipe);
         pageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -83,7 +77,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
             @Override
             public void onPageSelected(int position) {
-                updateColor(position);
+                textViewSwipeHint.setVisibility(position == 0 ? TextView.VISIBLE : TextView.GONE);
                 if (shouldLoadMorePhotos(position)) {
                     IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
                     if (photoStreamClient != null)
@@ -114,60 +108,6 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
     }
 
-    private void updateColor(int position) {
-        Photo photo = adapter.getPhotoAtPosition(position);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                final Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
-                new Palette.Builder(bitmap).maximumColorCount(10).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        bitmap.recycle();
-                        Palette.Swatch swatch = getMostPopularColorFromPalette(palette);
-                        if (swatch != null)
-                            updateThemeColor(swatch);
-                    }
-                });
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private Palette.Swatch getMostPopularColorFromPalette(Palette palette) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            List<Palette.Swatch> swatches = palette.getSwatches();
-            List<Palette.Swatch> modifiableList = new ArrayList<>(swatches);
-            Collections.sort(modifiableList, new Comparator<Palette.Swatch>() {
-                @Override
-                public int compare(Palette.Swatch lhs, Palette.Swatch rhs) {
-                    if (lhs.getPopulation() < rhs.getPopulation())
-                        return 1;
-                    else if (lhs.getPopulation() > rhs.getPopulation())
-                        return -1;
-                    else
-                        return 0;
-                }
-            });
-            return modifiableList.size() > 0 ? modifiableList.get(0) : null;
-        } else {
-            return null;
-        }
-    }
-
-    public void updateThemeColor(Palette.Swatch mostPopularColor) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(mostPopularColor.getRgb());
-            toolbar.setBackgroundColor(mostPopularColor.getRgb());
-            toolbar.setTitleTextColor(mostPopularColor.getBodyTextColor());
-            toolbar.setSubtitleTextColor(mostPopularColor.getBodyTextColor());
-        }
-    }
-
-    private ContentFragment getCurrentFragment(int position) {
-        return (ContentFragment) adapter.instantiateItem(viewPager, position);
-    }
-
     private boolean shouldLoadMorePhotos(int position) {
         int n = (position + PAGE_POSITION_OFFSET);
         boolean couldFetchMorePhotos = isConnectedToService() && n >= adapter.getCount();
@@ -183,7 +123,9 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     private void updateActionBarSubtitle() {
-        getSupportActionBar().setSubtitle(String.format("Photo %s von %s", viewPager.getCurrentItem() + 1, adapter.getCount()));
+        int currentItemPosition = viewPager.getCurrentItem() + 1;
+        int totalAmountOfPhotosLoaded = adapter.getCount();
+        getSupportActionBar().setSubtitle(String.format("Photo %s von %s", currentItemPosition, totalAmountOfPhotosLoaded));
     }
 
     @Override
@@ -221,7 +163,6 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     public void onPhotosReceived(PhotoQueryResult result) {
         if (result.isFirstPage()) {
             adapter.set(result.getPhotos());
-            updateColor(0);
         } else
             adapter.addAll(result.getPhotos());
         updateActionBarSubtitle();
@@ -281,7 +222,36 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         adapter.updateCommentCount(photoId, commentCount);
     }
 
-    public Toolbar getToolbar() {
-        return toolbar;
+    private static class FancyPageTransformer implements ViewPager.PageTransformer {
+        private static final float SCALE_FACTOR_SLIDE = 0.85f;
+        private static final double MIN_ALPHA_SLIDE = 0.0f;
+        private static final double MAX_ALPHA_SLIDE = 1.0f;
+        public static final double ALPHA_VELOCITY = 1.25;
+
+        @Override
+        public void transformPage(View page, float position) {
+            float scale;
+            double alpha;
+            float translationX;
+            if (position > 0 && position < 1) {
+                scale = Math.abs(Math.abs(position) - 1) * (1.0f - SCALE_FACTOR_SLIDE) + SCALE_FACTOR_SLIDE;
+                alpha = Math.max(MIN_ALPHA_SLIDE, 1 - Math.abs(position));
+                int pageWidth = page.getWidth();
+                float translateValue = position * -pageWidth;
+                if (translateValue > -pageWidth) {
+                    translationX = translateValue;
+                } else {
+                    translationX = 0;
+                }
+            }else {
+                alpha = Math.min(MAX_ALPHA_SLIDE, 1 - (Math.abs(position) * ALPHA_VELOCITY));
+                scale = 1;
+                translationX = 0;
+            }
+            page.setScaleX(scale);
+            page.setScaleY(scale);
+            page.setTranslationX(translationX);
+            page.setAlpha((float) alpha);
+        }
     }
 }

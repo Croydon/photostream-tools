@@ -65,17 +65,18 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                uploadButton.setEnabled(false);
                 IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
-                if (!photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD_PHOTO)) {
-                    byte[] imageBytes = BitmapUtils.bitmapToBytes(bitmap);
-                    try {
-                        String description = editText.getText().toString().trim();
-                        photoStreamClient.uploadPhoto(imageBytes, description);
-                    } catch (IOException e) {
-                        Log.e(TAG, "error while sending photo to server", e);
-                    } catch (JSONException e) {
-                        Log.e(TAG, "error while encoding data to json", e);
-                    }
+                byte[] imageBytes = BitmapUtils.bitmapToBytes(bitmap);
+                try {
+                    String description = editText.getText().toString().trim();
+                    photoStreamClient.uploadPhoto(imageBytes, description);
+                } catch (IOException e) {
+                    Log.e(TAG, "error while sending photo to server", e);
+                    uploadButton.setEnabled(true);
+                } catch (JSONException e) {
+                    Log.e(TAG, "error while encoding data to json", e);
+                    uploadButton.setEnabled(true);
                 }
             }
         });
@@ -96,6 +97,10 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotoUploadListener(this);
+        if (savedInstanceState != null){
+            boolean uploadRequestIsRunning = photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD_PHOTO);
+            uploadButton.setEnabled(!uploadRequestIsRunning);
+        }
     }
 
     @Override
@@ -106,11 +111,13 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
     @Override
     public void onPhotoUploaded(Photo photo) {
         Toast.makeText(this, "Photo Uploaded", Toast.LENGTH_LONG).show();
+        uploadButton.setEnabled(true);
     }
 
     @Override
     public void onPhotoUploadFailed(HttpError httpError) {
         Utils.showErrorInAlertDialog(this, "Photo Upload failed", httpError);
+        uploadButton.setEnabled(true);
     }
 
     @Override

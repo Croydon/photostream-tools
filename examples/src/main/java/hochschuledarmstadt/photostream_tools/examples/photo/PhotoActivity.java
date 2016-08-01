@@ -69,6 +69,8 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
      */
     private static final String KEY_BUTTON_VISIBILITY = "KEY_BUTTON_VISIBILITY";
 
+    private static final String KEY_BUTTON_ENABLED = "KEY_BUTTON_ENABLED";
+
     private static final String TAG = PhotoActivity.class.getName();
 
     private RecyclerView recyclerView;
@@ -109,10 +111,9 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
         loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadMoreButton.setEnabled(false);
                 IPhotoStreamClient photoStreamClient = getPhotoStreamClient();
-                if (!photoStreamClient.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)) {
-                    photoStreamClient.loadMorePhotos();
-                }
+                photoStreamClient.loadMorePhotos();
             }
         });
 
@@ -127,13 +128,6 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
             }
         });
 
-        if (savedInstanceState == null){
-            loadMoreButton.setVisibility(Button.GONE);
-        }else{
-            boolean buttonVisible = savedInstanceState.getInt(KEY_BUTTON_VISIBILITY) == 1;
-            loadMoreButton.setVisibility(buttonVisible ? Button.VISIBLE : Button.GONE);
-            adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
-        }
         recyclerView.setAdapter(adapter);
     }
 
@@ -143,6 +137,17 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
         Log.d(TAG, "onSaveInstanceState()");
         outState.putBundle(KEY_ADAPTER, adapter.saveInstanceState());
         outState.putInt(KEY_BUTTON_VISIBILITY, loadMoreButton.getVisibility() == Button.VISIBLE ? 1 : 0);
+        outState.putInt(KEY_BUTTON_ENABLED, loadMoreButton.isEnabled() ? 1 : 0);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        boolean buttonVisible = savedInstanceState.getInt(KEY_BUTTON_VISIBILITY) == 1;
+        boolean buttonEnabled = savedInstanceState.getInt(KEY_BUTTON_ENABLED) == 1;
+        loadMoreButton.setVisibility(buttonVisible ? Button.VISIBLE : Button.GONE);
+        loadMoreButton.setEnabled(buttonEnabled);
+        adapter.restoreInstanceState(savedInstanceState.getBundle(KEY_ADAPTER));
     }
 
     @Override
@@ -174,6 +179,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
             adapter.addAll(photos);
         }
         // Den Button sichtbar machen, wenn weitere Seiten im Stream vorhanden sind, ansonsten ausblenden
+        loadMoreButton.setEnabled(true);
         loadMoreButton.setVisibility(result.hasNextPage() ? Button.VISIBLE : Button.GONE);
     }
 
@@ -181,6 +187,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
     public void onReceivePhotosFailed(HttpError httpError) {
         String title = "Could not load photos";
         Utils.showErrorInAlertDialog(this, title, httpError);
+        loadMoreButton.setEnabled(true);
     }
 
     @Override

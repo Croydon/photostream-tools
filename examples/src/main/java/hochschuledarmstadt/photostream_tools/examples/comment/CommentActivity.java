@@ -108,6 +108,7 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
             adapter.restoreInstanceState(bundle);
         }
         // Registriert einen OnItemClickListener für die View mit der id "textView"
+        // innerhalb eines Elements in der Recyclerview (siehe layout "comment_item.xml")
         adapter.setOnItemClickListener(R.id.textView, new BaseCommentAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(View v, Comment comment) {

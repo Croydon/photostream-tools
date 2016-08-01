@@ -25,7 +25,6 @@
 package hochschuledarmstadt.photostream_tools.examples.search;
 
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +39,6 @@ import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
-import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
@@ -49,39 +47,30 @@ import hochschuledarmstadt.photostream_tools.examples.photo.PhotoAdapter;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
+import hochschuledarmstadt.photostream_tools.widget.SearchViewDelegate;
 
 public class SearchActivity extends PhotoStreamActivity implements OnSearchedPhotosReceivedListener {
 
     private static final int COLUMNS_PER_ROW = 2;
-    public static final String KEY_SEARCHVIEW_QUERY = "KEY_SEARCHVIEW_QUERY";
-    public static final String KEY_SEARCHVIEW_EXPANDED = "KEY_SEARCHVIEW_EXPANDED";
-    public static final String KEY_SEARCHVIEW_FOCUSED = "KEY_SEARCHVIEW_FOCUSED";
     private static final String KEY_PHOTOS = "KEY_PHOTOS";
+    private static final String KEY_SEARCHVIEW = "SEARCH_VIEW";
 
     private PhotoAdapter photoAdapter;
     private RecyclerView recyclerView;
-    private SearchView searchView;
-    private MenuItem searchMenuItem;
-    private boolean searchViewFocused;
-    private boolean searchViewExpanded;
-    private String searchViewQuery;
+    private SearchViewDelegate searchViewDelegate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        searchViewDelegate = new SearchViewDelegate();
+
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         photoAdapter = new PhotoAdapter();
-
-        if (savedInstanceState != null){
-            Bundle bundle = savedInstanceState.getBundle(KEY_PHOTOS);
-            photoAdapter.restoreInstanceState(bundle);
-        }
 
         photoAdapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener() {
             @Override
@@ -94,34 +83,11 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null){
-            searchViewFocused = savedInstanceState.getBoolean(KEY_SEARCHVIEW_FOCUSED);
-            searchViewExpanded = savedInstanceState.getBoolean(KEY_SEARCHVIEW_EXPANDED);
-            searchViewQuery = savedInstanceState.getString(KEY_SEARCHVIEW_QUERY);
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        searchMenuItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        setSearchViewListeners();
-        updateSearchView();
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    private void setSearchViewListeners() {
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                searchViewFocused = hasFocus;
-            }
-        });
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        searchViewDelegate.setSearchViewMenuItem(searchMenuItem);
+        searchViewDelegate.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query != null && query.trim().length() > 0) {
@@ -137,32 +103,21 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
                 return false;
             }
         });
-
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                searchViewExpanded = true;
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchViewExpanded = false;
-                return true;
-            }
-        });
+        return super.onCreateOptionsMenu(menu);
     }
 
-    private void updateSearchView() {
-        if (searchViewExpanded)
-            MenuItemCompat.expandActionView(searchMenuItem);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(KEY_PHOTOS, photoAdapter.saveInstanceState());
+        outState.putParcelable(KEY_SEARCHVIEW, searchViewDelegate.saveInstanceState());
+    }
 
-        searchView.setQuery(searchViewQuery, false);
-
-        if (searchViewFocused)
-            searchView.requestFocus();
-        else
-            searchView.clearFocus();
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        photoAdapter.restoreInstanceState(savedInstanceState.getBundle(KEY_PHOTOS));
+        searchViewDelegate.restoreInstanceState(savedInstanceState.getParcelable(KEY_SEARCHVIEW));
     }
 
     @Override
@@ -185,15 +140,6 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     public void onReceiveSearchedPhotosFailed(String query, HttpError httpError) {
         String title = "Could not load photos";
         Utils.showErrorInAlertDialog(this, title, httpError);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBundle(KEY_PHOTOS, photoAdapter.saveInstanceState());
-        outState.putBoolean(KEY_SEARCHVIEW_EXPANDED, searchViewExpanded);
-        outState.putBoolean(KEY_SEARCHVIEW_FOCUSED, searchViewFocused);
-        outState.putString(KEY_SEARCHVIEW_QUERY, searchView.getQuery().toString());
     }
 
     @Override
