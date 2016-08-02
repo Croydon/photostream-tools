@@ -57,6 +57,16 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
     }
 
     @Override
+    protected void onSystemUiVisible() {
+
+    }
+
+    @Override
+    protected void onSystemUiHidden() {
+
+    }
+
+    @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
 
     }

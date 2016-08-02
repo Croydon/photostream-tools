@@ -124,7 +124,7 @@ cobertura {
                         '.*BaseFragmentPagerAdapter.*',
                         '.*BitmapUtils.*',
                         '.*PhotoStreamService.*',
-                        '.*PhotoStreamClient.*',
+                        '.*PhotoStreamClient',
                         '.*WebSocket.*',
                         '.*hochschuledarmstadt\\.photostream_tools\\.widget.*',
                         '.*AndroidSocket.*',
