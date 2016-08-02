@@ -5,7 +5,7 @@ apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.github.kt3k.coveralls'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.67'
+version = '0.0.70'
 
 android {
     compileSdkVersion 23
@@ -124,6 +124,7 @@ cobertura {
                         '.*BaseFragmentPagerAdapter.*',
                         '.*BitmapUtils.*',
                         '.*PhotoStreamService.*',
+                        '.*PhotoStreamClient.*',
                         '.*WebSocket.*',
                         '.*hochschuledarmstadt\\.photostream_tools\\.widget.*',
                         '.*AndroidSocket.*',

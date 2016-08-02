@@ -28,6 +28,8 @@ package hochschuledarmstadt.photostream_tools;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.transition.Transition;
 import android.view.MotionEvent;
@@ -43,6 +45,11 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     private boolean isFirstStart = true;
     private boolean systemUiVisible = false;
+
+    private static final Handler handler = new Handler(Looper.getMainLooper());
+
+    protected abstract void onSystemUiVisible();
+    protected abstract void onSystemUiHidden();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,6 +225,13 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
 
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onSystemUiHidden();
+            }
+        }, 500);
+
     }
 
     private void showSystemUI() {
@@ -229,6 +243,14 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
         }else{
             getWindow().getDecorView().setSystemUiVisibility(0);
         }
+
+        handler.removeCallbacksAndMessages(null);
+        onSystemUiVisible();
     }
 
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
 }
