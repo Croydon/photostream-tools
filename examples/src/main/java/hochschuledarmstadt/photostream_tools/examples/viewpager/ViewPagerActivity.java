@@ -56,11 +56,14 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
      * mit {@code PAGE_POSITION_OFFSET} = 2, dann werden weitere Photos geladen.
      */
     private static final int PAGE_POSITION_OFFSET = 2;
+    private static final String KEY_MORE_PHOTOS_AVAILABLE = "KEY_MORE_PHOTOS_AVAILABLE";
+
     private ViewPager viewPager;
     private PhotoFragmentPagerAdapter adapter;
     private ViewPager.OnPageChangeListener pageChangeListener;
     private Toolbar toolbar;
     private TextView textViewSwipeHint;
+    private boolean morePhotosAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,10 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
         setContentView(R.layout.activity_view_pager);
+
+        if (savedInstanceState != null)
+            morePhotosAvailable = savedInstanceState.getBoolean(KEY_MORE_PHOTOS_AVAILABLE);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -116,7 +123,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     private boolean shouldLoadMorePhotos(int position) {
         int n = (position + PAGE_POSITION_OFFSET);
         boolean couldFetchMorePhotos = isConnectedToService() && n >= adapter.getCount();
-        return couldFetchMorePhotos && isNotAlreadyFetchingMorePhotos();
+        return morePhotosAvailable && couldFetchMorePhotos && isNotAlreadyFetchingMorePhotos();
     }
 
     private boolean isNotAlreadyFetchingMorePhotos() {
@@ -137,6 +144,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_ADAPTER, adapter.saveInstanceState());
+        outState.putBoolean(KEY_MORE_PHOTOS_AVAILABLE, morePhotosAvailable);
     }
 
     @Override
@@ -171,6 +179,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         } else
             adapter.addAll(result.getPhotos());
         updateActionBarSubtitle();
+        morePhotosAvailable = result.hasNextPage();
     }
 
     @Override

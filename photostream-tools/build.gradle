@@ -5,11 +5,11 @@ apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.github.kt3k.coveralls'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.70'
+version = '0.0.75'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
 
     lintOptions {
         abortOnError false
@@ -123,6 +123,7 @@ cobertura {
                         '.*PhotoStreamActivity.*',
                         '.*BaseFragmentPagerAdapter.*',
                         '.*BitmapUtils.*',
+                        '.*Plugin.*',
                         '.*PhotoStreamService.*',
                         '.*PhotoStreamClient',
                         '.*WebSocket.*',
@@ -136,9 +137,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.0'
     testCompile 'org.mockito:mockito-core:2.0.43-beta'
-    compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.google.code.gson:gson:2.4'
     compile 'io.socket:socket.io-client:0.6.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:recyclerview-v7:24.1.1'
 }

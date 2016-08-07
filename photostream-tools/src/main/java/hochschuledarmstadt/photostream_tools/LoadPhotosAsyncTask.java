@@ -25,8 +25,6 @@
 package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.google.gson.Gson;
 
@@ -47,7 +45,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     private final Context context;
     private final HttpImageLoader imageLoader;
 
-    public LoadPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback){
+    public LoadPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback) {
         super();
         this.executor = executor;
         this.imageLoader = imageLoader;
@@ -64,7 +62,7 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     protected PhotoQueryResult doInBackground(Void... params) {
         try {
             return getPhotos();
-        }catch (HttpPhotoStreamException e) {
+        } catch (HttpPhotoStreamException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
             final HttpError httpError = e.getHttpError();
             postError(httpError);
@@ -79,40 +77,47 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
     private PhotoQueryResult getPhotos() throws IOException, HttpPhotoStreamException {
         final HttpResponse httpResponse = executor.execute();
         int statusCode = httpResponse.getStatusCode();
-        if (statusCode == HttpURLConnection.HTTP_OK){
+        PhotoQueryResult photoQueryResult = null;
+        if (statusCode == HttpURLConnection.HTTP_OK) {
             String jsonResult = httpResponse.getResult();
             Gson gson = new Gson();
-            PhotoQueryResult photoQueryResult = gson.fromJson(jsonResult, PhotoQueryResult.class);
-            final List<Photo> photos = photoQueryResult.getPhotos();
-            final ImageCacher imageCacher = new ImageCacher(context);
-            List<Photo> uncachedPhotos = new ArrayList<>();
-            for (Photo photo : photos) {
-                int photoId = photo.getId();
-                if (!imageCacher.isCached(photoId)) {
-                    uncachedPhotos.add(photo);
-                }else{
-                    imageCacher.cacheImage(photo);
-                }
-            }
-            if (uncachedPhotos.size() > 0) {
-                imageLoader.execute(uncachedPhotos);
-                while(imageLoader.isRunning()) {
-                    HttpImageLoader.HttpImage httpImage = imageLoader.take();
-                    if (httpImage != null) {
-                        imageCacher.cacheImage(httpImage.getPhoto(), httpImage.getImageData());
-                    }
-                }
-                uncachedPhotos.clear();
-            }
+            photoQueryResult = gson.fromJson(jsonResult, PhotoQueryResult.class);
+            cacheImagesIfNecessary(photoQueryResult);
             jsonResult = gson.toJson(photoQueryResult);
             callback.onNewETag(executor.getEtag(), photoQueryResult.getPage(), jsonResult);
-            return photoQueryResult;
-        }else if(statusCode == HttpURLConnection.HTTP_NOT_MODIFIED){
+
+        } else if (statusCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
             int page = executor.getPage();
-            return callback.onNoNewPhotosAvailable(page);
+            photoQueryResult = callback.onNoNewPhotosAvailable(page);
+            if (photoQueryResult != null)
+                cacheImagesIfNecessary(photoQueryResult);
         }
 
-        return null;
+        return photoQueryResult;
+    }
+
+    private void cacheImagesIfNecessary(PhotoQueryResult photoQueryResult) throws IOException {
+        final List<Photo> photos = photoQueryResult.getPhotos();
+        final ImageCacher imageCacher = new ImageCacher(context);
+        List<Photo> uncachedPhotos = new ArrayList<>();
+        for (Photo photo : photos) {
+            int photoId = photo.getId();
+            if (!imageCacher.isCached(photoId)) {
+                uncachedPhotos.add(photo);
+            } else {
+                imageCacher.cacheImage(photo);
+            }
+        }
+        if (uncachedPhotos.size() > 0) {
+            imageLoader.execute(uncachedPhotos);
+            while (imageLoader.isRunning()) {
+                HttpImageLoader.HttpImage httpImage = imageLoader.take();
+                if (httpImage != null) {
+                    imageCacher.cacheImage(httpImage.getPhoto(), httpImage.getImageData());
+                }
+            }
+            uncachedPhotos.clear();
+        }
     }
 
     @Override
@@ -131,8 +136,11 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
     interface GetPhotosCallback {
         void onPhotosResult(PhotoQueryResult photoQueryResult);
+
         void onPhotosError(HttpError httpError);
+
         void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult);
+
         PhotoQueryResult onNoNewPhotosAvailable(int page);
     }
 

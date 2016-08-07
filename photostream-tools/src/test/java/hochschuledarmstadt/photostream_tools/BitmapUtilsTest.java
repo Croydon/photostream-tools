@@ -47,6 +47,7 @@ import java.io.FileOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -104,48 +105,10 @@ public class BitmapUtilsTest {
     @Test
     public void testRecycleBitmapFromImageView(){
         ImageView imageView = new ImageView(context);
-        imageView.setImageBitmap(createTestBitmap());
+        Bitmap testBitmap = createTestBitmap();
+        imageView.setImageBitmap(testBitmap);
         BitmapUtils.recycleBitmapFromImageView(imageView);
-        assertTrue(((BitmapDrawable)imageView.getDrawable()).getBitmap().isRecycled());
-    }
-
-    @Test
-    public void testReadBitmapFromFile(){
-        Bitmap bitmap = createTestBitmap();
-        try {
-            FileOutputStream fs = context.openFileOutput(UNIT_TEST_JPG, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fs);
-            File file = new File(context.getFilesDir(), UNIT_TEST_JPG);
-            Bitmap result = BitmapUtils.decodeBitmapFromFile(file);
-            if (file.exists())
-                file.delete();
-            assertNotNull(result);
-            assertTrue(!result.isRecycled());
-        } catch (FileNotFoundException e) {
-            fail(e.toString());
-        }
-    }
-
-    @Test
-    public void testReadBitmapFromUri(){
-
-        Bitmap bitmap = createTestBitmap();
-
-        try {
-
-            FileOutputStream fs = context.openFileOutput(UNIT_TEST_JPG, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, fs);
-
-            File file = new File(context.getFilesDir(), UNIT_TEST_JPG);
-            Bitmap result = BitmapUtils.decodeBitmapFromUri(context, Uri.fromFile(file));
-            if (file.exists())
-                file.delete();
-            assertNotNull(result);
-            assertTrue(!result.isRecycled());
-            result.recycle();
-        } catch (FileNotFoundException e) {
-            fail(e.toString());
-        }
-
+        assertTrue(testBitmap.isRecycled());
+        assertNull(((BitmapDrawable)imageView.getDrawable()).getBitmap());
     }
 }

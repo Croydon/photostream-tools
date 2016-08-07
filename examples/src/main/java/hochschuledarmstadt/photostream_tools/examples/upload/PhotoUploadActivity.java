@@ -25,6 +25,7 @@
 package hochschuledarmstadt.photostream_tools.examples.upload;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,9 +60,34 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_upload);
 
-        editText = (EditText) findViewById(R.id.commentEditText);
+        // Button und EditText referenzieren
+        findViews();
 
+        // Beispielfoto
+        Uri assetUri = Uri.parse("assets://architecture.png");
+
+        // Bitmap laden
+        loadBitmapAsync(assetUri, new OnBitmapLoadedListener() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap) {
+                PhotoUploadActivity.this.bitmap = bitmap;
+                // OnClickListener setzen für Button etc.
+                initializeViews();
+            }
+
+            @Override
+            public void onError(IOException e) {
+                Log.e(TAG, "Fehler beim Dekodieren des Bilds architecture.png", e);
+            }
+        });
+    }
+
+    private void findViews() {
+        editText = (EditText) findViewById(R.id.commentEditText);
         uploadButton = (Button) findViewById(R.id.uploadButton);
+    }
+
+    private void initializeViews() {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,12 +106,6 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
                 }
             }
         });
-
-        try {
-            bitmap = BitmapUtils.decodeBitmapFromAssetFile(getApplicationContext(), "architecture.png");
-        } catch (IOException e) {
-            Log.e(TAG, "Error while decoding Bitmap", e);
-        }
     }
 
     @Override

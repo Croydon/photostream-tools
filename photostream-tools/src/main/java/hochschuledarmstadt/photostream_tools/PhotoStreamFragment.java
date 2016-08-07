@@ -24,9 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+
+import java.io.File;
 
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 
@@ -112,4 +115,17 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
         }
         photoStreamClient = null;
     }
+
+    public void loadBitmapAsync(File file, final PhotoStreamActivity.OnBitmapLoadedListener listener){
+        ((PhotoStreamFragmentActivity)getActivity()).loadBitmapAsync(file, listener);
+    }
+
+    public void loadBitmapAsync(Uri uri, final PhotoStreamActivity.OnBitmapLoadedListener listener){
+        ((PhotoStreamFragmentActivity)getActivity()).loadBitmapAsync(uri, listener);
+    }
+
+    void loadBitmapAsync(String assetFileName, final PhotoStreamActivity.OnBitmapLoadedListener listener){
+        ((PhotoStreamFragmentActivity)getActivity()).loadBitmapAsync(assetFileName, listener);
+    }
+
 }

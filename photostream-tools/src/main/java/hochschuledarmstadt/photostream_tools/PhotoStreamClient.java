@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.util.Base64;
 
 import com.google.gson.Gson;
@@ -196,7 +197,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             @Override
             public void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult) {
                 photoTable.openDatabase();
-                photoTable.insertPhotos(jsonStringPhotoQueryResult, page, eTag);
+                photoTable.insertOrReplacePhotos(jsonStringPhotoQueryResult, page, eTag);
                 photoTable.closeDatabase();
             }
 
@@ -258,13 +259,12 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             @Override
             public void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult) {
                 photoTable.openDatabase();
-                photoTable.insertPhotos(jsonStringPhotoQueryResult, page, eTag);
+                photoTable.insertOrReplacePhotos(jsonStringPhotoQueryResult, page, eTag);
                 photoTable.closeDatabase();
             }
 
             @Override
             public PhotoQueryResult onNoNewPhotosAvailable(int page) {
-                incrementLastRequestedPage();
                 photoTable.openDatabase();
                 PhotoQueryResult photoQueryResult = photoTable.getCachedPhotoQueryResult(page);
                 photoTable.closeDatabase();
@@ -540,7 +540,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getSearchMorePhotosApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.SEARCH_PHOTOS;
-        SearchMorePhotosAsyncTask searchMorePhotosAsyncTask = new SearchMorePhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchMorePhotosAsyncTask task = new SearchMorePhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 removeOpenRequest(requestType);
@@ -554,7 +554,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
         });
         addOpenRequest(requestType);
-        searchMorePhotosAsyncTask.execute();
+        task.execute();
     }
 
     @Override
@@ -562,7 +562,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
         String url = urlBuilder.getSearchPhotosApiUrl(queryPhotoDescription);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.SEARCH_PHOTOS;
-        SearchPhotosAsyncTask searchPhotosAsyncTask = new SearchPhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
+        SearchPhotosAsyncTask task = new SearchPhotosAsyncTask(executor, imageLoader, context, new SearchPhotosAsyncTask.OnSearchPhotosResultCallback() {
             @Override
             public void onSearchPhotosResult(PhotoQueryResult photoQueryResult) {
                 lastSearchQuery = queryPhotoDescription;
@@ -578,7 +578,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
             }
         });
         addOpenRequest(requestType);
-        searchPhotosAsyncTask.execute();
+        task.execute();
     }
 
     @Override

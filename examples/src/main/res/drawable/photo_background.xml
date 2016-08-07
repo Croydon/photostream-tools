@@ -23,26 +23,9 @@
   ~ THE SOFTWARE.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <item android:state_selected="true" android:drawable="@color/colorAccent"/>
+    <item android:drawable="@android:color/transparent"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:id="@+id/textView"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:padding="5dp"
-            android:layout_marginRight="10dp"
-            android:textSize="17sp"
-            android:textColor="#444"
-            android:layout_height="wrap_content" />
-
-    </RelativeLayout>
-
-</LinearLayout>
+</selector>

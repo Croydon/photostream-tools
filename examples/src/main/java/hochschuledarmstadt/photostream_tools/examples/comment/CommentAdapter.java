@@ -24,10 +24,12 @@
 
 package hochschuledarmstadt.photostream_tools.examples.comment;
 
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import hochschuledarmstadt.photostream_tools.adapter.BaseCommentAdapter;
@@ -38,40 +40,45 @@ public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentVie
 
     public CommentAdapter() { }
 
-    static class CommentViewHolder extends RecyclerView.ViewHolder {
+    public static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;
         public CommentViewHolder(View itemView) {
             super(itemView);
-            // TextView referenzieren
             textView = (TextView) itemView.findViewById(R.id.textView);
         }
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return getItemAtPosition(position).isDeleteable() ? 0 : 1;
+    }
+
     /*
-        Wird aufgerufen, wenn ein neues Layout benötigt wird.
-        Es werden nur so viele ViewHolder instanziert wie Elemente in der Liste angezeigt werden können.
-        Sind also beispielsweise auf einem Handy in der Liste immer nur 3 Elemente sichtbar, wird diese Methode 3x aufgerufen.
-        Anschließend werden die erzeugten ViewHolder, wenn möglich, für andere Elemente in der Liste wiederverwendet.
-        Beispielsweise beim Scrollen:
+            Wird aufgerufen, wenn ein neues Layout benötigt wird.
+            Es werden nur so viele ViewHolder instanziert wie Elemente in der Liste angezeigt werden können.
+            Sind also beispielsweise auf einem Handy in der Liste immer nur 3 Elemente sichtbar, wird diese Methode 3x aufgerufen.
+            Anschließend werden die erzeugten ViewHolder, wenn möglich, für andere Elemente in der Liste wiederverwendet.
+            Beispielsweise beim Scrollen:
 
-        -----------------------------               -----------------------------
-        |        ViewHolder 1       |               |        ViewHolder 2       |
-        |         Element 1         |               |         Element 2         |
-        -----------------------------               -----------------------------
-        |        ViewHolder 2       |      =>       |        ViewHolder 3       |
-        |         Element 2         |  Scroll um    |         Element 3         |
-        -----------------------------  1 Element    -----------------------------
-        |        ViewHolder 3       |  nach unten   |        ViewHolder 1       |
-        |         Element 3         |               |         Element 4         |
-        -----------------------------               -----------------------------
+            -----------------------------               -----------------------------
+            |        ViewHolder 1       |               |        ViewHolder 2       |
+            |         Element 1         |               |         Element 2         |
+            -----------------------------               -----------------------------
+            |        ViewHolder 2       |      =>       |        ViewHolder 3       |
+            |         Element 2         |  Scroll um    |         Element 3         |
+            -----------------------------  1 Element    -----------------------------
+            |        ViewHolder 3       |  nach unten   |        ViewHolder 1       |
+            |         Element 3         |               |         Element 4         |
+            -----------------------------               -----------------------------
 
-        ViewHolder 1 wird also für Element 4 wiederverwendet!
-    */
+            ViewHolder 1 wird also für Element 4 wiederverwendet!
+        */
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.comment_item, parent, false);
-        return new CommentViewHolder(v);
+        CommentViewHolder viewHolder = new CommentViewHolder(v);
+        return viewHolder;
     }
 
     /*
@@ -80,6 +87,7 @@ public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentVie
      */
     @Override
     public void onBindViewHolder(CommentViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
         Comment comment = getItemAtPosition(position);
         holder.textView.setText(comment.getMessage());
     }

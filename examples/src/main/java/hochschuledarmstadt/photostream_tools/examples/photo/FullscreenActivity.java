@@ -29,7 +29,9 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.FullscreenPhotoActivity;
@@ -41,19 +43,45 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
 
     public static final String KEY_PHOTO = "KEY_PHOTO";
     private ImageView imageView;
+    private boolean isFirstStart = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_layout);
         imageView = (ImageView) findViewById(R.id.imageView);
+        isFirstStart = (savedInstanceState == null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         Photo photo = getIntent().getParcelableExtra(KEY_PHOTO);
-        try {
-            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
-            imageView.setImageBitmap(bitmap);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        File imageFile = photo.getImageFile();
+        loadBitmapAsync(imageFile, new OnBitmapLoadedListener() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap) {
+                imageView.setImageBitmap(bitmap);
+                if (isFirstStart) {
+                    isFirstStart = false;
+                    imageView.setScaleY(0.5f);
+                    imageView.setScaleX(0.5f);
+                    imageView.setAlpha(0.1f);
+                    imageView.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(800).start();
+                }
+            }
+
+            @Override
+            public void onError(IOException e) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        BitmapUtils.recycleBitmapFromImageView(imageView);
+        super.onStop();
     }
 
     @Override
@@ -74,11 +102,5 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        BitmapUtils.recycleBitmapFromImageView(imageView);
-        super.onDestroy();
     }
 }

@@ -39,4 +39,9 @@
     <string name="title_activity_view_pager">ViewPagerActivity</string>
     <string name="search">Suche</string>
     <string name="swipe"><![CDATA[<- SWIPE ->]]></string>
+    <string name="delete">Löschen</string>
+    <string name="share">Teilen</string>
+    <string name="cab_title_format">%1$d markiert</string>
+    <string name="cab_plugin_activity_title">CAB Plugin</string>
+    <string name="cab_dialog_activity_title">Dialog Plugin</string>
 </resources>

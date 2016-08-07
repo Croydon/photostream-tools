@@ -100,6 +100,17 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
         // Standard Animationen setzen
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CommentAdapter();
+
+        // Registriert einen OnItemClickListener für die View mit der id "textView"
+        // innerhalb eines Elements in der Recyclerview (siehe layout "comment_item.xml")
+        adapter.setOnItemClickListener(R.id.textView, new BaseCommentAdapter.OnItemClickListener<CommentAdapter.CommentViewHolder>() {
+            @Override
+            public void onItemClicked(CommentAdapter.CommentViewHolder viewHolder, View v, Comment comment) {
+                String message = String.format("Comment Id: %d", comment.getId());
+                Toast.makeText(CommentActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Wenn die Activity neu aufgebaut wird
         if (savedInstanceState != null) {
             // dann die Kommentare aus der vorherigen Activity Instanz wiederherstellen/referenzieren
@@ -107,15 +118,7 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
             // und an den Adapter übergeben
             adapter.restoreInstanceState(bundle);
         }
-        // Registriert einen OnItemClickListener für die View mit der id "textView"
-        // innerhalb eines Elements in der Recyclerview (siehe layout "comment_item.xml")
-        adapter.setOnItemClickListener(R.id.textView, new BaseCommentAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClicked(View v, Comment comment) {
-                String message = String.format("Comment Id: %d", comment.getId());
-                Toast.makeText(CommentActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+
         // Als Letztes den Adapter der RecyclerView zuweisen
         recyclerView.setAdapter(adapter);
     }

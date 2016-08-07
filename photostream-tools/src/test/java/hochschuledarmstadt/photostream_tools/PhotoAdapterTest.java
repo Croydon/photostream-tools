@@ -32,6 +32,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.junit.After;
@@ -46,6 +47,7 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
+import hochschuledarmstadt.photostream_tools.model.BaseItem;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 import static org.junit.Assert.assertEquals;
@@ -86,6 +88,11 @@ public class PhotoAdapterTest {
         @Override
         public void onBindViewHolder(TestViewHolder holder, int position) {
             super.onBindViewHolder(holder, position);
+        }
+
+        @Override
+        protected void onBitmapLoadedIntoImageView(ImageView imageView) {
+
         }
     }
 
@@ -213,11 +220,12 @@ public class PhotoAdapterTest {
     @Test
     public void testOnClickIsWorking() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener<TestViewHolder>() {
             @Override
-            public void onItemClicked(View v, Photo photo) {
+            public void onItemClicked(TestViewHolder viewHolder, View v, Photo photo) {
                 latch.countDown();
             }
+
         });
         TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
         simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
@@ -229,15 +237,15 @@ public class PhotoAdapterTest {
     @Test
     public void testOnClickIsWorkingAfterReplacingListener() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener<TestViewHolder>() {
             @Override
-            public void onItemClicked(View v, Photo photo) {
+            public void onItemClicked(TestViewHolder viewHolder, View v, Photo photo) {
 
             }
         });
-        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener() {
+        simplePhotoAdapter.setOnItemClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemClickListener<TestViewHolder>() {
             @Override
-            public void onItemClicked(View v, Photo photo) {
+            public void onItemClicked(TestViewHolder viewHolder, View v, Photo photo) {
                 latch.countDown();
             }
         });
@@ -251,9 +259,9 @@ public class PhotoAdapterTest {
     @Test
     public void testOnLongClickIsWorking() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener<TestViewHolder>() {
             @Override
-            public boolean onItemLongClicked(View v, Photo photo) {
+            public boolean onItemLongClicked(TestViewHolder viewHolder, View v, Photo photo) {
                 latch.countDown();
                 return true;
             }
@@ -268,18 +276,20 @@ public class PhotoAdapterTest {
     @Test
     public void testOnLongClickIsWorkingAfterReplacingListener() {
         final CountDownLatch latch = new CountDownLatch(1);
-        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener<TestViewHolder>() {
             @Override
-            public boolean onItemLongClicked(View v, Photo photo) {
+            public boolean onItemLongClicked(TestViewHolder viewHolder, View v, Photo photo) {
                 return true;
             }
         });
-        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener() {
+        simplePhotoAdapter.setOnItemLongClickListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemLongClickListener<TestViewHolder>() {
+
             @Override
-            public boolean onItemLongClicked(View v, Photo photo) {
+            public boolean onItemLongClicked(TestViewHolder viewHolder, View v, Photo photo) {
                 latch.countDown();
                 return true;
             }
+
         });
         TestViewHolder viewHolder = simplePhotoAdapter.onCreateViewHolder(null, 0);
         simplePhotoAdapter.onBindViewHolder(viewHolder, 0);
@@ -291,9 +301,10 @@ public class PhotoAdapterTest {
     @Test
     public void testOnTouchIsWorking() {
         final CountDownLatch latch = new CountDownLatch(2);
-        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener<TestViewHolder>() {
+
             @Override
-            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+            public boolean onItemTouched(TestViewHolder viewHolder, View v, MotionEvent motionEvent, Photo photo) {
                 if (MotionEvent.ACTION_DOWN == motionEvent.getAction()){
                     latch.countDown();
                     return true;
@@ -316,15 +327,15 @@ public class PhotoAdapterTest {
     @Test
     public void testOnTouchIsWorkingAfterReplacingListener() {
         final CountDownLatch latch = new CountDownLatch(2);
-        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener<TestViewHolder>() {
             @Override
-            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+            public boolean onItemTouched(TestViewHolder viewHolder, View v, MotionEvent motionEvent, Photo photo) {
                 return false;
             }
         });
-        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener() {
+        simplePhotoAdapter.setOnItemTouchListener(R.id.adapter_test_view_id, new BasePhotoAdapter.OnItemTouchListener<TestViewHolder>() {
             @Override
-            public boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo) {
+            public boolean onItemTouched(TestViewHolder viewHolder, View v, MotionEvent motionEvent, Photo photo) {
                 if (MotionEvent.ACTION_DOWN == motionEvent.getAction()){
                     latch.countDown();
                     return true;

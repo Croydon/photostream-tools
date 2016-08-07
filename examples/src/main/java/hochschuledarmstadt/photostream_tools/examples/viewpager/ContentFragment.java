@@ -35,12 +35,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,6 +50,7 @@ import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragment;
 import hochschuledarmstadt.photostream_tools.adapter.BaseFragmentPagerAdapter;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
@@ -63,6 +66,7 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
 
     public static final String KEY_POSITION = BaseFragmentPagerAdapter.KEY_POSITION;
     private static final String KEY_COMMENTS = "KEY_COMMENTS";
+    private static final String TAG = ContentFragment.class.getName();
     private ImageView imageView;
     private int position;
     private RecyclerView recyclerView;
@@ -107,13 +111,18 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
 
         photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
 
-        try {
-            Bitmap bitmap = BitmapUtils.decodeBitmapFromFile(photo.getImageFile());
-            if (bitmap != null)
-                imageView.setImageBitmap(bitmap);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        loadBitmapAsync(photo.getImageFile(), new PhotoStreamActivity.OnBitmapLoadedListener() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap) {
+                if (bitmap != null)
+                    imageView.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onError(IOException e) {
+                Log.e(TAG, "Fehler beim Dekodieren", e);
+            }
+        });
     }
 
     @Override

@@ -57,14 +57,12 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
 
     private PhotoAdapter photoAdapter;
     private RecyclerView recyclerView;
-    private SearchViewDelegate searchViewDelegate;
+    private SearchViewDelegate searchViewDelegate = new SearchViewDelegate();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
-        searchViewDelegate = new SearchViewDelegate();
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
@@ -72,9 +70,9 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
 
         photoAdapter = new PhotoAdapter();
 
-        photoAdapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener() {
+        photoAdapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener<PhotoAdapter.PhotoViewHolder>() {
             @Override
-            public void onItemClicked(View v, Photo photo) {
+            public void onItemClicked(PhotoAdapter.PhotoViewHolder viewHolder, View v, Photo photo) {
                 Toast.makeText(SearchActivity.this, String.format("Photo Id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
             }
         });
@@ -84,7 +82,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+        getMenuInflater().inflate(R.menu.menu_search_example, menu);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         searchViewDelegate.setSearchViewMenuItem(searchMenuItem);
         searchViewDelegate.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

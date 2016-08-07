@@ -78,6 +78,14 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
 
     @Override
     public int getItemPosition(Object object) {
+        PhotoStreamFragment fragment = (PhotoStreamFragment) object;
+        int position = fragment.getArguments().getInt(KEY_POSITION);
+        Photo photo = getPhotoAtPosition(position);
+        for (int i = 0; i < photos.size(); i++) {
+            Photo p = photos.get(i);
+            if (p.getId() == photo.getId())
+                return POSITION_UNCHANGED;
+        }
         return POSITION_NONE;
     }
 

@@ -43,6 +43,8 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity;
+import hochschuledarmstadt.photostream_tools.examples.plugin.AlertDialogPluginActivity;
+import hochschuledarmstadt.photostream_tools.examples.plugin.ContextualActionBarPluginActivity;
 import hochschuledarmstadt.photostream_tools.examples.notification.NotificationActivity;
 import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 import hochschuledarmstadt.photostream_tools.examples.search.SearchActivity;
@@ -59,10 +61,14 @@ public class MenuActivity extends AppCompatActivity {
     private static final String MENU_UPLOAD_PHOTO = "Neues Photo hochladen";
     private static final String MENU_SEARCH = "Suche nach Photos anhand Beschreibung";
     private static final String MENU_VIEW_PAGER = "Photos anzeigen in einem ViewPager Widget";
+    private static final String MENU_CAB_EXTENSION = "Beispiel für Contextual ActionBar Plugin";
+    private static final String MENU_DIALOG_EXTENSION = "Beispiel für AlertDialog Plugin";
     private static final String MENU_BROADCAST_RECEIVER = "Broadcast Receiver Beispiel";
 
     private static final MenuItem[] menu = new MenuItem[]{
             new MenuItem(MENU_PHOTOS, PhotoActivity.class),
+            new MenuItem(MENU_CAB_EXTENSION, ContextualActionBarPluginActivity.class),
+            new MenuItem(MENU_DIALOG_EXTENSION, AlertDialogPluginActivity.class),
             new MenuItem(MENU_COMMENTS, CommentActivity.class),
             new MenuItem(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
             new MenuItem(MENU_SEARCH, SearchActivity.class),

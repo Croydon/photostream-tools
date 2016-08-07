@@ -24,7 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,10 +31,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -43,35 +38,44 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public class PhotoAdapter extends BasePhotoAdapter<PhotoAdapter.PhotoViewHolder> {
 
+    private static final float BEGIN_SCALE = 0.5f, BEGIN_ALPHA = 0.1f, MAX = 1.0f;
+    private static final int DURATION_IN_MILLIS = 500;
+
+    public PhotoAdapter(){
+        super();
+    }
+
+    public PhotoAdapter(int cacheSizeInMegaByte) {
+        super(cacheSizeInMegaByte);
+    }
+
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        return new PhotoViewHolder(layoutInflater.inflate(R.layout.photo_item, parent, false));
+        View itemView = layoutInflater.inflate(R.layout.photo_item, parent, false);
+        return new PhotoViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(PhotoViewHolder holder, int position) {
+    public void onBindViewHolder(final PhotoViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        BitmapUtils.recycleBitmapFromImageView(holder.imageView);
-        Photo photo = getItemAtPosition(position);
-        File imageFile = photo.getImageFile();
-        Bitmap bitmap = null;
-        try {
-            bitmap = BitmapUtils.decodeBitmapFromFile(imageFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        holder.imageView.setImageBitmap(bitmap);
+        final Photo photo = getItemAtPosition(position);
         holder.textView.setText(photo.getDescription());
+        // Bitmap anhand des Photo Objekts laden und in der ImageView setzen
+        loadBitmapIntoImageViewAsync(holder, holder.imageView, photo);
     }
 
     @Override
-    public void onViewRecycled(PhotoViewHolder holder) {
-        BitmapUtils.recycleBitmapFromImageView(holder.imageView);
-        super.onViewRecycled(holder);
+    protected void onBitmapLoadedIntoImageView(ImageView imageView) {
+        // Bild ist in der ImageView gesetzt.
+        // Jetzt kann man zum Beispiel noch eine Animation durchführen
+        imageView.setScaleX(BEGIN_SCALE);
+        imageView.setScaleY(BEGIN_SCALE);
+        imageView.setAlpha(BEGIN_ALPHA);
+        imageView.animate().scaleX(MAX).scaleY(MAX).alpha(MAX).setDuration(DURATION_IN_MILLIS).start();
     }
 
-    static class PhotoViewHolder extends RecyclerView.ViewHolder {
+    public static class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
         public final ImageView imageView;

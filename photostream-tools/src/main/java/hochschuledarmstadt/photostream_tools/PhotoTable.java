@@ -27,7 +27,9 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 import com.google.gson.Gson;
 
@@ -72,12 +74,17 @@ class PhotoTable {
         }
     }
 
-    public void insertPhotos(String jsonStringPhotoQueryResult, int page, String eTag) {
+    public void insertOrReplacePhotos(String jsonStringPhotoQueryResult, int page, String eTag) {
         ContentValues cv = new ContentValues();
         cv.put(PhotoTable.COLUMN_PAGE, page);
         cv.put(PhotoTable.COLUMN_ETAG, eTag);
         cv.put(PhotoTable.COLUMN_PHOTOS, jsonStringPhotoQueryResult);
-        database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        try{
+            database.insertOrThrow(TABLE_NAME, null, cv);
+        }catch(SQLException e){
+            database.update(TABLE_NAME, cv, COLUMN_PAGE + " = ?", new String[]{String.valueOf(page)});
+        }
+
     }
 
     public String loadEtagFor(int page) {

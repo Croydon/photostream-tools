@@ -121,18 +121,18 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
         super.restoreInstanceState(bundle);
     }
 
-    public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Comment>{
+    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<Comment, H>{
         @Override
-        void onItemClicked(View v, Comment comment);
+        void onItemClicked(H viewHolder, View v, Comment comment);
     }
 
-    public interface OnItemLongClickListener extends BaseAdapter.OnItemLongClickListener<Comment>{
+    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<Comment, H>{
         @Override
-        boolean onItemLongClicked(View v, Comment comment);
+        boolean onItemLongClicked(H viewHolder, View v, Comment comment);
     }
 
-    public interface OnItemTouchListener extends BaseAdapter.OnItemTouchListener<Comment> {
+    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<Comment, H> {
         @Override
-        boolean onItemTouched(View v, MotionEvent motionEvent, Comment comment);
+        boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvent, Comment comment);
     }
 }

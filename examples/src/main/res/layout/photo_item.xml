@@ -25,22 +25,24 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:id="@+id/itemRoot"
+    android:background="@drawable/photo_background"
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:id="@+id/imageView"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:layout_height="150dp" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:layout_height="150dp" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:id="@+id/textView"
-        android:layout_gravity="center"
-        android:textSize="14sp"
-        android:padding="10dp"
-        android:textColor="#222"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="match_parent"
+            android:id="@+id/textView"
+            android:layout_gravity="center"
+            android:textSize="14sp"
+            android:padding="10dp"
+            android:textColor="#222"
+            android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -26,8 +26,10 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 class CommentTable {
     public static final String TABLE_NAME = "comment";
@@ -76,7 +78,11 @@ class CommentTable {
         cv.put(COLUMN_COMMENTS, comments);
         cv.put(COLUMN_ETAG, etag);
 
-        return database.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        try{
+            return database.insertOrThrow(TABLE_NAME, null, cv);
+        }catch(SQLException e){
+            return database.update(TABLE_NAME, cv, COLUMN_PHOTO_ID + " = ?", new String[]{String.valueOf(photoId)});
+        }
     }
 
     public String loadEtag(int photoId) {

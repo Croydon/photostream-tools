@@ -24,14 +24,19 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
+import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
@@ -43,13 +48,24 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
 
     private static final int LIKE = -10;
     private static final int DISLIKE = -11;
+    private static final int DEFAULT_CACHE_SIZE_IN_MB = 10;
 
-    public BasePhotoAdapter(ArrayList<Photo> photos){
+    private Activity activity;
+    private List<BitmapLoaderTask> tasks = new ArrayList<>();
+    private LruBitmapCache lruBitmapCache;
+    private OnImageLoadedListener listener = new InternalBitmapLoaderListener();
+
+    private BasePhotoAdapter(ArrayList<Photo> photos, int cacheSizeInMegaByte){
         super(photos);
+        lruBitmapCache = new LruBitmapCache(1000 * 1000 * cacheSizeInMegaByte);
+    }
+
+    public BasePhotoAdapter(int cacheSizeInMegaByte){
+        this(new ArrayList<Photo>(), cacheSizeInMegaByte);
     }
 
     public BasePhotoAdapter(){
-        super(new ArrayList<Photo>());
+        this(new ArrayList<Photo>(), DEFAULT_CACHE_SIZE_IN_MB);
     }
 
     /**
@@ -122,7 +138,24 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
      */
     @Override
     public Bundle saveInstanceState() {
+        if (activity != null) {
+            if (activity.isFinishing() || activity.isChangingConfigurations()) {
+                destroyReferences();
+            }
+        }else{
+            destroyReferences();
+        }
         return super.saveInstanceState();
+    }
+
+    private void destroyReferences() {
+        for (BitmapLoaderTask task : tasks) {
+            Log.d(BasePhotoAdapter.class.getSimpleName(), "cancelled task");
+            task.cancel(true);
+        }
+        tasks.clear();
+        lruBitmapCache.destroy();
+        listener = null;
     }
 
     /**
@@ -133,7 +166,7 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
     public void restoreInstanceState(Bundle bundle) {
         super.restoreInstanceState(bundle);
     }
-    
+
     /**
      * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>geliked</b>
      * @param photoId id des Photos
@@ -184,19 +217,86 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         }
     }
 
-    public interface OnItemClickListener extends BaseAdapter.OnItemClickListener<Photo>{
-        @Override
-        void onItemClicked(View v, Photo photo);
+    @Override
+    public void onBindViewHolder(H holder, int position) {
+        super.onBindViewHolder(holder, position);
+        if (activity == null) {
+            try {
+                activity = (Activity) holder.itemView.getContext();
+            } catch (ClassCastException e) {
+            }
+        }
     }
 
-    public interface OnItemLongClickListener extends BaseAdapter.OnItemLongClickListener<Photo>{
-        @Override
-        boolean onItemLongClicked(View v, Photo photo);
+    protected void loadBitmapIntoImageViewAsync(H viewHolder, final ImageView imageView, final Photo photo){
+        imageView.setImageBitmap(null);
+        Integer prevKey = -1;
+        try{
+            prevKey = Integer.valueOf(imageView.getTag().toString());
+        }catch(Exception e){}
+
+        if (cancelPotentialWork(photo.getId(), imageView)) {
+            if (prevKey != -1){
+                lruBitmapCache.referenceDecrease(prevKey);
+            }
+
+            boolean shouldAnimate = viewHolder.getOldPosition() != viewHolder.getAdapterPosition();
+            BitmapLoaderTask task = new BitmapLoaderTask(lruBitmapCache, imageView, photo.getId(), photo.getImageFile(), listener);
+            task.setShouldAnimate(shouldAnimate);
+            AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), null, task);
+            imageView.setImageDrawable(asyncDrawable);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 
-    public interface OnItemTouchListener extends BaseAdapter.OnItemTouchListener<Photo>{
+    private boolean cancelPotentialWork(int photoId, ImageView imageView) {
+        final BitmapLoaderTask bitmapLoaderTask = BitmapLoaderTask.getBitmapLoaderTaskRefFrom(imageView);
+        if (bitmapLoaderTask != null) {
+            final int workerTaskPhotoId = bitmapLoaderTask.getPhotoId();
+            // If photoId is not yet set or it differs from the new data
+            if (photoId != workerTaskPhotoId) {
+                // Cancel previous task
+                return bitmapLoaderTask.cancel(false);
+            } else {
+                // The same work is already in progress
+                return false;
+            }
+        }
+        // No task associated with the ImageView, or an existing task was cancelled
+        return true;
+    }
+
+    protected abstract void onBitmapLoadedIntoImageView(ImageView imageView);
+
+    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<Photo, H>{
         @Override
-        boolean onItemTouched(View v, MotionEvent motionEvent, Photo photo);
+        void onItemClicked(H viewHolder, View v, Photo photo);
+    }
+
+    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<Photo, H>{
+        @Override
+        boolean onItemLongClicked(H viewHolder, View v, Photo photo);
+    }
+
+    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<Photo, H>{
+        @Override
+        boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvent, Photo photo);
+    }
+
+    private class InternalBitmapLoaderListener implements OnImageLoadedListener {
+
+        @Override
+        public void onTaskStarted(BitmapLoaderTask bitmapLoaderTask) {
+            if (!tasks.contains(bitmapLoaderTask))
+                tasks.add(bitmapLoaderTask);
+        }
+
+        @Override
+        public void onTaskFinishedOrCanceled(BitmapLoaderTask bitmapLoaderTask, ImageView imageView) {
+            tasks.remove(bitmapLoaderTask);
+            if (imageView != null && bitmapLoaderTask.getShouldAnimate())
+                onBitmapLoadedIntoImageView(imageView);
+        }
     }
 
 }
