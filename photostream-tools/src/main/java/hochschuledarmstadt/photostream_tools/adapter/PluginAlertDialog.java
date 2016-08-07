@@ -36,7 +36,7 @@ import android.view.View;
 
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H extends RecyclerView.ViewHolder> extends Plugin<T, H> {
+public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H extends RecyclerView.ViewHolder> extends Plugin<H, T> {
 
     private static final String PHOTO_KEY = "PHOTO_KEY";
     private final AppCompatActivity activity;

@@ -25,6 +25,7 @@
 package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -103,6 +104,16 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
         return super.getItemCount();
     }
 
+    @Override
+    public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
+        super.addOnLongClickPlugin(viewId, plugin);
+    }
+
+    @Override
+    public void addOnClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
+        super.addOnClickPlugin(viewId, plugin);
+    }
+
     /**
      * Speichert die aktuelle Liste von Kommentaren in ein Bundle
      * @return bundle
@@ -121,17 +132,17 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
         super.restoreInstanceState(bundle);
     }
 
-    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<Comment, H>{
+    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<H, Comment>{
         @Override
         void onItemClicked(H viewHolder, View v, Comment comment);
     }
 
-    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<Comment, H>{
+    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<H, Comment>{
         @Override
         boolean onItemLongClicked(H viewHolder, View v, Comment comment);
     }
 
-    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<Comment, H> {
+    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<H, Comment> {
         @Override
         boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvent, Comment comment);
     }

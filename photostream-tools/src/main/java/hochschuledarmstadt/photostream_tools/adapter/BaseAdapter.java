@@ -40,7 +40,7 @@ import java.util.Map;
 
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem & Parcelable> extends RecyclerView.Adapter<T> {
+abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> extends RecyclerView.Adapter<H> {
 
     public static final int EXTENSION_EVENT_TYPE_CLICK = 0x2389472;
     public static final int EXTENSION_EVENT_TYPE_LONG_CLICK = 0x8389472;
@@ -49,7 +49,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
     private DelegateOnLongClickListener delegateOnLongClickListener = new DelegateOnLongClickListener();
     private DelegateOnClickListener clickDelegate = new DelegateOnClickListener(null);
 
-    private static final class PluginInfo<H extends BaseItem & Parcelable, T extends RecyclerView.ViewHolder> {
+    private static final class PluginInfo<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
         public PluginInfo(Plugin<H, T> plugin, int eventType, @IdRes int viewId) {
             this.plugin = plugin;
             this.eventType = eventType;
@@ -64,17 +64,17 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
     }
 
     protected static final String KEY_ITEMS = "KEY_ITEMS";
-    protected ArrayList<H> items = new ArrayList<>();
+    protected ArrayList<T> items = new ArrayList<>();
     private List<PluginInfo<H, T>> plugins = new ArrayList<>();
     private Map<Integer, OnItemClickListener<H, T>> itemClickListenersMap = new HashMap<>();
     private Map<Integer, OnItemLongClickListener<H, T>> itemLongClickListenersMap = new HashMap<>();
     private Map<Integer, OnItemTouchListener<H, T>> itemTouchListenersMap = new HashMap<>();
 
     public BaseAdapter() {
-        this(new ArrayList<H>());
+        this(new ArrayList<T>());
     }
 
-    public BaseAdapter(ArrayList<H> items) {
+    public BaseAdapter(ArrayList<T> items) {
         this.items = items;
         setHasStableIds(true);
     }
@@ -107,7 +107,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      * @param position Position in der Liste
      * @return Item
      */
-    public H getItemAtPosition(int position) {
+    public T getItemAtPosition(int position) {
         return items.get(position);
     }
 
@@ -116,7 +116,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      *
      * @param item Item das an das <b>Ende</b> der Liste hinzugefügt werden soll
      */
-    public void addAtFront(H item) {
+    public void addAtFront(T item) {
         this.items.add(0, item);
         notifyItemInserted(0);
     }
@@ -126,7 +126,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      *
      * @param item Item das an den <b>Anfang</b> der Liste hinzugefügt werden soll
      */
-    public void add(H item) {
+    public void add(T item) {
         this.items.add(item);
         notifyItemInserted(items.size() - 1);
     }
@@ -136,7 +136,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      *
      * @param items Liste von Items
      */
-    public void addAll(Collection<? extends H> items) {
+    public void addAll(Collection<? extends T> items) {
         final int itemCountBefore = getItemCount();
         this.items.addAll(items);
         final int lastItemIndex = getItemCount() - 1;
@@ -148,7 +148,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      *
      * @param items die neue Liste von Items
      */
-    public void set(Collection<? extends H> items) {
+    public void set(Collection<? extends T> items) {
         this.items.clear();
         this.items.addAll(items);
         notifyDataSetChanged();
@@ -161,7 +161,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
      */
     public void remove(int id) {
         for (int position = 0; position < items.size(); position++) {
-            H photo = getItemAtPosition(position);
+            T photo = getItemAtPosition(position);
             if (itemHasEqualId(id, photo)) {
                 items.remove(position);
                 notifyItemRemoved(position);
@@ -180,7 +180,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         return items.size();
     }
 
-    protected boolean itemHasEqualId(int id, H item) {
+    protected boolean itemHasEqualId(int id, T item) {
         return item.getId() == id;
     }
 
@@ -255,20 +255,20 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
             notifyDataSetChanged();
     }
 
-    protected interface OnItemLongClickListener<H extends BaseItem & Parcelable, T extends RecyclerView.ViewHolder> {
-        boolean onItemLongClicked(T viewHolder, View v, H item);
+    protected interface OnItemLongClickListener< H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
+        boolean onItemLongClicked(H viewHolder, View v, T item);
     }
 
-    protected interface OnItemClickListener<H extends BaseItem & Parcelable, T extends RecyclerView.ViewHolder> {
-        void onItemClicked(T viewHolder, View v, H item);
+    protected interface OnItemClickListener<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
+        void onItemClicked(H viewHolder, View v, T item);
     }
 
-    protected interface OnItemTouchListener<H extends BaseItem & Parcelable, T extends RecyclerView.ViewHolder> {
-        boolean onItemTouched(T viewHolder, View v, MotionEvent motionEvent, H item);
+    protected interface OnItemTouchListener<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
+        boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvenH, T item);
     }
 
     @Override
-    public void onBindViewHolder(T holder, int position) {
+    public void onBindViewHolder(H holder, int position) {
         applyOnItemClickListeners(holder);
         applyOnItemLongClickListeners(holder);
         applyOnItemTouchListeners(holder);
@@ -295,7 +295,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         return views;
     }
 
-    private void applyOnItemLongClickListeners(T holder) {
+    private void applyOnItemLongClickListeners(H holder) {
 
         List<View> viewsWithValidId = getAllViewsWithValidId(holder.itemView);
 
@@ -325,7 +325,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         return injectees;
     }
 
-    private void applyOnItemClickListeners(T holder) {
+    private void applyOnItemClickListeners(H holder) {
 
         List<View> viewsWithValidId = getAllViewsWithValidId(holder.itemView);
 
@@ -345,7 +345,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
         }
     }
 
-    private void applyOnItemTouchListeners(T holder) {
+    private void applyOnItemTouchListeners(H holder) {
         for (Map.Entry<Integer, OnItemTouchListener<H, T>> entry : itemTouchListenersMap.entrySet()) {
             int viewId = entry.getKey();
             View v = holder.itemView.findViewById(viewId);
@@ -356,7 +356,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
     }
 
     @Override
-    public void onViewRecycled(T holder) {
+    public void onViewRecycled(H holder) {
         holder.itemView.setOnClickListener(null);
         holder.itemView.setOnLongClickListener(null);
         holder.itemView.setOnTouchListener(null);
@@ -388,10 +388,10 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
 
     private class InternalOnClickListener implements View.OnClickListener {
 
-        private final T viewHolder;
+        private final H viewHolder;
         private final List<PluginInfo<H, T>> injectees;
 
-        public InternalOnClickListener(T viewHolder, List<PluginInfo<H, T>> injectees) {
+        public InternalOnClickListener(H viewHolder, List<PluginInfo<H, T>> injectees) {
             this.viewHolder = viewHolder;
             this.injectees = injectees;
         }
@@ -402,7 +402,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
             if (itemClickListenersMap.containsKey(viewId)) {
                 OnItemClickListener<H, T> listener = itemClickListenersMap.get(viewId);
                 int position = viewHolder.getAdapterPosition();
-                H item = (position >= 0) ? getItemAtPosition(position) : null;
+                T item = (position >= 0) ? getItemAtPosition(position) : null;
                 for (PluginInfo<H, T> e : injectees) {
                     e.plugin.onItemClicked(viewHolder, v, item);
                 }
@@ -414,9 +414,9 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
 
     private class InternalOnTouchListener implements View.OnTouchListener {
 
-        private final T viewHolder;
+        private final H viewHolder;
 
-        public InternalOnTouchListener(T viewHolder) {
+        public InternalOnTouchListener(H viewHolder) {
             this.viewHolder = viewHolder;
         }
 
@@ -426,7 +426,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
             if (itemTouchListenersMap.containsKey(viewId)) {
                 OnItemTouchListener<H, T> listener = itemTouchListenersMap.get(viewId);
                 int position = viewHolder.getAdapterPosition();
-                H item = (position >= 0) ? getItemAtPosition(position) : null;
+                T item = (position >= 0) ? getItemAtPosition(position) : null;
                 return listener.onItemTouched(viewHolder, v, event, item);
             }
             return false;
@@ -457,10 +457,10 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
 
     private class InternalOnLongClickListener implements View.OnLongClickListener {
 
-        private final T viewHolder;
+        private final H viewHolder;
         private final List<PluginInfo<H, T>> injectees;
 
-        public InternalOnLongClickListener(T viewHolder, List<PluginInfo<H, T>> injectees) {
+        public InternalOnLongClickListener(H viewHolder, List<PluginInfo<H, T>> injectees) {
             this.viewHolder = viewHolder;
             this.injectees = injectees;
         }
@@ -470,7 +470,7 @@ abstract class BaseAdapter<T extends RecyclerView.ViewHolder, H extends BaseItem
             int viewId = v.getId();
             OnItemLongClickListener<H, T> listener = itemLongClickListenersMap.get(viewId);
             int position = viewHolder.getAdapterPosition();
-            H item = (position >= 0) ? getItemAtPosition(position) : null;
+            T item = (position >= 0) ? getItemAtPosition(position) : null;
             boolean result = false;
             for (PluginInfo<H, T> e : injectees) {
                 if (e.plugin.onItemLongClicked(viewHolder, v, item))

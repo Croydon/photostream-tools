@@ -40,7 +40,7 @@ import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable, H extends RecyclerView.ViewHolder> extends Plugin<T, H> {
+public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable, H extends RecyclerView.ViewHolder> extends Plugin<H, T> {
 
     private static final String KEY_SELECTED_IDS = "list";
     private static final String KEY_CAB_VISIBLE = "KEY_CAB_VISIBLE";

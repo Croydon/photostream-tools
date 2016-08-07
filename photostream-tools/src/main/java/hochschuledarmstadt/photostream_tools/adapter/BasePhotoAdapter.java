@@ -27,6 +27,7 @@ package hochschuledarmstadt.photostream_tools.adapter;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -130,6 +131,16 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
     @Override
     public int getItemCount() {
         return super.getItemCount();
+    }
+
+    @Override
+    public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, Photo> plugin) {
+        super.addOnLongClickPlugin(viewId, plugin);
+    }
+
+    @Override
+    public void addOnClickPlugin(@IdRes int viewId, Plugin<H, Photo> plugin) {
+        super.addOnClickPlugin(viewId, plugin);
     }
 
     /**
@@ -268,17 +279,17 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
 
     protected abstract void onBitmapLoadedIntoImageView(ImageView imageView);
 
-    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<Photo, H>{
+    public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<H, Photo>{
         @Override
         void onItemClicked(H viewHolder, View v, Photo photo);
     }
 
-    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<Photo, H>{
+    public interface OnItemLongClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemLongClickListener<H, Photo>{
         @Override
         boolean onItemLongClicked(H viewHolder, View v, Photo photo);
     }
 
-    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<Photo, H>{
+    public interface OnItemTouchListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemTouchListener<H, Photo>{
         @Override
         boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvent, Photo photo);
     }

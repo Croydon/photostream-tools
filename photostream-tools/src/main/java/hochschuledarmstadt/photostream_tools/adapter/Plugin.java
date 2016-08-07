@@ -32,7 +32,7 @@ import android.view.View;
 
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-public abstract class Plugin<T extends BaseItem & Parcelable, H extends RecyclerView.ViewHolder> {
+public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
 
     @IdRes
     protected int viewId = View.NO_ID;
