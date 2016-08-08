@@ -28,6 +28,7 @@ package hochschuledarmstadt.photostream_tools.examples.plugin;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -59,6 +60,7 @@ public class ContextualActionBarPluginActivity extends PhotoStreamActivity imple
         setContentView(R.layout.plugin_example);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         adapter = new PhotoAdapter();
         adapter.addOnLongClickPlugin(R.id.itemRoot, new PluginContextualActionBar<Photo, PhotoAdapter.PhotoViewHolder>(this, R.menu.menu_cab_example) {
             @Override
@@ -82,8 +84,8 @@ public class ContextualActionBarPluginActivity extends PhotoStreamActivity imple
 
             @Override
             protected boolean shouldExecute(PhotoAdapter.PhotoViewHolder viewHolder, View v, Photo item) {
-                // Es sollen also nur Bilder selektiert werden, die auch gelöscht werden können
-                return item.isDeleteable();
+                return true; // <-- alle Photos können markiert werden
+                // return item.isDeleteable() <-- nur Photos, die löschbar sind, können markiert werden
             }
         });
         recyclerView.setAdapter(adapter);
@@ -143,4 +145,5 @@ public class ContextualActionBarPluginActivity extends PhotoStreamActivity imple
     public void onRequestFinished() {
 
     }
+
 }

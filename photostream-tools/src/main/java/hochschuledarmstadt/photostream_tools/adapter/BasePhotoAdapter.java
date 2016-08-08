@@ -25,6 +25,7 @@
 package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import hochschuledarmstadt.photostream_tools.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
@@ -251,10 +253,15 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
                 lruBitmapCache.referenceDecrease(prevKey);
             }
 
-            boolean shouldAnimate = viewHolder.getOldPosition() != viewHolder.getAdapterPosition();
+            Object tag = viewHolder.itemView.getTag(R.id.should_animate);
+            boolean shouldAnimate = tag == null || !tag.equals(Boolean.FALSE);
+            if (shouldAnimate)
+                viewHolder.itemView.setTag(R.id.should_animate, Boolean.TRUE);
+
             BitmapLoaderTask task = new BitmapLoaderTask(lruBitmapCache, imageView, photo.getId(), photo.getImageFile(), listener);
             task.setShouldAnimate(shouldAnimate);
-            AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), null, task);
+            Bitmap placeHolderBitmap = lruBitmapCache.get(photo.getId());
+            AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), placeHolderBitmap, task);
             imageView.setImageDrawable(asyncDrawable);
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }

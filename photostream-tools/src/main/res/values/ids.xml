@@ -24,5 +24,5 @@
   -->
 
 <resources>
-    <item name="adapter_test_view_id" type="id">0x88164</item>
+    <item name="should_animate" type="id"/>
 </resources>

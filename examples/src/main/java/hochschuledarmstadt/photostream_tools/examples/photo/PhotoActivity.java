@@ -26,7 +26,6 @@ package hochschuledarmstadt.photostream_tools.examples.photo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,7 +41,6 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
-import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
@@ -173,6 +171,13 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
             }
         });
 
+        adapter.setOnItemClickListener(R.id.textView, new BasePhotoAdapter.OnItemClickListener<PhotoAdapter.PhotoViewHolder>() {
+            @Override
+            public void onItemClicked(PhotoAdapter.PhotoViewHolder viewHolder, View v, Photo photo) {
+                Toast.makeText(PhotoActivity.this, String.valueOf(photo.getId()), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Als Letztes der RecyclerView die Datenquelle zuweisen
         recyclerView.setAdapter(adapter);
     }
@@ -213,7 +218,7 @@ public class PhotoActivity extends PhotoStreamActivity implements OnPhotosReceiv
         if (item.getItemId() == R.id.action_refresh){
             final IPhotoStreamClient client = getPhotoStreamClient();
             // Wenn nicht bereits ein Request für Photos ausgeführt wird,
-            if (!client.hasOpenRequestsOfType(RequestType.LOAD_PHOTOS)){
+            if (!client.hasOpenRequestOfType(RequestType.LOAD_PHOTOS)){
                 // dann die erste Seite aus dem Stream laden
                 getPhotoStreamClient().loadPhotos();
             }

@@ -24,35 +24,25 @@
 
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragment;
-import hochschuledarmstadt.photostream_tools.adapter.BaseFragmentPagerAdapter;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
@@ -62,11 +52,12 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-public class ContentFragment extends PhotoStreamFragment implements OnCommentsReceivedListener {
+public class PageFragment extends PhotoStreamFragment implements OnCommentsReceivedListener {
 
-    public static final String KEY_POSITION = BaseFragmentPagerAdapter.KEY_POSITION;
     private static final String KEY_COMMENTS = "KEY_COMMENTS";
-    private static final String TAG = ContentFragment.class.getName();
+
+    private static final String TAG = PageFragment.class.getName();
+
     private ImageView imageView;
     private int position;
     private RecyclerView recyclerView;
@@ -76,18 +67,8 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            position = getArguments().getInt(KEY_POSITION);
-        }else {
-            position = savedInstanceState.getInt(KEY_POSITION);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(KEY_POSITION, position);
-        outState.putBundle(KEY_COMMENTS, adapter.saveInstanceState());
+        position = getArguments().getInt(ViewPagerActivity.PhotoFragmentPagerAdapter.KEY_POSITION);
+        photo = getArguments().getParcelable(ViewPagerActivity.PhotoFragmentPagerAdapter.KEY_PHOTO);
     }
 
     @Nullable
@@ -99,45 +80,47 @@ public class ContentFragment extends PhotoStreamFragment implements OnCommentsRe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         recyclerView = (RecyclerView) getView().findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         adapter = new CommentAdapter();
+
+        if (savedInstanceState != null) {
+            Bundle bundle = savedInstanceState.getBundle(KEY_COMMENTS);
+            adapter.restoreInstanceState(bundle);
+        }
 
         recyclerView.setAdapter(adapter);
 
         imageView = (ImageView) getView().findViewById(R.id.imageView);
 
-        photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
-
         loadBitmapAsync(photo.getImageFile(), new PhotoStreamActivity.OnBitmapLoadedListener() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap) {
-                if (bitmap != null)
+                if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
+                }
             }
 
             @Override
-            public void onError(IOException e) {
+            public void onLoadBitmapError(IOException e) {
                 Log.e(TAG, "Fehler beim Dekodieren", e);
             }
         });
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            Bundle bundle = savedInstanceState.getBundle(KEY_COMMENTS);
-            adapter.restoreInstanceState(bundle);
-        }
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(KEY_COMMENTS, adapter.saveInstanceState());
     }
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient service, Bundle savedInstanceState) {
         service.addOnCommentsReceivedListener(this);
-        photo = ((ViewPagerActivity)getActivity()).getPhoto(position);
         if (savedInstanceState == null)
             service.loadComments(photo.getId());
     }

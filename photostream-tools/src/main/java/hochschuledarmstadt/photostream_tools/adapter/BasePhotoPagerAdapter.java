@@ -24,12 +24,13 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.annotation.LayoutRes;
+import android.support.v4.view.PagerAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -38,15 +39,21 @@ import java.util.List;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
-public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> extends FragmentStatePagerAdapter{
+public abstract class BasePhotoPagerAdapter extends PagerAdapter{
 
-    public static final String KEY_POSITION = "KEY_POSITION";
-    public static final String KEY_PHOTO = "KEY_PHOTO";
+    @LayoutRes
+    private final int layoutResId;
+    private ViewGroup container;
+
+    public BasePhotoPagerAdapter(@LayoutRes int layoutResId){
+        this.layoutResId = layoutResId;
+    }
 
     private List<Photo> photos = new ArrayList<>();
 
-    public BaseFragmentPagerAdapter(FragmentManager fm) {
-        super(fm);
+    @Override
+    public int getCount() {
+        return photos.size();
     }
 
     public void set(List<Photo> photos){
@@ -58,6 +65,27 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
     public void addAll(List<Photo> photos){
         this.photos.addAll(photos);
         notifyDataSetChanged();
+    }
+
+    public View getViewAtPosition(int position){
+        return container.findViewWithTag(Integer.valueOf(position));
+    }
+
+    public View getViewWithId(int id){
+        return container.findViewById(id);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        View v = (View) object;
+        int position = Integer.parseInt(v.getTag().toString());
+        Photo photo = getPhotoAtPosition(position);
+        for (int i = 0; i < photos.size(); i++) {
+            Photo p = photos.get(i);
+            if (p.getId() == photo.getId())
+                return (position == i) ? POSITION_UNCHANGED : POSITION_NONE;
+        }
+        return POSITION_NONE;
     }
 
     public void updateCommentCount(int photoId, int commentCount){
@@ -76,52 +104,6 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
                 }
             }
         }
-    }
-
-    @Override
-    public int getItemPosition(Object object) {
-        PhotoStreamFragment fragment = (PhotoStreamFragment) object;
-        int position = fragment.getArguments().getInt(KEY_POSITION);
-        Photo photo = fragment.getArguments().getParcelable(KEY_PHOTO);
-        for (int i = 0; i < photos.size(); i++) {
-            Photo p = photos.get(i);
-            if (p.getId() == photo.getId())
-                return (position == i) ? POSITION_UNCHANGED : POSITION_NONE;
-        }
-        return POSITION_NONE;
-    }
-
-    @Override
-    public int getCount() {
-        return photos.size();
-    }
-
-    protected abstract T createNewFragment();
-
-    @Override
-    public Fragment getItem(int position) {
-        PhotoStreamFragment fragment = createNewFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(KEY_POSITION, position);
-        bundle.putParcelable(KEY_PHOTO, getPhotoAtPosition(position));
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return photos.get(position).getDescription();
-    }
-
-    public Parcelable saveInstanceState() {
-        return new SavedState(photos);
-    }
-
-    public void restoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState) state;
-        this.photos.clear();
-        this.photos.addAll(savedState.photos);
-        notifyDataSetChanged();
     }
 
     public void remove(int photoId) {
@@ -144,17 +126,52 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
         return photos.get(position);
     }
 
-    public static class SavedState implements Parcelable{
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        this.container = container;
+        Photo photo = photos.get(position);
+        LayoutInflater inflater = LayoutInflater.from(container.getContext());
+        ViewGroup layout = (ViewGroup) inflater.inflate(layoutResId, container, false);
+        onBindView(layout, photo);
+        layout.setTag(Integer.valueOf(position));
+        layout.setId(photo.getId());
+        container.addView(layout);
+        return layout;
+    }
 
-        private List<Photo> photos;
+    protected abstract void onBindView(ViewGroup layout, Photo photo);
 
-        public SavedState(List<Photo> photos){
-            this.photos = photos;
-        }
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object view) {
+        container.removeView((View) view);
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view == object;
+    }
+
+    public void restoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        this.photos = new ArrayList<>(savedState.items);
+        savedState.items.clear();
+        notifyDataSetChanged();
+    }
+
+    public Parcelable saveStateInstanceState() {
+        return new SavedState(photos);
+    }
+
+    protected static class SavedState implements Parcelable {
+
+        public List<Photo> items;
 
         protected SavedState(Parcel in) {
-            photos = new ArrayList<>();
-            in.readTypedList(photos, Photo.CREATOR);
+            in.readList(items, Photo.class.getClassLoader());
+        }
+
+        public SavedState(List<Photo> items){
+            this.items = items;
         }
 
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
@@ -175,9 +192,8 @@ public abstract class BaseFragmentPagerAdapter<T extends PhotoStreamFragment> ex
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeTypedList(photos);
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeList(items);
         }
     }
-
 }

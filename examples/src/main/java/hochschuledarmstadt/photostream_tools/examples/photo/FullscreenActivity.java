@@ -24,18 +24,22 @@
 
 package hochschuledarmstadt.photostream_tools.examples.photo;
 
-
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import hochschuledarmstadt.photostream_tools.BitmapUtils;
 import hochschuledarmstadt.photostream_tools.FullscreenPhotoActivity;
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
+import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
@@ -44,12 +48,22 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
     public static final String KEY_PHOTO = "KEY_PHOTO";
     private ImageView imageView;
     private boolean isFirstStart = true;
+    private Button button;
+    private boolean isZoomedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_layout);
+
         imageView = (ImageView) findViewById(R.id.imageView);
+        button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(FullscreenActivity.this, "button clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
         isFirstStart = (savedInstanceState == null);
     }
 
@@ -57,25 +71,48 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
     protected void onStart() {
         super.onStart();
         Photo photo = getIntent().getParcelableExtra(KEY_PHOTO);
-        File imageFile = photo.getImageFile();
+        final File imageFile = photo.getImageFile();
         loadBitmapAsync(imageFile, new OnBitmapLoadedListener() {
+
             @Override
             public void onBitmapLoaded(Bitmap bitmap) {
                 imageView.setImageBitmap(bitmap);
+
+                // Logik für Zoom initialisieren
+                setImageViewZoomable(imageView, new OnImageViewZoomChangedListener() {
+                    @Override
+                    public void onImageViewZoomReset() {
+                        isZoomedIn = false;
+                        if (isSystemUiVisible())
+                            button.setVisibility(Button.VISIBLE);
+                    }
+
+                    @Override
+                    public void onImageViewZoomedIn() {
+                        isZoomedIn = true;
+                        button.setVisibility(Button.GONE);
+                    }
+                });
+
+                // Nur beim ersten Start der Activity die Animation durchführen
                 if (isFirstStart) {
                     isFirstStart = false;
-                    imageView.setScaleY(0.5f);
-                    imageView.setScaleX(0.5f);
-                    imageView.setAlpha(0.1f);
-                    imageView.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(800).start();
+                    animateImageView();
                 }
             }
 
             @Override
-            public void onError(IOException e) {
-
+            public void onLoadBitmapError(IOException e) {
+                Log.e(FullscreenActivity.class.getName(), e.toString(), e);
             }
         });
+    }
+
+    private void animateImageView() {
+        imageView.setScaleY(0.5f);
+        imageView.setScaleX(0.5f);
+        imageView.setAlpha(0.1f);
+        imageView.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(800).start();
     }
 
     @Override
@@ -86,12 +123,13 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
 
     @Override
     protected void onSystemUiVisible() {
-
+        if (!isZoomedIn)
+            button.setVisibility(Button.VISIBLE);
     }
 
     @Override
     protected void onSystemUiHidden() {
-
+        button.setVisibility(Button.GONE);
     }
 
     @Override
@@ -103,4 +141,5 @@ public class FullscreenActivity extends FullscreenPhotoActivity {
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
 
     }
+
 }

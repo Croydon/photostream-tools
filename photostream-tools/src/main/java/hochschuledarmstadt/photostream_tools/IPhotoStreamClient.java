@@ -330,5 +330,5 @@ public interface IPhotoStreamClient {
      * @param requestType Typ des Requests ({@link RequestType})
      * @return {@code true}, wenn mindestens ein Request aus der angegebenen Kategorie verarbeitet wird, ansonsten {@code false}
      */
-    boolean hasOpenRequestsOfType(RequestType requestType);
+    boolean hasOpenRequestOfType(RequestType requestType);
 }

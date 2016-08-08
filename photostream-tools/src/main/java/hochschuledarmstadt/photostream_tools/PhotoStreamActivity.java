@@ -37,11 +37,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.provider.MediaStore;
-import android.support.v4.content.ContentResolverCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
@@ -51,11 +48,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
-import hochschuledarmstadt.photostream_tools.model.Photo;
 
 /**
  * Activities erhalten durch Erben von dieser Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
@@ -198,7 +192,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    listener.onError(e);
+                    listener.onLoadBitmapError(e);
                 }
             });
         }
@@ -206,7 +200,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
 
     public interface OnBitmapLoadedListener {
         void onBitmapLoaded(Bitmap bitmap);
-        void onError(IOException e);
+        void onLoadBitmapError(IOException e);
     }
 
     /**

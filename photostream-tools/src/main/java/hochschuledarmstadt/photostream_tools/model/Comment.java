@@ -77,7 +77,7 @@ public class Comment extends BaseItem implements Parcelable {
      * Liefert die id des Photos zurück
      * @return photo id
      */
-    public Integer getPhotoId() {
+    public int getPhotoId() {
         return photoId;
     }
 

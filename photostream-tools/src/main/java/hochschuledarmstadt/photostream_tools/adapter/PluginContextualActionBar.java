@@ -54,17 +54,11 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
 
     private Listener listener = new Listener();
 
-    private BaseAdapter<H, T> adapter;
-
     public PluginContextualActionBar(AppCompatActivity activity, @MenuRes int menuResource){
         this.activity = activity;
         this.menuRes = menuResource;
     }
 
-    @Override
-    void setAdapter(BaseAdapter<H, T> adapter) {
-        this.adapter = adapter;
-    }
 
     @Override
     void trigger(H viewHolder, View view, T item) {
@@ -81,7 +75,8 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
 
         for (int i = 0; i < adapter.getItemCount(); i++) {
             if (adapter.getItemAtPosition(i).getId() == itemId) {
-                adapter.notifyItemChanged(i);
+                dontAnimate(itemId);
+                adapter.notifyItemChanged(i, Boolean.FALSE);
                 break;
             }
         }
@@ -118,17 +113,23 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
     }
 
     @Override
-    void onBindViewHolder(H viewHolder, int position) {
+    boolean onBindViewHolder(H viewHolder, int position) {
         int photoId = adapter.getItemAtPosition(position).getId();
-        viewHolder.itemView.findViewById(getViewId()).setSelected(selectedIds.contains(Integer.valueOf(photoId)));
+        boolean selected = selectedIds.contains(Integer.valueOf(photoId));
+        View view = viewHolder.itemView.findViewById(getViewId());
+        boolean previouslySelected = view.isSelected();
+        view.setSelected(selected);
+        return previouslySelected == selected;
     }
 
     void reset() {
         int count = getAmountSelectedItems();
         int found = 0;
         for (int i = 0; i < adapter.getItemCount(); i++) {
-            if (selectedIds.contains(Integer.valueOf(adapter.getItemAtPosition(i).getId()))) {
-                adapter.notifyItemChanged(i);
+            Integer itemId = Integer.valueOf(adapter.getItemAtPosition(i).getId());
+            if (selectedIds.contains(itemId)) {
+                dontAnimate(itemId);
+                adapter.notifyItemChanged(i, Boolean.FALSE);
                 if (++found == count)
                     break;
         }
@@ -175,8 +176,9 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
             List<Integer> ids = new ArrayList<>(selectedIds);
             boolean result = PluginContextualActionBar.this.onActionItemClicked(mode, item, ids);
             ids.clear();
-            if (result)
+            if (result) {
                 mode.finish();
+            }
             return result;
         }
 

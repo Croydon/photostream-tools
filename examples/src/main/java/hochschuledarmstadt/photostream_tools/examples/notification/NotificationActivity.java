@@ -43,6 +43,7 @@ public class NotificationActivity extends PhotoStreamActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_demo);
+        // Button referenzieren
         Button button = (Button) findViewById(R.id.intent_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

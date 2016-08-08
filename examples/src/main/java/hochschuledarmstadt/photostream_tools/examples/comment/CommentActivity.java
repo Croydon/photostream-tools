@@ -28,8 +28,12 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -38,13 +42,15 @@ import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamActivity;
 import hochschuledarmstadt.photostream_tools.adapter.DividerItemDecoration;
 import hochschuledarmstadt.photostream_tools.adapter.BaseCommentAdapter;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentUploadFailedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 
-public class CommentActivity extends PhotoStreamActivity implements OnCommentsReceivedListener {
+public class CommentActivity extends PhotoStreamActivity implements OnCommentsReceivedListener, OnNewCommentReceivedListener, OnCommentUploadFailedListener {
 
     /**
      * Key für das Speichern der Kommentare in der Methode {@link CommentActivity#onSaveInstanceState(Bundle)}"
@@ -65,12 +71,18 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
      */
     private CommentAdapter adapter;
 
+    /**
+     * Input für neuen Kommentar
+     */
+    private EditText editText;
+
     /*
      * Methode wird von der Bibliothek automatisch aufgerufen, wenn die Activity an den Service gebunden wurde.
      */
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnCommentsReceivedListener(this);
+        photoStreamClient.addOnNewCommentReceivedListener(this);
         /*
             Kommentare laden, wenn die Activity zum ersten Mal gestartet wird
          */
@@ -85,12 +97,38 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         // Listener wieder entfernen um Memory Leak zu vermeiden
         photoStreamClient.removeOnCommentsReceivedListener(this);
+        photoStreamClient.removeOnNewCommentReceivedListener(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
+
+        editText = (EditText) findViewById(R.id.editText);
+
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if ((actionId & EditorInfo.IME_MASK_ACTION) == EditorInfo.IME_ACTION_DONE) {
+                    if ((actionId & EditorInfo.IME_MASK_ACTION) == EditorInfo.IME_ACTION_DONE) {
+                        String comment = editText.getText().toString().trim();
+                        if (!comment.isEmpty()) {
+                            editText.setEnabled(false);
+                            getPhotoStreamClient().uploadComment(PHOTO_ID, comment);
+                        } else {
+                            Toast.makeText(CommentActivity.this, R.string.message_no_comment_input, Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        });
+
+        editText.requestFocus();
+
         // RecyclerView referenzieren
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // LinearLayoutManager setzen (Elemente in der angezeigten Liste werden vertikal sequentiell dargestellt)
@@ -154,5 +192,22 @@ public class CommentActivity extends PhotoStreamActivity implements OnCommentsRe
     public void onRequestFinished() {
         // ProgressBar verstecken
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
+    }
+
+    @Override
+    public void onNewCommentReceived(Comment comment) {
+        if (comment.getPhotoId() == PHOTO_ID) {
+            adapter.add(comment);
+            editText.setEnabled(true);
+            if (comment.isDeleteable()) {
+                editText.setText("");
+                recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+            }
+        }
+    }
+
+    @Override
+    public void onCommentUploadFailed(HttpError httpError) {
+        editText.setEnabled(true);
     }
 }

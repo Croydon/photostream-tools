@@ -531,7 +531,7 @@ class PhotoStreamClient implements AndroidSocket.OnMessageListener, IPhotoStream
     }
 
     @Override
-    public boolean hasOpenRequestsOfType(RequestType requestType) {
+    public boolean hasOpenRequestOfType(RequestType requestType) {
         return callbackContainer.hasOpenRequestsOfType(requestType);
     }
 

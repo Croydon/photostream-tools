@@ -58,7 +58,17 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
     private final int photoId;
     private OnImageLoadedListener listener;
     private File imageFile;
-    private boolean shouldAnimate;
+
+
+    private boolean shouldAnimate = false;
+
+    public boolean getShouldAnimate() {
+        return shouldAnimate;
+    }
+
+    public void setShouldAnimate(boolean shouldAnimate) {
+        this.shouldAnimate = shouldAnimate;
+    }
 
     public int getPhotoId() {
         return photoId;
@@ -156,14 +166,6 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
             }
         }
         return null;
-    }
-
-    public void setShouldAnimate(boolean shouldAnimate) {
-        this.shouldAnimate = shouldAnimate;
-    }
-
-    public boolean getShouldAnimate() {
-        return shouldAnimate;
     }
 
     private static Bitmap decodeBitmapFromFile(File file) throws FileNotFoundException {

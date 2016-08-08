@@ -38,10 +38,11 @@
     <string name="the_comment">Der Kommentar zu dem Photo</string>
     <string name="title_activity_view_pager">ViewPagerActivity</string>
     <string name="search">Suche</string>
-    <string name="swipe"><![CDATA[<- SWIPE ->]]></string>
     <string name="delete">Löschen</string>
     <string name="share">Teilen</string>
     <string name="cab_title_format">%1$d markiert</string>
     <string name="cab_plugin_activity_title">CAB Plugin</string>
     <string name="cab_dialog_activity_title">Dialog Plugin</string>
+    <string name="swipe"><![CDATA[<-- SWIPE]]></string>
+    <string name="message_no_comment_input">Das Eingabefeld enthält keinen Text. Kommentar konnte nicht gesendet werden!</string>
 </resources>

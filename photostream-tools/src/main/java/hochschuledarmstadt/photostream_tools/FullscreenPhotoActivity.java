@@ -26,14 +26,22 @@ package hochschuledarmstadt.photostream_tools;
 
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.transition.Transition;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Bietet Unterstützung bei der Vollbildanzeige von Photos.
@@ -42,14 +50,122 @@ import android.view.View;
 public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     private static final String KEY_SYSTEM_UI_VISIBLE = "KEY_SYSTEM_UI_VISIBLE";
+    public static final float TOUCH_OFFSET = 10.f;
+    public static final int UI_HIDE_DELAY_MILLIS = 0; //500;
+    public static final int UI_SHOW_DELAY_MILLIS = 0; //200;
 
     private boolean isFirstStart = true;
     private boolean systemUiVisible = false;
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
 
+    private ImageViewAttacher imageViewAttacher;
+    private OnImageViewZoomChangedListener zoomChangedListener;
+
+    float x, y;
+
+    private boolean uiVisibilitySelfTriggered = false;
+
+    private final Runnable runnableZoomReset = new Runnable() {
+        @Override
+        public void run() {
+            if (zoomChangedListener != null)
+                zoomChangedListener.onImageViewZoomReset();
+        }
+    };
+    private final Runnable runnableZoomedIn = new Runnable() {
+        @Override
+        public void run() {
+            if (zoomChangedListener != null)
+                zoomChangedListener.onImageViewZoomedIn();
+        }
+    };
+
+    private Runnable runnableShowSystemUi = new Runnable() {
+        @Override
+        public void run() {
+            uiVisibilitySelfTriggered = true;
+            if (Build.VERSION.SDK_INT >= 16) {
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            } else {
+                getWindow().getDecorView().setSystemUiVisibility(0);
+            }
+        }
+    };
+    private Runnable runnableHideSystemUi = new Runnable() {
+        @Override
+        public void run() {
+            onSystemUiHidden();
+        }
+    };
+
+    /**
+     * Wird aufgerufen, wenn die Statusbar und Navigationbar sichtbar sind.
+     */
     protected abstract void onSystemUiVisible();
+
+    /**
+     * Wird aufgerufen, wenn die Statusbar und Navigationbar nicht sichtbar sind
+     */
     protected abstract void onSystemUiHidden();
+
+    protected void setImageViewZoomable(ImageView imageView, OnImageViewZoomChangedListener zoomChangedListener){
+        this.zoomChangedListener = zoomChangedListener;
+        imageViewAttacher = new ImageViewAttacher(imageView);
+        imageViewAttacher.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+                return false;
+            }
+        });
+        imageViewAttacher.setOnScaleChangeListener(new PhotoViewAttacher.OnScaleChangeListener() {
+            @Override
+            public void onScaleChange(float scaleFactor, float focusX, float focusY) {
+                handler.removeCallbacks(runnableZoomedIn);
+                handler.removeCallbacks(runnableZoomReset);
+                if (Math.abs(1.0f - scaleFactor) < 0.001){
+                    handler.postDelayed(runnableZoomReset, 100);
+                }else {
+                    handler.postDelayed(runnableZoomedIn, 100);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (imageViewAttacher != null && Math.abs(1.0f - imageViewAttacher.getScale()) >= 0.001) {
+            imageViewAttacher.setScale(1.0f, false);
+            handler.removeCallbacks(runnableZoomedIn);
+            handler.removeCallbacks(runnableZoomReset);
+            runnableZoomReset.run();
+        }else
+            super.onBackPressed();
+    }
+
+    protected interface OnImageViewZoomChangedListener {
+        /**
+         * Diese Methode wird aufgerufen, sobald das Bild nicht mehr gezoomt ist
+         */
+        void onImageViewZoomReset();
+        /**
+         * Diese Methode wird aufgerufen, wenn das Bild gezoomt wurde
+         */
+        void onImageViewZoomedIn();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +174,27 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             isFirstStart = false;
             systemUiVisible = savedInstanceState.getBoolean(KEY_SYSTEM_UI_VISIBLE);
         }
+        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
+                if (!uiVisibilitySelfTriggered) {
+                    handler.removeCallbacks(runnableHideSystemUi);
+                    handler.removeCallbacks(runnableShowSystemUi);
+                    if (isSystemUiVisible())
+                        onSystemUiVisible();
+                    else
+                        onSystemUiHidden();
+                }else{
+                    uiVisibilitySelfTriggered = false;
+                }
+            }
+        });
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (savedInstanceState == null) {
                 watchForEnterTransition();
@@ -95,15 +227,38 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean isVisible = isSystemUiVisible();
+        boolean handled = super.dispatchTouchEvent(ev);
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            if (isVisible)
-                hideSystemUI();
-            else
-                showSystemUI();
-            return true;
+            x = ev.getRawX();
+            y = ev.getRawY();
         }
-        return true;
+        if (canBeInterpretedAsATap(ev, handled)) {
+            boolean isVisible = isSystemUiVisible();
+            if (ev.getAction() == MotionEvent.ACTION_UP) {
+                if (isVisible)
+                    hideSystemUI();
+                else
+                    showSystemUI();
+                handled = true;
+            }
+        }
+        if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL){
+            x = 0;
+            y = 0;
+        }
+
+        return handled;
+    }
+
+    private boolean canBeInterpretedAsATap(MotionEvent ev, boolean handled) {
+        float diffX = Math.abs(ev.getRawX() - x);
+        float diffY = Math.abs(ev.getRawY() - y);
+        boolean result = !handled || isTouchOnZoomableImageView(ev, diffX, diffY);
+        return result;
+    }
+
+    private boolean isTouchOnZoomableImageView(MotionEvent ev, float diffX, float diffY) {
+        return imageViewAttacher != null && (ev.getSource() == imageViewAttacher.getImageView().getId()) && ev.getAction() == MotionEvent.ACTION_UP && diffX < TOUCH_OFFSET && diffY < TOUCH_OFFSET;
     }
 
     /**
@@ -206,51 +361,68 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     // This snippet hides the system bars.
     private void hideSystemUI() {
+
+        handler.removeCallbacks(runnableShowSystemUi);
+        handler.removeCallbacks(runnableHideSystemUi);
+
+        uiVisibilitySelfTriggered = true;
+
         if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 19) {
             getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
         } else if (Build.VERSION.SDK_INT >= 19) {
             getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                onSystemUiHidden();
-            }
-        }, 500);
-
+        handler.postDelayed(runnableHideSystemUi, UI_HIDE_DELAY_MILLIS);
     }
 
     private void showSystemUI() {
-        if (Build.VERSION.SDK_INT >= 16) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }else{
-            getWindow().getDecorView().setSystemUiVisibility(0);
-        }
-
-        handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacks(runnableShowSystemUi);
+        handler.removeCallbacks(runnableHideSystemUi);
+        handler.postDelayed(runnableShowSystemUi, UI_SHOW_DELAY_MILLIS);
         onSystemUiVisible();
     }
 
     @Override
     protected void onDestroy() {
-        handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacks(runnableHideSystemUi);
+        handler.removeCallbacks(runnableShowSystemUi);
+        handler.removeCallbacks(runnableZoomReset);
+        handler.removeCallbacks(runnableZoomedIn);
+        if (imageViewAttacher != null)
+            imageViewAttacher.cleanup();
         super.onDestroy();
     }
+
+    private static class ImageViewAttacher extends PhotoViewAttacher {
+
+        public ImageViewAttacher(ImageView imageView) {
+            super(imageView);
+        }
+
+        public ImageViewAttacher(ImageView imageView, boolean zoomable) {
+            super(imageView, zoomable);
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent ev) {
+            ev.setSource(getImageView().getId());
+            return super.onTouch(v, ev);
+        }
+    }
+
 }

@@ -30,6 +30,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionModeStyle">@style/Custom.ActionMode</item>
+        <item name="actionBarPopupTheme">@style/AppTheme.PopupOverlay</item>
+        <item name="actionBarTheme">@style/AppTheme.AppBarOverlay</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -68,6 +71,10 @@
         <item name="android:textColor">#ccc</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Custom.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="background">@color/colorPrimaryDark</item>
     </style>
 
 </resources>

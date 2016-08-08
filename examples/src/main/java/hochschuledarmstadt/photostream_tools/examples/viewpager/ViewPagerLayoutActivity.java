@@ -24,31 +24,66 @@
 
 package hochschuledarmstadt.photostream_tools.examples.viewpager;
 
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2016 Andreas Schattney
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import android.support.annotation.LayoutRes;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.IPhotoStreamClient;
 import hochschuledarmstadt.photostream_tools.PhotoStreamFragmentActivity;
 import hochschuledarmstadt.photostream_tools.RequestType;
-import hochschuledarmstadt.photostream_tools.adapter.BaseFragmentPagerAdapter;
+import hochschuledarmstadt.photostream_tools.adapter.BasePhotoPagerAdapter;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.examples.R;
 import hochschuledarmstadt.photostream_tools.examples.Utils;
+import hochschuledarmstadt.photostream_tools.examples.comment.CommentAdapter;
+import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 
-public class ViewPagerActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnPhotoDeletedListener, OnCommentCountChangedListener {
+public class ViewPagerLayoutActivity extends PhotoStreamFragmentActivity implements OnPhotosReceivedListener, OnNewPhotoReceivedListener, OnPhotoDeletedListener, OnCommentCountChangedListener, OnCommentsReceivedListener {
 
     private static final String KEY_ADAPTER = "KEY_ADAPTER";
 
@@ -61,7 +96,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     private static final String KEY_MORE_PHOTOS_AVAILABLE = "KEY_MORE_PHOTOS_AVAILABLE";
 
     private ViewPager viewPager;
-    private PhotoFragmentPagerAdapter adapter;
+    private PhotoPagerAdapter adapter;
     private ViewPager.OnPageChangeListener pageChangeListener;
     private Toolbar toolbar;
     private TextView textViewSwipeHint;
@@ -70,9 +105,11 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
+
         setContentView(R.layout.activity_view_pager);
 
         if (savedInstanceState != null)
@@ -83,7 +120,9 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setPageTransformer(true, new FancyPageTransformer());
+
         textViewSwipeHint = (TextView) findViewById(R.id.textViewHintSwipe);
+
         pageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -109,16 +148,6 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
 
         viewPager.addOnPageChangeListener(pageChangeListener);
 
-        adapter = new PhotoFragmentPagerAdapter(getSupportFragmentManager());
-
-        if (savedInstanceState != null) {
-            // Photos aus vorheriger Activity wiederherstellen
-            adapter.restoreInstanceState(savedInstanceState.getParcelable(KEY_ADAPTER));
-            updateActionBarSubtitle();
-        }
-
-        viewPager.setAdapter(adapter);
-
     }
 
     private boolean shouldLoadMorePhotos(int position) {
@@ -132,26 +161,33 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     }
 
     private void updateActionBarSubtitle() {
-        int position = viewPager.getCurrentItem();
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setSubtitle(adapter.getPageTitle(position));
+        int currentItemPosition = viewPager.getCurrentItem() + 1;
+        int totalAmountOfPhotosLoaded = adapter.getCount();
+        getSupportActionBar().setSubtitle(String.format("Photo %s von %s", currentItemPosition, totalAmountOfPhotosLoaded));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(KEY_ADAPTER, adapter.saveInstanceState());
+        outState.putParcelable(KEY_ADAPTER, adapter.saveStateInstanceState());
         outState.putBoolean(KEY_MORE_PHOTOS_AVAILABLE, morePhotosAvailable);
     }
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         super.onPhotoStreamServiceConnected(photoStreamClient, savedInstanceState);
+
+        adapter = new PhotoPagerAdapter(R.layout.viewpager_item);
+        if (savedInstanceState != null) {
+            // Photos aus vorheriger Activity wiederherstellen
+            adapter.restoreInstanceState(savedInstanceState.getParcelable(KEY_ADAPTER));
+            updateActionBarSubtitle();
+        }
+        viewPager.setAdapter(adapter);
+
         photoStreamClient.addOnPhotosReceivedListener(this);
-        photoStreamClient.addOnPhotoDeletedListener(this);
-        photoStreamClient.addOnNewPhotoReceivedListener(this);
-        photoStreamClient.addOnCommentCountChangedListener(this);
+        photoStreamClient.addOnCommentsReceivedListener(this);
+
         if (savedInstanceState == null || shouldLoadPhotos(photoStreamClient)) {
             photoStreamClient.loadPhotos();
         }
@@ -165,9 +201,7 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
         super.onPhotoStreamServiceDisconnected(photoStreamClient);
         photoStreamClient.removeOnPhotosReceivedListener(this);
-        photoStreamClient.removeOnPhotoDeletedListener(this);
-        photoStreamClient.removeOnNewPhotoReceivedListener(this);
-        photoStreamClient.removeOnCommentCountChangedListener(this);
+        photoStreamClient.removeOnCommentsReceivedListener(this);
     }
 
     @Override
@@ -230,21 +264,50 @@ public class ViewPagerActivity extends PhotoStreamFragmentActivity implements On
         adapter.updateCommentCount(photoId, commentCount);
     }
 
-    public static class PhotoFragmentPagerAdapter extends BaseFragmentPagerAdapter<PageFragment> {
+    @Override
+    public void onCommentsReceived(int photoId, List<Comment> comments) {
+        adapter.onCommentsReceived(photoId, comments);
+    }
 
-        public PhotoFragmentPagerAdapter(FragmentManager fm) {
-            super(fm);
+    @Override
+    public void onReceiveCommentsFailed(int photoId, HttpError httpError) {
+
+    }
+
+    private class PhotoPagerAdapter extends BasePhotoPagerAdapter {
+
+        public PhotoPagerAdapter(@LayoutRes int layoutResId) {
+            super(layoutResId);
         }
 
         @Override
-        protected PageFragment createNewFragment() {
-            return new PageFragment();
+        protected void onBindView(ViewGroup layout, Photo photo) {
+            final ImageView imageView = (ImageView) layout.findViewById(R.id.imageView);
+            loadBitmapAsync(photo.getImageFile(), new OnBitmapLoadedListener() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap) {
+                    imageView.setImageBitmap(bitmap);
+                }
+
+                @Override
+                public void onLoadBitmapError(IOException e) {
+
+                }
+            });
+            getPhotoStreamClient().loadComments(photo.getId());
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return String.format("Photo %d von %d", position + 1, getCount());
+        public void onCommentsReceived(int photoId, List<Comment> comments) {
+            View v = getViewWithId(photoId);
+            RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
+            CommentAdapter adapter = new CommentAdapter();
+            adapter.set(comments);
+            recyclerView.setLayoutManager(new LinearLayoutManager(ViewPagerLayoutActivity.this));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
         }
+
     }
 
 }
+

@@ -30,12 +30,15 @@ import android.support.annotation.IdRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import hochschuledarmstadt.photostream_tools.R;
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
 public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
 
     @IdRes
     protected int viewId = View.NO_ID;
+
+    protected BaseAdapter<H, T> adapter;
 
     void setViewId(@IdRes int viewId) {
         this.viewId = viewId;
@@ -58,6 +61,10 @@ public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseIt
         }
     }
 
+    protected void dontAnimate(int itemId){
+        adapter.dontAnimate(itemId);
+    }
+
     /**
      *  Diese Methode soll als Ergebnis liefern, ob das Event für das übergebene {@code item} verarbeiten soll
      * @param viewHolder Enthält das View Element, welches das Plugin ausgelöst hat
@@ -67,8 +74,10 @@ public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseIt
      */
     protected abstract boolean shouldExecute(H viewHolder, View v, T item);
     abstract void trigger(H ViewHolder, View v, T item);
-    abstract void onBindViewHolder(H viewHolder, int position);
+    abstract boolean onBindViewHolder(H viewHolder, int position);
     abstract void saveInstanceState(Bundle bundle);
     abstract void restoreInstanceState(Bundle bundle);
-    abstract void setAdapter(BaseAdapter<H, T> adapter);
+    void setAdapter(BaseAdapter<H, T> adapter){
+        this.adapter = adapter;
+    }
 }

@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import hochschuledarmstadt.photostream_tools.R;
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
 abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> extends RecyclerView.Adapter<H> {
@@ -170,6 +171,10 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         }
     }
 
+    public List<T> getItems(){
+        return new ArrayList<>(items);
+    }
+
     /**
      * Liefert die Anzahl der Items in der Liste
      *
@@ -273,6 +278,11 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         applyOnItemLongClickListeners(holder);
         applyOnItemTouchListeners(holder);
         for (PluginInfo<H, T> e : plugins) {
+            Integer itemId = Integer.valueOf((int) getItemId(position));
+            if (ignoredAnimations.contains(itemId)){
+                holder.itemView.setTag(R.id.should_animate, Boolean.FALSE);
+                ignoredAnimations.remove(itemId);
+            }
             e.plugin.onBindViewHolder(holder, position);
         }
     }
@@ -313,6 +323,14 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
                 view.setOnLongClickListener(delegateOnLongClickListener);
             }
         }
+    }
+
+    private List<Integer> ignoredAnimations = new ArrayList<>();
+
+    void dontAnimate(int id){
+        Integer itemId = Integer.valueOf(id);
+        if (!ignoredAnimations.contains(itemId))
+            ignoredAnimations.add(itemId);
     }
 
     private List<PluginInfo<H, T>> getCompatibleExtensions(int viewId, int eventType) {

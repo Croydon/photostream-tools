@@ -63,7 +63,7 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
         // Button und EditText referenzieren
         findViews();
 
-        // Beispielfoto
+        // Beispielphoto
         Uri assetUri = Uri.parse("assets://architecture.png");
 
         // Bitmap laden
@@ -76,7 +76,7 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
             }
 
             @Override
-            public void onError(IOException e) {
+            public void onLoadBitmapError(IOException e) {
                 Log.e(TAG, "Fehler beim Dekodieren des Bilds architecture.png", e);
             }
         });
@@ -118,7 +118,7 @@ public class PhotoUploadActivity extends PhotoStreamActivity implements OnPhotoU
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
         photoStreamClient.addOnPhotoUploadListener(this);
         if (savedInstanceState != null){
-            boolean uploadRequestIsRunning = photoStreamClient.hasOpenRequestsOfType(RequestType.UPLOAD_PHOTO);
+            boolean uploadRequestIsRunning = photoStreamClient.hasOpenRequestOfType(RequestType.UPLOAD_PHOTO);
             uploadButton.setEnabled(!uploadRequestIsRunning);
         }
     }

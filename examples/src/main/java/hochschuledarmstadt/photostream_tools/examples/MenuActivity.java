@@ -50,6 +50,7 @@ import hochschuledarmstadt.photostream_tools.examples.photo.PhotoActivity;
 import hochschuledarmstadt.photostream_tools.examples.search.SearchActivity;
 import hochschuledarmstadt.photostream_tools.examples.upload.PhotoUploadActivity;
 import hochschuledarmstadt.photostream_tools.examples.viewpager.ViewPagerActivity;
+import hochschuledarmstadt.photostream_tools.examples.viewpager.ViewPagerLayoutActivity;
 
 /**
  * Nur ein Auswahlmenü für die Anzeige der einzelnen Beispielactivities.
@@ -60,7 +61,8 @@ public class MenuActivity extends AppCompatActivity {
     private static final String MENU_COMMENTS = "Kommentare anzeigen";
     private static final String MENU_UPLOAD_PHOTO = "Neues Photo hochladen";
     private static final String MENU_SEARCH = "Suche nach Photos anhand Beschreibung";
-    private static final String MENU_VIEW_PAGER = "Photos anzeigen in einem ViewPager Widget";
+    private static final String MENU_VIEW_PAGER = "Photos anzeigen in einem ViewPager Widget (mit Fragmente)";
+    private static final String MENU_VIEW_PAGER_LAYOUT = "Photos anzeigen in einem ViewPager Widget (ohne Fragmente)";
     private static final String MENU_CAB_EXTENSION = "Beispiel für Contextual ActionBar Plugin";
     private static final String MENU_DIALOG_EXTENSION = "Beispiel für AlertDialog Plugin";
     private static final String MENU_BROADCAST_RECEIVER = "Broadcast Receiver Beispiel";
@@ -73,6 +75,7 @@ public class MenuActivity extends AppCompatActivity {
             new MenuItem(MENU_UPLOAD_PHOTO, PhotoUploadActivity.class),
             new MenuItem(MENU_SEARCH, SearchActivity.class),
             new MenuItem(MENU_VIEW_PAGER, ViewPagerActivity.class),
+            new MenuItem(MENU_VIEW_PAGER_LAYOUT, ViewPagerLayoutActivity.class),
             new MenuItem(MENU_BROADCAST_RECEIVER, NotificationActivity.class)
     };
 

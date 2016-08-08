@@ -48,11 +48,6 @@ public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentVie
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return getItemAtPosition(position).isDeleteable() ? 0 : 1;
-    }
-
     /*
             Wird aufgerufen, wenn ein neues Layout benötigt wird.
             Es werden nur so viele ViewHolder instanziert wie Elemente in der Liste angezeigt werden können.
@@ -71,7 +66,8 @@ public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentVie
             |         Element 3         |               |         Element 4         |
             -----------------------------               -----------------------------
 
-            ViewHolder 1 wird also für Element 4 wiederverwendet!
+            ViewHolder 1 wird also für Element 4 wiederverwendet! Hierbei wird die Methode
+            "onBindViewHolder", mit den Argumenten ViewHolder 1 und position 4, aufgerufen
         */
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -82,8 +78,8 @@ public class CommentAdapter extends BaseCommentAdapter<CommentAdapter.CommentVie
     }
 
     /*
-        Wird intern von der RecyclerView aufgerufen,
-        um den Inhalt einer View, mit Informationen aus dem Element an der "position", zu aktualisieren
+        Wird intern von der RecyclerView aufgerufen, um den Inhalt einer View,
+        mit Informationen aus dem Element an der "position", zu aktualisieren
      */
     @Override
     public void onBindViewHolder(CommentViewHolder holder, int position) {
