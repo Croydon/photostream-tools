@@ -29,7 +29,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="actionModeStyle">@style/Custom.ActionMode</item>
+        <item name="actionModeStyle">@style/Custom.ActionModeStyle</item>
         <item name="actionBarPopupTheme">@style/AppTheme.PopupOverlay</item>
         <item name="actionBarTheme">@style/AppTheme.AppBarOverlay</item>
     </style>
