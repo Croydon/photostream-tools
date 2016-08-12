@@ -32,7 +32,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpError;
  * {@link OnCommentDeletedListener#onCommentDeleteFailed(int, HttpError)} <br>
  * Wird aufgerufen wenn beim Löschen eines eigenen Kommentars ein Fehler aufgetreten ist <br> <br>
  */
-public interface OnCommentDeletedListener extends OnRequestListener{
+public interface OnCommentDeletedListener {
     /**
      * Wird aufgerufen wenn ein eigener Kommentar gelöscht wurde, oder ein Kommentar von einem anderen Gerät gelöscht wurde. <br>
      * {@code commentId} entspricht der id des gelöschten Kommentars

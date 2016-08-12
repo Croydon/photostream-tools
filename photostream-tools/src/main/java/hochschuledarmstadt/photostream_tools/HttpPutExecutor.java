@@ -38,6 +38,7 @@ class HttpPutExecutor extends HttpExecutor{
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(getUrl()).openConnection();
         urlConnection.setRequestMethod("PUT");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.setReadTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", getInstallationId());
         if (urlConnection.getResponseCode() != HttpURLConnection.HTTP_OK){
             throw new BaseAsyncTask.HttpPhotoStreamException(getHttpErrorResult(urlConnection.getErrorStream()));

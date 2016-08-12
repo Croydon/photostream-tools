@@ -30,7 +30,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
  * {@link OnNewPhotoReceivedListener#onNewPhotoReceived(Photo)}<br>
  * Wird aufgerufen wenn ein neues Photo veröffentlicht wurde
  */
-public interface OnNewPhotoReceivedListener extends OnRequestListener {
+public interface OnNewPhotoReceivedListener {
     /**
      * Wird aufgerufen wenn ein neues Photo veröffentlicht wurde
      * {@code photo} kann ein eigenes Photo sein oder ein Photo von einem anderen Gerät

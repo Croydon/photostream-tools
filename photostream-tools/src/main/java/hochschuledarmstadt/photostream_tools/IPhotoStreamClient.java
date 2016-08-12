@@ -41,6 +41,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
+import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.model.Comment;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
@@ -64,6 +65,10 @@ public interface IPhotoStreamClient {
      * Photo photo = intent.getParcelableExtra(IPhotoStreamClient.INTENT_KEY_PHOTO); <br>
      */
     String INTENT_KEY_PHOTO = "INTENT_KEY_NEW_PHOTO";
+
+    void addOnRequestListener(OnRequestListener onRequestListener, RequestType... requestTypes);
+
+    void removeOnRequestListener(OnRequestListener onRequestListener);
 
     /**
      * Registriert einen Listener des Typs {@link OnPhotoLikeListener}. <br>

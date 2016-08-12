@@ -26,7 +26,7 @@
     <string name="app_name">PhotoStream Examples</string>
     <string name="action_refresh">Refresh</string>
     <string name="header_comments">Comments for Photo With ID = 1</string>
-    <string name="comment_example">CommentExample</string>
+    <string name="comment_example">CommentActivity</string>
     <string name="photo_example">PhotoExample</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="examples">Examples</string>
@@ -37,12 +37,19 @@
     <string name="upload">Photo senden</string>
     <string name="the_comment">Der Kommentar zu dem Photo</string>
     <string name="title_activity_view_pager">ViewPagerActivity</string>
+    <string name="title_fragment_activity_view_pager">ViewPagerFragmentActivity</string>
     <string name="search">Suche</string>
     <string name="delete">Löschen</string>
     <string name="share">Teilen</string>
     <string name="cab_title_format">%1$d markiert</string>
-    <string name="cab_plugin_activity_title">CAB Plugin</string>
-    <string name="cab_dialog_activity_title">Dialog Plugin</string>
+    <string name="cab_plugin_activity_title">ContextualActionBarPluginActivity</string>
+    <string name="cab_dialog_activity_title">AlertDialogPluginActivity</string>
     <string name="swipe"><![CDATA[<-- SWIPE]]></string>
     <string name="message_no_comment_input">Das Eingabefeld enthält keinen Text. Kommentar konnte nicht gesendet werden!</string>
+    <string name="title_photoactivity">PhotoActivity</string>
+    <string name="title_fullscreen_activity_viewpager">FullscreenActivityViewPager</string>
+    <string name="title_photo_upload_activity">PhotoUploadActivity</string>
+    <string name="title_search_activity">SearchActivity</string>
+    <string name="NotificationActivity">NotificationActivity</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
 </resources>

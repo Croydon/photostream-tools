@@ -43,7 +43,7 @@ public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H exten
 
     private static final String KEY_PHOTO = "KEY_PHOTO";
     private static final String KEY_SELECTED_ITEM_IDS = "KEY_SELECTED_ITEM_IDS";
-    private final AppCompatActivity activity;
+    private AppCompatActivity activity;
     private final int dialogStyle;
 
     private T item;
@@ -86,7 +86,7 @@ public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H exten
         for (int i = 0; i < adapter.getItemCount(); i++) {
             if (adapter.getItemAtPosition(i).getId() == itemId) {
                 dontAnimate(itemId);
-                adapter.notifyItemChanged(i, Boolean.FALSE);
+                adapter.notifyItemChanged(i);
                 break;
             }
         }
@@ -101,30 +101,30 @@ public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H exten
     }
 
     @Override
-    boolean onBindViewHolder(H viewHolder, int position) {
+    void onBindViewHolder(H viewHolder, int position) {
         int photoId = adapter.getItemAtPosition(position).getId();
         Integer itemId = Integer.valueOf(photoId);
-        boolean selected = selectedIds.contains(itemId);
         View view = viewHolder.itemView.findViewById(getViewId());
-        boolean previouslySelected = view.isSelected();
+        boolean selected = selectedIds.contains(itemId);
         view.setSelected(selected);
-        return previouslySelected == selected;
     }
 
     @Override
     void saveInstanceState(Bundle bundle) {
-        AlertDialog alertDialog = builder.alertDialog;
-        if ((builder == null || alertDialog == null) || !alertDialog.isShowing()){
-            item = null;
+        if (builder != null) {
+            AlertDialog alertDialog = builder.alertDialog;
+            if ((builder == null || alertDialog == null) || !alertDialog.isShowing()) {
+                item = null;
+            }
+            if (builder != null && alertDialog != null && alertDialog.isShowing()) {
+                DialogInterface.OnDismissListener dismissListener = builder.getOnDismissListener().onDismissListener;
+                if (dismissListener != null)
+                    dismissListener.onDismiss(alertDialog);
+                builder.clear();
+                alertDialog.dismiss();
+            }
+            builder.alertDialog = null;
         }
-        if (builder != null && alertDialog != null && alertDialog.isShowing()) {
-            DialogInterface.OnDismissListener dismissListener = builder.getOnDismissListener().onDismissListener;
-            if (dismissListener != null)
-                dismissListener.onDismiss(alertDialog);
-            builder.clear();
-            alertDialog.dismiss();
-        }
-        builder.alertDialog = null;
         bundle.putParcelable(KEY_PHOTO, item);
         bundle.putIntegerArrayList(KEY_SELECTED_ITEM_IDS, selectedIds);
     }
@@ -138,6 +138,17 @@ public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H exten
             onCreateAlertDialog(builder, item);
             showAlertDialogIfNecessary();
         }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        activity = null;
+        if (builder != null) {
+            builder.clear();
+            builder = null;
+        }
+        item = null;
     }
 
     private class AlertDialogBuilderProxy extends AlertDialog.Builder {
@@ -184,7 +195,8 @@ public abstract class PluginAlertDialog<T extends BaseItem & Parcelable, H exten
         }
 
         void clear() {
-            alertDialog.setOnDismissListener(null);
+            if (alertDialog != null)
+                alertDialog.setOnDismissListener(null);
         }
 
         private class DelegateOnDismissListener implements DialogInterface.OnDismissListener {

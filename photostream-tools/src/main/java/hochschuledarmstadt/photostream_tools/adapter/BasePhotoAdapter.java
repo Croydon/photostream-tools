@@ -51,9 +51,9 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
 
     private static final int LIKE = -10;
     private static final int DISLIKE = -11;
+
     private static final int DEFAULT_CACHE_SIZE_IN_MB = 10;
 
-    private Activity activity;
     private List<BitmapLoaderTask> tasks = new ArrayList<>();
     private LruBitmapCache lruBitmapCache;
     private OnImageLoadedListener listener = new InternalBitmapLoaderListener();
@@ -145,23 +145,9 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         super.addOnClickPlugin(viewId, plugin);
     }
 
-    /**
-     * Speichert die aktuelle Liste von Photos in ein Bundle
-     * @return bundle
-     */
     @Override
-    public Bundle saveInstanceState() {
-        if (activity != null) {
-            if (activity.isFinishing() || activity.isChangingConfigurations()) {
-                destroyReferences();
-            }
-        }else{
-            destroyReferences();
-        }
-        return super.saveInstanceState();
-    }
-
-    private void destroyReferences() {
+    protected void destroyReferences() {
+        super.destroyReferences();
         for (BitmapLoaderTask task : tasks) {
             Log.d(BasePhotoAdapter.class.getSimpleName(), "cancelled task");
             task.cancel(true);
@@ -230,17 +216,6 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         }
     }
 
-    @Override
-    public void onBindViewHolder(H holder, int position) {
-        super.onBindViewHolder(holder, position);
-        if (activity == null) {
-            try {
-                activity = (Activity) holder.itemView.getContext();
-            } catch (ClassCastException e) {
-            }
-        }
-    }
-
     protected void loadBitmapIntoImageViewAsync(H viewHolder, final ImageView imageView, final Photo photo){
         imageView.setImageBitmap(null);
         Integer prevKey = -1;
@@ -255,7 +230,7 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
 
             Object tag = viewHolder.itemView.getTag(R.id.should_animate);
             boolean shouldAnimate = tag == null || !tag.equals(Boolean.FALSE);
-            if (shouldAnimate)
+            if (!shouldAnimate)
                 viewHolder.itemView.setTag(R.id.should_animate, Boolean.TRUE);
 
             BitmapLoaderTask task = new BitmapLoaderTask(lruBitmapCache, imageView, photo.getId(), photo.getImageFile(), listener);

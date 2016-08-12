@@ -41,14 +41,14 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
     private static final String TAG = SearchPhotosAsyncTask.class.getName();
     private final OnSearchPhotosResultCallback callback;
     private final HttpGetExecutor executor;
-    private final Context context;
+    private final ImageCacher imageCacher;
     private final HttpImageLoader imageLoader;
 
-    public SearchPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, OnSearchPhotosResultCallback callback){
+    public SearchPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, ImageCacher imageCacher, OnSearchPhotosResultCallback callback){
         super();
         this.executor = executor;
         this.imageLoader = imageLoader;
-        this.context = context;
+        this.imageCacher = imageCacher;
         this.callback = callback;
     }
 
@@ -75,7 +75,6 @@ class SearchPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> 
         HttpResponse httpResponse = executor.execute();
         PhotoQueryResult photoQueryResult = new Gson().fromJson(httpResponse.getResult(), PhotoQueryResult.class);
         final List<Photo> photos = photoQueryResult.getPhotos();
-        final ImageCacher imageCacher = new ImageCacher(context);
         List<Photo> uncachedPhotos = new ArrayList<>();
         for (Photo photo : photos) {
             int photoId = photo.getId();

@@ -30,7 +30,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpError;
  * {@link OnCommentUploadFailedListener#onCommentUploadFailed(HttpError)}<br>
  * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
  */
-public interface OnCommentUploadFailedListener extends OnRequestListener {
+public interface OnCommentUploadFailedListener {
     /**
      * Wird aufgerufen, wenn das Senden eines Kommentars an den Server fehlgeschlagen ist.
      * @param httpError enthält HTTP Status Code sowie die Fehlernachricht

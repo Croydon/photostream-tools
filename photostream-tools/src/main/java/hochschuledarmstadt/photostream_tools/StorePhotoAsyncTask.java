@@ -29,6 +29,8 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -38,10 +40,14 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
     private static final String TAG = StorePhotoAsyncTask.class.getName();
     private final OnPhotoStoredCallback callback;
     private final HttpPostExecutor executor;
+    private HttpImageLoader imageLoader;
+    private ImageCacher imageCacher;
 
-    public StorePhotoAsyncTask(HttpPostExecutor executor, OnPhotoStoredCallback callback){
+    public StorePhotoAsyncTask(HttpPostExecutor executor, HttpImageLoader imageLoader, ImageCacher imageCacher, OnPhotoStoredCallback callback){
         super();
         this.executor = executor;
+        this.imageLoader = imageLoader;
+        this.imageCacher = imageCacher;
         this.callback = callback;
     }
 
@@ -70,6 +76,15 @@ class StorePhotoAsyncTask extends BaseAsyncTask<JSONObject, Void, Photo> {
         if (newEtag != null)
             callback.onNewETag(newEtag);
         Photo photo = new Gson().fromJson(httpResponse.getResult(), Photo.class);
+        if (photo == null)
+            throw new IOException("Internal error, could not decode result from http request!");
+        List<Photo> list = new ArrayList<>(1);
+        list.add(photo);
+        imageLoader.execute(list);
+        HttpImageLoader.HttpImage httpImage = imageLoader.take();
+        if (httpImage != null) {
+            imageCacher.cacheImage(httpImage.getPhoto(), httpImage.getImageData());
+        }
         return photo;
     }
 

@@ -24,9 +24,8 @@
 
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- Standard Theme für die Applikation -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -53,12 +52,10 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppCompatDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <!-- Used for the buttons -->
-        <item name="colorAccent">#eee</item>
-        <!-- Used for the title and text -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:textColorPrimary">#eee</item>
-        <!-- Used for the background -->
-        <item name="android:background">#303F9F</item>
         <item name="android:windowTitleStyle">@style/DialogTitleTextStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/DialogPositiveButtonStyle</item>
     </style>
@@ -73,7 +70,7 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="Custom.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+    <style name="Custom.ActionModeStyle" parent="@style/Widget.AppCompat.ActionMode">
         <item name="background">@color/colorPrimaryDark</item>
     </style>
 

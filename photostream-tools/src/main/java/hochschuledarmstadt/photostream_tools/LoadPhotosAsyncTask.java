@@ -40,16 +40,16 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
     private static final String TAG = LoadPhotosAsyncTask.class.getName();
+    private final ImageCacher imageCacher;
     private final GetPhotosCallback callback;
     private final HttpGetExecutor executor;
-    private final Context context;
     private final HttpImageLoader imageLoader;
 
-    public LoadPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, Context context, GetPhotosCallback callback) {
+    public LoadPhotosAsyncTask(HttpGetExecutor executor, HttpImageLoader imageLoader, ImageCacher imageCacher, GetPhotosCallback callback) {
         super();
         this.executor = executor;
         this.imageLoader = imageLoader;
-        this.context = context;
+        this.imageCacher = imageCacher;
         this.callback = callback;
     }
 
@@ -98,7 +98,6 @@ class LoadPhotosAsyncTask extends BaseAsyncTask<Void, Void, PhotoQueryResult> {
 
     private void cacheImagesIfNecessary(PhotoQueryResult photoQueryResult) throws IOException {
         final List<Photo> photos = photoQueryResult.getPhotos();
-        final ImageCacher imageCacher = new ImageCacher(context);
         List<Photo> uncachedPhotos = new ArrayList<>();
         for (Photo photo : photos) {
             int photoId = photo.getId();

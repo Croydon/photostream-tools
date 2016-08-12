@@ -38,6 +38,9 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
 
     private static final String UTF_8 = "UTF-8";
     private static final String TAG = StoreCommentAsyncTask.class.getName();
+
+    private static final String KEY_MESSAGE = "message";
+
     private final HttpPostExecutor executor;
     private final OnCommentSentListener callback;
     private final int photoId;
@@ -68,11 +71,10 @@ class StoreCommentAsyncTask extends BaseAsyncTask<Void, Void, Comment> {
     private Comment sendComment() throws IOException, HttpPhotoStreamException {
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("message", comment);
+            jsonObject.put(KEY_MESSAGE, comment);
             String s = jsonObject.toString();
             HttpResponse httpResponse = executor.execute(s);
-            Comment comment = new Gson().fromJson(httpResponse.getResult(), Comment.class);
-            return comment;
+            return new Gson().fromJson(httpResponse.getResult(), Comment.class);
         } catch (JSONException e) {
             Logger.log(TAG, LogLevel.ERROR, e.toString());
         }

@@ -29,7 +29,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="30dp"
-    tools:context="hochschuledarmstadt.photostream_tools.examples.upload.PhotoUploadActivity">
+    tools:context=".examples.upload.PhotoUploadActivity">
 
     <EditText
         android:layout_width="match_parent"

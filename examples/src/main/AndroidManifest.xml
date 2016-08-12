@@ -3,28 +3,40 @@
     package="hochschuledarmstadt.photostream_tools.examples">
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".photo.PhotoActivity"
-            android:label="@string/photo_example" />
+        <!-- URL festlegen für den Photostream Server -->
+        <meta-data
+            android:name="PHOTOSTREAM_URL"
+            android:value="http://5.45.97.155:8082" />
 
-        <activity android:name=".plugin.ContextualActionBarPluginActivity"
+        <!-- Größe festlegen für eine Seite aus dem Photostream -->
+        <meta-data
+            android:name="PAGE_SIZE"
+            android:value="3" />
+
+        <activity
+            android:name=".examples.photo.PhotoActivity"
+            android:label="@string/title_photoactivity" />
+
+        <activity android:name=".examples.plugin.ContextualActionBarPluginActivity"
             android:label="@string/cab_plugin_activity_title"/>
 
-        <activity android:name=".plugin.AlertDialogPluginActivity"
+        <activity android:name=".examples.plugin.AlertDialogPluginActivity"
             android:label="@string/cab_dialog_activity_title"/>
 
         <activity
-            android:name=".comment.CommentActivity"
+            android:name=".examples.comment.CommentActivity"
             android:label="@string/comment_example" />
 
+        <activity android:name=".advanced_examples.fullscreen.FullscreenActivityViewPager"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
+            android:label="@string/title_fullscreen_activity_viewpager"/>
+
         <activity
-            android:name=".MenuActivity"
+            android:name=".main.MenuActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -34,29 +46,46 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="PHOTOSTREAM_URL"
-            android:value="http://5.45.97.155:8082" />
-
-        <activity android:name=".upload.PhotoUploadActivity" />
-
-        <activity android:name=".search.SearchActivity" />
+        <activity
+            android:name=".main.ExamplesActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
         <activity
-            android:name=".viewpager.ViewPagerActivity"
+            android:name=".main.AdvancedExamplesActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".examples.upload.PhotoUploadActivity"
+            android:label="@string/title_photo_upload_activity"/>
+
+        <activity
+            android:name=".examples.search.SearchActivity"
+            android:label="@string/title_search_activity"/>
+
+        <activity
+            android:name=".advanced_examples.viewpager.ViewPagerFragmentActivity"
+            android:label="@string/title_fragment_activity_view_pager"
+            android:theme="@style/AppTheme.NoActionBar.ViewPager"/>
+
+        <activity
+            android:name=".advanced_examples.viewpager.ViewPagerWithoutFragmentsActivity"
             android:label="@string/title_activity_view_pager"
             android:theme="@style/AppTheme.NoActionBar.ViewPager"/>
 
         <activity
-            android:name=".viewpager.ViewPagerLayoutActivity"
-            android:label="@string/title_activity_view_pager"
-            android:theme="@style/AppTheme.NoActionBar.ViewPager"/>
+            android:name=".examples.notification.NotificationActivity"
+            android:label="@string/NotificationActivity"/>
 
-        <activity android:name=".notification.NotificationActivity"/>
+        <activity
+            android:name=".examples.photo.FullscreenActivity"
+            android:label="@string/title_activity_fullscreen"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"/>
 
-        <activity android:name=".photo.FullscreenActivity" android:theme="@style/AppTheme.NoActionBar.Fullscreen"/>
-
-        <receiver android:name=".notification.NotificationBroadcastReceiver">
+        <receiver android:name=".examples.notification.NotificationBroadcastReceiver">
             <intent-filter>
                 <action android:name="hochschuledarmstadt.photostream_tools.intent.NEW_PHOTO"/>
             </intent-filter>

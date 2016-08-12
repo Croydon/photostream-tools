@@ -48,7 +48,7 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
     private static final String KEY_CAB_SUBTITLE = "cab_subtitle";
 
     private final int menuRes;
-    private final AppCompatActivity activity;
+    private AppCompatActivity activity;
     private ArrayList<Integer> selectedIds = new ArrayList<>();
     private ActionMode actionMode;
 
@@ -76,19 +76,31 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
         for (int i = 0; i < adapter.getItemCount(); i++) {
             if (adapter.getItemAtPosition(i).getId() == itemId) {
                 dontAnimate(itemId);
-                adapter.notifyItemChanged(i, Boolean.FALSE);
+                adapter.notifyItemChanged(i);
                 break;
             }
         }
 
+        List<T> allItems = getAllItems();
         if (amountBeforeChange == 0 && getAmountSelectedItems() > 0) {
             actionMode = activity.startSupportActionMode(listener);
-            onUpdateContextualActionBar(actionMode, activity.getApplicationContext(), getAmountSelectedItems());
+            onUpdateContextualActionBar(actionMode, activity.getApplicationContext(), allItems, getAmountSelectedItems());
         } else if(amountBeforeChange > 0 && getAmountSelectedItems() == 0) {
             actionMode.finish();
         }else{
-            onUpdateContextualActionBar(actionMode, activity.getApplicationContext(), getAmountSelectedItems());
+            onUpdateContextualActionBar(actionMode, activity.getApplicationContext(), allItems, getAmountSelectedItems());
         }
+        allItems.clear();
+    }
+
+    @Override
+    boolean onItemLongClicked(H viewHolder, View v, T item) {
+        Integer itemId = Integer.valueOf(item.getId());
+        if (selectedIds.contains(itemId)) {
+            trigger(viewHolder, v, item);
+            return true;
+        }else
+            return super.onItemLongClicked(viewHolder, v, item);
     }
 
     @Override
@@ -113,26 +125,52 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
     }
 
     @Override
-    boolean onBindViewHolder(H viewHolder, int position) {
+    void onBindViewHolder(H viewHolder, int position) {
         int photoId = adapter.getItemAtPosition(position).getId();
-        boolean selected = selectedIds.contains(Integer.valueOf(photoId));
         View view = viewHolder.itemView.findViewById(getViewId());
-        boolean previouslySelected = view.isSelected();
+        boolean selected = selectedIds.contains(Integer.valueOf(photoId));
         view.setSelected(selected);
-        return previouslySelected == selected;
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        adapter = null;
+        if (actionMode != null) {
+            actionMode = null;
+        }
+        activity = null;
+        listener = null;
+    }
+
+    private List<T> getAllItems(){
+        List<T> items = new ArrayList<>();
+        int count = getAmountSelectedItems();
+        int found = 0;
+        for (int position = 0; position < adapter.getItemCount(); position++) {
+            T item = adapter.getItemAtPosition(position);
+            if (selectedIds.contains(Integer.valueOf(item.getId()))) {
+                items.add(item);
+                if (++found == count)
+                    break;
+            }
+        }
+        return items;
     }
 
     void reset() {
+        if (adapter == null)
+            return;
         int count = getAmountSelectedItems();
         int found = 0;
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            Integer itemId = Integer.valueOf(adapter.getItemAtPosition(i).getId());
+        for (int position = 0; position < adapter.getItemCount(); position++) {
+            Integer itemId = Integer.valueOf(adapter.getItemAtPosition(position).getId());
             if (selectedIds.contains(itemId)) {
                 dontAnimate(itemId);
-                adapter.notifyItemChanged(i, Boolean.FALSE);
+                adapter.notifyItemChanged(position);
                 if (++found == count)
                     break;
-        }
+            }
         }
         selectedIds.clear();
     }
@@ -156,7 +194,7 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
      * @param context Context Objekt, falls benötigt
      * @param selectedItemsCount Die Anzahl der selektierten Elemente
      */
-    protected abstract void onUpdateContextualActionBar(ActionMode actionMode, Context context, int selectedItemsCount);
+    protected abstract void onUpdateContextualActionBar(ActionMode actionMode, Context context, List<T> items, int selectedItemsCount);
 
     private class Listener implements ActionMode.Callback {
 

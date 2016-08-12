@@ -48,8 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
+import java.util.UUID;
 
 /**
  * Activities erhalten durch Erben von dieser Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
@@ -57,11 +56,14 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 public abstract class PhotoStreamActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final String TAG = PhotoStreamActivity.class.getName();
+    private static final String KEY_ACTIVITY_ID = "KEY_ACTIVITY_ID";
 
-    private PhotoStreamClient photoStreamClient;
+    private PhotoStreamClientDelegate photoStreamClient;
+
     private boolean bound;
     private Bundle refSavedInstanceState;
     private List<AsyncBitmapLoader<?>> asyncBitmapLoaders = new ArrayList<>();
+    private String activityId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,12 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         // Service starten, wenn die aktuelle Instanz der Activity neu erzeugt wurde
         if (savedInstanceState == null){
             startService(new Intent(this, PhotoStreamService.class));
+            if (getIntent() != null && getIntent().hasExtra("parent"))
+                activityId = getIntent().getStringExtra("parent");
+            else
+                activityId = UUID.randomUUID().toString();
+        }else{
+            activityId = savedInstanceState.getString(KEY_ACTIVITY_ID);
         }
     }
 
@@ -84,7 +92,8 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     protected void onPause() {
         super.onPause();
         if (!isFinishing() && isConnectedToService()) {
-            photoStreamClient.registerActivity(this);
+            photoStreamClient.removeActivityVisible(this);
+            photoStreamClient.addActivityMovedToBackground(this);
         }
     }
 
@@ -100,25 +109,36 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         super.onResume();
         if (!bound)
             bindService(new Intent(this, PhotoStreamService.class), this, Context.BIND_AUTO_CREATE);
-        if (isConnectedToService())
-            photoStreamClient.unregisterActivity(this);
+        if (isConnectedToService()) {
+            photoStreamClient.removeActivityMovedToBackground(this);
+            photoStreamClient.addActivityVisible(this);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         if (isConnectedToService()){
-            if (isFinishing() && this instanceof OnPhotosReceivedListener) {
-                photoStreamClient.resetEtag();
+            if (isChangingConfigurations() && photoStreamClient.hasOnPhotosReceivedListenerRegistered()) {
+                photoStreamClient.setShouldReloadFirstPageOfPhotosFromCache(Boolean.FALSE);
+            }else if(isFinishing() && (getIntent() == null || !getIntent().hasExtra("parent"))){
+                photoStreamClient.clearShouldReloadFirstPageOfPhotosFromCache();
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_ACTIVITY_ID, activityId);
     }
 
     @Override
     protected void onDestroy() {
         cancelTasks();
         if (photoStreamClient != null) {
-            photoStreamClient.unregisterActivity(this);
+            photoStreamClient.removeActivityMovedToBackground(this);
+            photoStreamClient.removeActivityVisible(this);
             onPhotoStreamServiceDisconnected(photoStreamClient);
         }
         try {
@@ -221,15 +241,18 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        photoStreamClient = ((PhotoStreamService.PhotoStreamServiceBinder)service).getClient();
+        PhotoStreamClientImpl client = ((PhotoStreamService.PhotoStreamServiceBinder) service).getClient();
+        photoStreamClient = new PhotoStreamClientDelegate(activityId, client);
         bound = true;
         onPhotoStreamServiceConnected(photoStreamClient, refSavedInstanceState);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        photoStreamClient.unregisterActivity(this);
+        photoStreamClient.removeActivityVisible(this);
+        photoStreamClient.removeActivityMovedToBackground(this);
         bound = false;
+        photoStreamClient.clear();
         photoStreamClient = null;
     }
 
@@ -448,4 +471,10 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
 
     }
 
+    @Override
+    public void startActivity(Intent intent) {
+        if (photoStreamClient.hasOnPhotosReceivedListenerRegistered())
+            intent.putExtra("parent", activityId);
+        super.startActivity(intent);
+    }
 }

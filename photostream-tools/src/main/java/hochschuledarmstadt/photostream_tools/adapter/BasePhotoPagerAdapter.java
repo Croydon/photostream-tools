@@ -35,8 +35,6 @@ import android.view.ViewGroup;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import hochschuledarmstadt.photostream_tools.PhotoStreamFragment;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public abstract class BasePhotoPagerAdapter extends PagerAdapter{
@@ -68,11 +66,16 @@ public abstract class BasePhotoPagerAdapter extends PagerAdapter{
     }
 
     public View getViewAtPosition(int position){
-        return container.findViewWithTag(Integer.valueOf(position));
+        if (container != null)
+            return container.findViewWithTag(Integer.valueOf(position));
+        else
+            return null;
     }
 
     public View getViewWithId(int id){
-        return container.findViewById(id);
+        if (container != null)
+            return container.findViewById(id);
+        return null;
     }
 
     @Override
@@ -80,10 +83,12 @@ public abstract class BasePhotoPagerAdapter extends PagerAdapter{
         View v = (View) object;
         int position = Integer.parseInt(v.getTag().toString());
         Photo photo = getPhotoAtPosition(position);
-        for (int i = 0; i < photos.size(); i++) {
-            Photo p = photos.get(i);
-            if (p.getId() == photo.getId())
-                return (position == i) ? POSITION_UNCHANGED : POSITION_NONE;
+        if (photo != null) {
+            for (int i = 0; i < photos.size(); i++) {
+                Photo p = photos.get(i);
+                if (p.getId() == photo.getId())
+                    return (position == i) ? POSITION_UNCHANGED : POSITION_NONE;
+            }
         }
         return POSITION_NONE;
     }
@@ -123,7 +128,10 @@ public abstract class BasePhotoPagerAdapter extends PagerAdapter{
     }
 
     public Photo getPhotoAtPosition(int position) {
-        return photos.get(position);
+        if (position >= 0 && position < photos.size())
+            return photos.get(position);
+        else
+            return null;
     }
 
     @Override
@@ -132,14 +140,14 @@ public abstract class BasePhotoPagerAdapter extends PagerAdapter{
         Photo photo = photos.get(position);
         LayoutInflater inflater = LayoutInflater.from(container.getContext());
         ViewGroup layout = (ViewGroup) inflater.inflate(layoutResId, container, false);
-        onBindView(layout, photo);
         layout.setTag(Integer.valueOf(position));
         layout.setId(photo.getId());
+        onBindView(layout, position, photo);
         container.addView(layout);
         return layout;
     }
 
-    protected abstract void onBindView(ViewGroup layout, Photo photo);
+    protected abstract void onBindView(ViewGroup layout, int position, Photo photo);
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object view) {
@@ -158,8 +166,12 @@ public abstract class BasePhotoPagerAdapter extends PagerAdapter{
         notifyDataSetChanged();
     }
 
-    public Parcelable saveStateInstanceState() {
+    public Parcelable saveInstanceState() {
         return new SavedState(photos);
+    }
+
+    public ArrayList<Photo> getItems() {
+        return new ArrayList<>(photos);
     }
 
     protected static class SavedState implements Parcelable {

@@ -33,7 +33,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
  * {@link OnPhotoUploadListener#onPhotoUploadFailed(HttpError)}<br>
  * Wird aufgerufen, wenn ein Photo aufgrund eines Fehlers nicht über den Server veröffentlicht werden konnte.
  */
-public interface OnPhotoUploadListener extends OnRequestListener {
+public interface OnPhotoUploadListener {
 
     /**
      * Wird aufgerufen, wenn das Photo über den Server veröffentlicht wurde

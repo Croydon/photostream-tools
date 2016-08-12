@@ -27,7 +27,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hochschuledarmstadt.photostream_tools.examples.comment.CommentActivity">
+    tools:context=".examples.comment.CommentActivity">
 
     <TextView
         android:layout_width="match_parent"

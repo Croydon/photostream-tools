@@ -50,6 +50,7 @@ class HttpGetExecutor extends HttpExecutor {
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(getUrl()).openConnection();
         urlConnection.setDoInput(true);
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.setReadTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", getInstallationId());
         for (Map.Entry<String, String> entry : headerFields.entrySet()){
             urlConnection.addRequestProperty(entry.getKey(), entry.getValue());

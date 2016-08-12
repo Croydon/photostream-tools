@@ -24,14 +24,17 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,12 +46,14 @@ import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
 abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> extends RecyclerView.Adapter<H> {
 
-    public static final int EXTENSION_EVENT_TYPE_CLICK = 0x2389472;
-    public static final int EXTENSION_EVENT_TYPE_LONG_CLICK = 0x8389472;
-    private static final String KEY_COUNT_EXTENSIONS = "KEY_COUNT_EXTENSIONS";
+    private static final int PLUGIN_EVENT_TYPE_CLICK = 0x2389472;
+    private static final int PLUGIN_EVENT_TYPE_LONG_CLICK = 0x8389472;
+
+    private static final String KEY_COUNT_PLUGINS = "KEY_COUNT_PLUGINS";
 
     private DelegateOnLongClickListener delegateOnLongClickListener = new DelegateOnLongClickListener();
     private DelegateOnClickListener clickDelegate = new DelegateOnClickListener(null);
+    private WeakReference<Activity> activity;
 
     private static final class PluginInfo<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
         public PluginInfo(Plugin<H, T> plugin, int eventType, @IdRes int viewId) {
@@ -62,6 +67,9 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         @IdRes
         public int viewId;
 
+        public void destroy() {
+            plugin.destroy();
+        }
     }
 
     protected static final String KEY_ITEMS = "KEY_ITEMS";
@@ -81,11 +89,11 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
     }
 
     public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, T> plugin) {
-        internalAddPlugin(viewId, plugin, EXTENSION_EVENT_TYPE_LONG_CLICK);
+        internalAddPlugin(viewId, plugin, PLUGIN_EVENT_TYPE_LONG_CLICK);
     }
 
     public void addOnClickPlugin(@IdRes int viewId, Plugin<H, T> plugin) {
-        internalAddPlugin(viewId, plugin, EXTENSION_EVENT_TYPE_CLICK);
+        internalAddPlugin(viewId, plugin, PLUGIN_EVENT_TYPE_CLICK);
     }
 
     private void internalAddPlugin(@IdRes int viewId, Plugin<H, T> plugin, int eventType){
@@ -171,7 +179,7 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         }
     }
 
-    public List<T> getItems(){
+    public ArrayList<T> getItems(){
         return new ArrayList<>(items);
     }
 
@@ -196,11 +204,23 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
      */
     public Bundle saveInstanceState() {
         Bundle bundle = new Bundle();
-        bundle.putInt(KEY_COUNT_EXTENSIONS, plugins.size());
+        bundle.putInt(KEY_COUNT_PLUGINS, plugins.size());
+        int position = 0;
         for (PluginInfo<H, T> e : plugins) {
-            e.plugin.saveInstanceState(bundle);
+            Bundle childBundle = new Bundle();
+            e.plugin.saveInstanceState(childBundle);
+            String key = String.valueOf(e.viewId) + String.valueOf(++position);
+            bundle.putBundle(key, childBundle);
         }
         bundle.putParcelableArrayList(KEY_ITEMS, items);
+        if (this.activity != null) {
+            Activity activity = this.activity.get();
+            if (activity != null) {
+                if (activity.isFinishing() || activity.isChangingConfigurations()) {
+                    if (!destroyed) destroyReferences();
+                }
+            }
+        }
         return bundle;
     }
 
@@ -210,13 +230,16 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
      * @param bundle das Bundle, welches die Liste von Items enthält
      */
     public void restoreInstanceState(Bundle bundle) {
-        int countExtensions = bundle.getInt(KEY_COUNT_EXTENSIONS);
-        if (countExtensions != plugins.size()){
-            throw new IllegalStateException("Extensions müssen vor dem restoreInstanceState() Aufruf gesetzt werden!");
+        int countPlugins = bundle.getInt(KEY_COUNT_PLUGINS);
+        if (countPlugins != plugins.size()){
+            throw new IllegalStateException("Plugins müssen vor dem restoreInstanceState() Aufruf gesetzt werden!");
         }
         items = bundle.getParcelableArrayList(KEY_ITEMS);
+        int position = 0;
         for (PluginInfo<H, T> e : plugins) {
-            e.plugin.restoreInstanceState(bundle);
+            String key = String.valueOf(e.viewId) + String.valueOf(++position);
+            Bundle childBundle = bundle.getBundle(key);
+            e.plugin.restoreInstanceState(childBundle);
         }
     }
 
@@ -272,11 +295,24 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvenH, T item);
     }
 
+    private boolean destroyed = false;
+
+    protected void destroyReferences() {
+        for(PluginInfo<H, T> plugin : plugins){
+            plugin.destroy();
+        }
+        plugins.clear();
+        destroyed = true;
+    }
+
     @Override
     public void onBindViewHolder(H holder, int position) {
-        applyOnItemClickListeners(holder);
-        applyOnItemLongClickListeners(holder);
+        observeActivityWindow(holder);
+        List<View> views = getAllViewsInLayout(holder.itemView);
+        applyOnItemClickListeners(holder, views);
+        applyOnItemLongClickListeners(holder, views);
         applyOnItemTouchListeners(holder);
+        views.clear();
         for (PluginInfo<H, T> e : plugins) {
             Integer itemId = Integer.valueOf((int) getItemId(position));
             if (ignoredAnimations.contains(itemId)){
@@ -287,7 +323,32 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         }
     }
 
-    private static ArrayList<View> getAllViewsWithValidId(View root) {
+    private void observeActivityWindow(H holder) {
+        if (activity == null) {
+            try {
+                activity = new WeakReference<>((Activity) holder.itemView.getContext());
+                activity.get().getWindow().getDecorView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    @Override
+                    public void onViewAttachedToWindow(View view) {
+
+                    }
+
+                    @Override
+                    public void onViewDetachedFromWindow(View view) {
+                        if (activity.get().isFinishing()) {
+                            if (!destroyed)
+                                destroyReferences();
+                        }
+                        activity.get().getWindow().getDecorView().removeOnAttachStateChangeListener(this);
+                        activity.clear();
+                        activity = null;
+                    }
+                });
+            } catch (ClassCastException e) { }
+        }
+    }
+
+    private static ArrayList<View> getAllViewsInLayout(View root) {
         ArrayList<View> views = new ArrayList<>();
         views.add(root);
         if (root instanceof ViewGroup) {
@@ -296,7 +357,7 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
             for (int i = 0; i < childCount; i++) {
                 final View child = rootViewGroup.getChildAt(i);
                 if (child instanceof ViewGroup) {
-                    views.addAll(getAllViewsWithValidId(child));
+                    views.addAll(getAllViewsInLayout(child));
                 } else {
                     views.add(child);
                 }
@@ -305,15 +366,13 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         return views;
     }
 
-    private void applyOnItemLongClickListeners(H holder) {
+    private void applyOnItemLongClickListeners(H holder, List<View> views) {
 
-        List<View> viewsWithValidId = getAllViewsWithValidId(holder.itemView);
-
-        for (View view : viewsWithValidId) {
+        for (View view : views) {
             int viewId = view.getId();
             if (viewId != View.NO_ID) {
                 OnItemLongClickListener<H, T> listener = itemLongClickListenersMap.get(viewId);
-                List<PluginInfo<H, T>> injectees = getCompatibleExtensions(viewId, EXTENSION_EVENT_TYPE_LONG_CLICK);
+                List<PluginInfo<H, T>> injectees = getCompatiblePlugins(viewId, PLUGIN_EVENT_TYPE_LONG_CLICK);
                 if (listener != null || !injectees.isEmpty()) {
                     view.setOnLongClickListener(new InternalOnLongClickListener(holder, injectees));
                 } else {
@@ -333,7 +392,7 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
             ignoredAnimations.add(itemId);
     }
 
-    private List<PluginInfo<H, T>> getCompatibleExtensions(int viewId, int eventType) {
+    private List<PluginInfo<H, T>> getCompatiblePlugins(int viewId, int eventType) {
         List<PluginInfo<H, T>> injectees = new ArrayList<>();
         for (PluginInfo<H, T> e : plugins) {
             if (e.eventType == eventType && viewId == e.viewId) {
@@ -343,15 +402,13 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         return injectees;
     }
 
-    private void applyOnItemClickListeners(H holder) {
+    private void applyOnItemClickListeners(H holder, List<View> views) {
 
-        List<View> viewsWithValidId = getAllViewsWithValidId(holder.itemView);
-
-        for (View view : viewsWithValidId) {
+        for (View view : views) {
             int viewId = view.getId();
             if (viewId != View.NO_ID) {
                 OnItemClickListener<H, T> listener = itemClickListenersMap.get(viewId);
-                List<PluginInfo<H, T>> injectees = getCompatibleExtensions(viewId, EXTENSION_EVENT_TYPE_CLICK);
+                List<PluginInfo<H, T>> injectees = getCompatiblePlugins(viewId, PLUGIN_EVENT_TYPE_CLICK);
                 if (listener != null || !injectees.isEmpty()) {
                     view.setOnClickListener(new DelegateOnClickListener(new InternalOnClickListener(holder, injectees)));
                 } else {

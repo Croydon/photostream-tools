@@ -26,7 +26,6 @@ package hochschuledarmstadt.photostream_tools;
 
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,11 +35,7 @@ import android.transition.Transition;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -49,23 +44,19 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
+    private static final float TOUCH_OFFSET = 10.f;
     private static final String KEY_SYSTEM_UI_VISIBLE = "KEY_SYSTEM_UI_VISIBLE";
-    public static final float TOUCH_OFFSET = 10.f;
-    public static final int UI_HIDE_DELAY_MILLIS = 0; //500;
-    public static final int UI_SHOW_DELAY_MILLIS = 0; //200;
-
-    private boolean isFirstStart = true;
-    private boolean systemUiVisible = false;
+    private static final String KEY_SCALE = "KEY_SCALE";
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
 
-    private ImageViewAttacher imageViewAttacher;
-    private OnImageViewZoomChangedListener zoomChangedListener;
+    private float scale = 1.0f;
 
     float x, y;
-
-    private boolean uiVisibilitySelfTriggered = false;
-
+    private boolean isFirstStart = true;
+    private boolean systemUiVisible = false;
+    private ImageViewAttacher imageViewAttacher;
+    private OnImageViewZoomChangedListener zoomChangedListener;
     private final Runnable runnableZoomReset = new Runnable() {
         @Override
         public void run() {
@@ -80,18 +71,18 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                 zoomChangedListener.onImageViewZoomedIn();
         }
     };
-
+    private boolean uiVisibilitySelfTriggered = false;
     private Runnable runnableShowSystemUi = new Runnable() {
         @Override
         public void run() {
             uiVisibilitySelfTriggered = true;
             if (Build.VERSION.SDK_INT >= 16) {
-                getWindow().getDecorView().setSystemUiVisibility(
+                getWindow().getDecorView().getRootView().setSystemUiVisibility(
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             } else {
-                getWindow().getDecorView().setSystemUiVisibility(0);
+                getWindow().getDecorView().getRootView().setSystemUiVisibility(0);
             }
         }
     };
@@ -113,7 +104,16 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     protected abstract void onSystemUiHidden();
 
     protected void setImageViewZoomable(ImageView imageView, OnImageViewZoomChangedListener zoomChangedListener){
+
+        if (imageViewAttacher != null){
+            imageViewAttacher.setOnDoubleTapListener(null);
+            imageViewAttacher.setOnScaleChangeListener(null);
+            imageViewAttacher.cleanup();
+            imageViewAttacher = null;
+        }
+
         this.zoomChangedListener = zoomChangedListener;
+
         imageViewAttacher = new ImageViewAttacher(imageView);
         imageViewAttacher.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
             @Override
@@ -137,12 +137,14 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                 handler.removeCallbacks(runnableZoomedIn);
                 handler.removeCallbacks(runnableZoomReset);
                 if (Math.abs(1.0f - scaleFactor) < 0.001){
-                    handler.postDelayed(runnableZoomReset, 100);
+                    handler.postDelayed(runnableZoomReset, 150);
                 }else {
-                    handler.postDelayed(runnableZoomedIn, 100);
+                    handler.postDelayed(runnableZoomedIn, 150);
                 }
             }
         });
+        imageViewAttacher.setScale(scale);
+        imageViewAttacher.update();
     }
 
     @Override
@@ -156,25 +158,16 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             super.onBackPressed();
     }
 
-    protected interface OnImageViewZoomChangedListener {
-        /**
-         * Diese Methode wird aufgerufen, sobald das Bild nicht mehr gezoomt ist
-         */
-        void onImageViewZoomReset();
-        /**
-         * Diese Methode wird aufgerufen, wenn das Bild gezoomt wurde
-         */
-        void onImageViewZoomedIn();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null){
             isFirstStart = false;
             systemUiVisible = savedInstanceState.getBoolean(KEY_SYSTEM_UI_VISIBLE);
+            scale = savedInstanceState.getFloat(KEY_SCALE);
         }
-        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+
+        getWindow().getDecorView().getRootView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int i) {
                 if (!uiVisibilitySelfTriggered) {
@@ -194,6 +187,8 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
+        handleSystemUi();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (savedInstanceState == null) {
@@ -227,27 +222,33 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean handled = super.dispatchTouchEvent(ev);
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            x = ev.getRawX();
-            y = ev.getRawY();
-        }
-        if (canBeInterpretedAsATap(ev, handled)) {
-            boolean isVisible = isSystemUiVisible();
-            if (ev.getAction() == MotionEvent.ACTION_UP) {
-                if (isVisible)
-                    hideSystemUI();
-                else
-                    showSystemUI();
-                handled = true;
-            }
-        }
-        if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL){
-            x = 0;
-            y = 0;
-        }
 
-        return handled;
+        try {
+            boolean handled = super.dispatchTouchEvent(ev);
+            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                x = ev.getRawX();
+                y = ev.getRawY();
+            }
+            if (canBeInterpretedAsATap(ev, handled)) {
+                boolean isVisible = isSystemUiVisible();
+                if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    if (isVisible)
+                        hideSystemUI();
+                    else
+                        showSystemUI();
+                    handled = true;
+                }
+            }
+            if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                x = 0;
+                y = 0;
+            }
+
+            return handled;
+
+        }catch(Exception e){}
+
+        return false;
     }
 
     private boolean canBeInterpretedAsATap(MotionEvent ev, boolean handled) {
@@ -266,7 +267,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
      * @return {@code true, wenn beide Bars sichtbar sind, ansonsten {@code false}}
      */
     public boolean isSystemUiVisible() {
-        int currentSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+        int currentSystemUiVisibility = getWindow().getDecorView().getRootView().getSystemUiVisibility();
         if (Build.VERSION.SDK_INT >= 16) {
             int isVisible = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -350,6 +351,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_SYSTEM_UI_VISIBLE, isSystemUiVisible());
+        outState.putFloat(KEY_SCALE, imageViewAttacher != null ? imageViewAttacher.getScale() : 1.0f);
     }
 
     @Override
@@ -368,7 +370,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
         uiVisibilitySelfTriggered = true;
 
         if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 19) {
-            getWindow().getDecorView().setSystemUiVisibility(
+            getWindow().getDecorView().getRootView().setSystemUiVisibility(
                               View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -376,7 +378,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                             | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
         } else if (Build.VERSION.SDK_INT >= 19) {
-            getWindow().getDecorView().setSystemUiVisibility(
+            getWindow().getDecorView().getRootView().setSystemUiVisibility(
                               View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -384,16 +386,16 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+            getWindow().getDecorView().getRootView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
 
-        handler.postDelayed(runnableHideSystemUi, UI_HIDE_DELAY_MILLIS);
+        runnableHideSystemUi.run();
     }
 
     private void showSystemUI() {
         handler.removeCallbacks(runnableShowSystemUi);
         handler.removeCallbacks(runnableHideSystemUi);
-        handler.postDelayed(runnableShowSystemUi, UI_SHOW_DELAY_MILLIS);
+        runnableShowSystemUi.run();
         onSystemUiVisible();
     }
 
@@ -408,6 +410,17 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
         super.onDestroy();
     }
 
+    protected interface OnImageViewZoomChangedListener {
+        /**
+         * Diese Methode wird aufgerufen, sobald das Bild nicht mehr gezoomt ist
+         */
+        void onImageViewZoomReset();
+        /**
+         * Diese Methode wird aufgerufen, wenn das Bild gezoomt wurde
+         */
+        void onImageViewZoomedIn();
+    }
+
     private static class ImageViewAttacher extends PhotoViewAttacher {
 
         public ImageViewAttacher(ImageView imageView) {
@@ -420,8 +433,9 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
         @Override
         public boolean onTouch(View v, MotionEvent ev) {
+            boolean result = super.onTouch(v, ev);
             ev.setSource(getImageView().getId());
-            return super.onTouch(v, ev);
+            return true;
         }
     }
 

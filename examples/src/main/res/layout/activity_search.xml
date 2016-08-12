@@ -27,7 +27,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hochschuledarmstadt.photostream_tools.examples.search.SearchActivity">
+    tools:context=".examples.search.SearchActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

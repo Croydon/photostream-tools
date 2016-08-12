@@ -33,7 +33,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
  * {@link OnSearchedPhotosReceivedListener#onReceiveSearchedPhotosFailed(String, HttpError)}<br>
  * Wird aufgerufen, wenn eine Seite von gesuchten Photos <b>nicht</b> geladen werden konnte
  */
-public interface OnSearchedPhotosReceivedListener extends OnRequestListener {
+public interface OnSearchedPhotosReceivedListener {
     /**
      * Wird aufgerufen, wenn eine Seite von gesuchten Photos geladen werden konnte
      * @param result enthält die gefundenen Photos aus der Seite

@@ -36,16 +36,20 @@ import io.socket.engineio.client.transports.WebSocket;
 
 class WebSocketClientImpl implements WebSocketClient {
 
-    public static final int RECONNECTION_DELAY_IN_MILLIS = 10000;
-    public static final int COUNT_OF_RECONNECTION_ATTEMPTS = 10;
+    public static final int RECONNECTION_DELAY_IN_MILLIS = 3000;
+    public static final int COUNT_OF_RECONNECTION_ATTEMPTS = 30;
     private String installationId;
+    private final HttpImageLoader imageLoader;
     private String url;
     private AndroidSocket.OnMessageListener messageListener;
     private AndroidSocket androidSocket;
+    private ImageCacher imageCacher;
 
-    public WebSocketClientImpl(String url, String installationId) {
+    public WebSocketClientImpl(String url, String installationId, ImageCacher imageCacher, HttpImageLoader imageLoader) {
         this.url = url;
         this.installationId = installationId;
+        this.imageCacher = imageCacher;
+        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -61,11 +65,12 @@ class WebSocketClientImpl implements WebSocketClient {
             options.reconnection = true;
             options.transports = new String[]{WebSocket.NAME};
             options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
-
+            options.forceNew = true;
+            options.rememberUpgrade = true;
             String endpoint = String.format("%s/?token=%s", this.url, installationId);
             URI uri = URI.create(endpoint);
             if (androidSocket == null)
-                androidSocket = new AndroidSocket(options, uri, messageListener);
+                androidSocket = new AndroidSocket(options, uri, imageLoader, imageCacher, messageListener);
             return androidSocket.connect();
         } catch (KeyManagementException e) {
             Log.e(PhotoStreamService.class.getName(), e.toString());

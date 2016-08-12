@@ -36,7 +36,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
  * Wird aufgerufen, wenn keine neuen Photos im Stream vorhanden sind.
  *
  */
-public interface OnPhotosReceivedListener extends OnRequestListener {
+public interface OnPhotosReceivedListener {
     /**
      * Wird aufgerufen, wenn eine Seite von Photos aus dem Stream geladen werden konnte
      * @param result enthält die Seitenzahl, sowie die Photos aus dem Stream

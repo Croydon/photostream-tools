@@ -31,7 +31,7 @@ import hochschuledarmstadt.photostream_tools.model.Comment;
  * {@link OnNewCommentReceivedListener#onNewCommentReceived(Comment)}<br>
  * Wird aufgerufen wenn ein neuer Kommentar zu einem Photo vorhanden ist.<br>
  */
-public interface OnNewCommentReceivedListener extends OnRequestListener {
+public interface OnNewCommentReceivedListener {
     /**
      * Wird aufgerufen wenn ein neuer Kommentar zu einem Photo vorhanden ist.<br>
      * {@code comment} kann ein eigener Kommentar sein oder ein Kommentar von einem anderen Gerät

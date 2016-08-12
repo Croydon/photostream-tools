@@ -39,6 +39,7 @@ class HttpDeleteExecutor extends HttpExecutor{
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(getUrl()).openConnection();
         urlConnection.setRequestMethod("DELETE");
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.setReadTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", getInstallationId());
         final int responseCode = urlConnection.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK){

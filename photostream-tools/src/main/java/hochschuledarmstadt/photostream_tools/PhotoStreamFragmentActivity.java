@@ -31,10 +31,10 @@ import java.util.ArrayList;
 /**
  * Fragmente, die von {@link PhotoStreamFragment} erben, erhalten über diese Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
  */
-public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity implements ServiceStateChangedNotifier {
+public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity implements ServiceStateChangedNotifier, OnBackPressedNotifier {
 
     private ArrayList<OnServiceStateChangedListener> serviceStateChangedListeners = new ArrayList<>();
-
+    private ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
     boolean alreadyNotified = false;
 
     @Override
@@ -50,6 +50,38 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
             if (isConnectedToService())
                 onServiceStateChangedListener.onServiceConnected(getPhotoStreamClient());
         }
+    }
+
+    @Override
+    public void addOnBackPressedListener(OnBackPressedListener listener) {
+        if (onBackPressedListeners.contains(listener))
+            onBackPressedListeners.add(listener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        serviceStateChangedListeners.clear();
+        onBackPressedListeners.clear();
+    }
+
+    @Override
+    public void removeOnBackPressedListener(OnBackPressedListener listener) {
+        if (onBackPressedListeners.contains(listener))
+            onBackPressedListeners.remove(listener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        boolean handled = false;
+        for (OnBackPressedListener listener : onBackPressedListeners) {
+            if (listener.onBackPressed()) {
+                handled = true;
+                break;
+            }
+        }
+        if (!handled)
+            super.onBackPressed();
     }
 
     /**
@@ -82,4 +114,9 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
             onServiceStateChangedListener.onServiceDisconnected(photoStreamClient);
         alreadyNotified = false;
     }
+
+    interface OnBackPressedListener {
+        boolean onBackPressed();
+    }
+
 }

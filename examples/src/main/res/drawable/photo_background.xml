@@ -25,7 +25,9 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Hintergrund festlegen, wenn selektiert -->
     <item android:state_selected="true" android:drawable="@color/colorAccent"/>
+    <!-- Default -->
     <item android:drawable="@android:color/transparent"/>
 
 </selector>

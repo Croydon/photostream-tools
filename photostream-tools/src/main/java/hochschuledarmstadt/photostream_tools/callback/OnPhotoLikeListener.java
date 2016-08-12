@@ -35,7 +35,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpError;
  * Wird aufgerufen wenn beim Liken oder Disliken eines Photos ein Fehler aufgetreten ist
  *
  */
-public interface OnPhotoLikeListener extends OnRequestListener {
+public interface OnPhotoLikeListener {
     /**
      * Wird aufgerufen wenn ein Photo geliked wurde
      * @param photoId id des Photos

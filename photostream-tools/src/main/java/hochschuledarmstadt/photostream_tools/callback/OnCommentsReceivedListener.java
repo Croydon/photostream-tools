@@ -35,7 +35,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpError;
  * {@link OnCommentsReceivedListener#onReceiveCommentsFailed(int, HttpError)} <br>
  * Wird aufgerufen wenn beim Abrufen der Kommentare ein Fehler aufgetreten ist <br> <br>
  */
-public interface OnCommentsReceivedListener extends OnRequestListener {
+public interface OnCommentsReceivedListener {
 
     /**
      * Wird aufgerufen wenn die Kommentare zu einem Photo abefragt werden konnten

@@ -30,6 +30,7 @@ import android.util.Base64;
 import com.google.gson.Gson;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,7 @@ public class ImageCacherTest {
     private void educateMock(String fileName) {
         when(context.getFileStreamPath(fileName)).thenReturn(new File(CURRENT_DIR, fileName));
         try {
-            when(context.openFileOutput(fileName, Context.MODE_PRIVATE)).thenReturn(new FileOutputStream(new File(CURRENT_DIR, fileName)));
+            when(context.openFileOutput(fileName, Context.MODE_WORLD_WRITEABLE)).thenReturn(new FileOutputStream(new File(CURRENT_DIR, fileName)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -78,8 +79,9 @@ public class ImageCacherTest {
     public void tearDown() {
         if (photo != null) {
             File imageFile = photo.getImageFile();
-            if (imageFile != null && imageFile.exists())
+            if (imageFile != null && imageFile.exists()) {
                 imageFile.delete();
+            }
         }
     }
 
@@ -139,3 +141,4 @@ public class ImageCacherTest {
     }
 
 }
+

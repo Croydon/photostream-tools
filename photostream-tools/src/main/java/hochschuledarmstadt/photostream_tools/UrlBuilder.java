@@ -30,21 +30,28 @@ import java.net.URLEncoder;
 class UrlBuilder {
 
     private final String baseUrl;
+    private final int photoPageSize;
 
-    public UrlBuilder(String baseUrl){
+    public UrlBuilder(String baseUrl, int photoPageSize){
         this.baseUrl = baseUrl;
+        this.photoPageSize = photoPageSize;
+    }
+
+    public int getPhotoPageSize() {
+        return photoPageSize;
     }
 
     public String getUploadPhotoApiUrl(){
         return  String.format("%s/photostream/api/image", baseUrl);
     }
 
-    public String getLoadPhotosApiUrl(){
-        return String.format("%s/photostream/api/stream", baseUrl);
+    public String getLoadPhotosApiUrl(boolean initialLoad){
+        int initial = initialLoad ? 1 : 0;
+        return String.format("%s/photostream/api/stream?page_size=%d&initial_load=%d", baseUrl, photoPageSize, initial);
     }
 
     public String getLoadMorePhotosApiUrl(){
-        return String.format("%s/photostream/api/stream/more", baseUrl);
+        return String.format("%s/photostream/api/stream/more?page_size=%d", baseUrl, photoPageSize);
     }
 
     public String getDeletePhotoApiUrl(int photoId){
@@ -72,20 +79,22 @@ class UrlBuilder {
     }
 
     public String getSearchMorePhotosApiUrl() {
-        return String.format("%s/photostream/api/search/more", baseUrl);
+        return String.format("%s/photostream/api/search/more?page_size=%d", baseUrl, photoPageSize);
     }
 
     public String getSearchPhotosApiUrl(String query) {
         try {
-            return String.format("%s/photostream/api/search/?q=%s", baseUrl, URLEncoder.encode(query, "UTF-8"));
+            String encode = URLEncoder.encode(query, "UTF-8");
+            return String.format("%s/photostream/api/search/?q=%s&page_size=%d", baseUrl, encode, photoPageSize);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return String.format("%s/photostream/api/search/?q=%s", baseUrl, query);
+            return String.format("%s/photostream/api/search/?q=%s&page_size=%d", baseUrl, query, photoPageSize);
         }
     }
 
     public String getFormatPhotoContentApiUrl(){
         return String.format("%s/photostream/api/image/%s/content", baseUrl, "%s");
     }
+
 
 }

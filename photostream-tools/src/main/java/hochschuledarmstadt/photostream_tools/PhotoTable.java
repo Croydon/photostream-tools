@@ -43,12 +43,14 @@ class PhotoTable {
     public static final String TABLE_NAME = "photo";
 
     public static final String COLUMN_PAGE = "page";
+    public static final String COLUMN_PAGE_SIZE = "page_size";
     public static final String COLUMN_PHOTOS = "photos";
     public static final String COLUMN_ETAG = "etag";
 
     public static final String TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NAME + "("
             + COLUMN_PAGE + " INTEGER NOT NULL, "
+            + COLUMN_PAGE_SIZE + " INTEGER NOT NULL, "
             + COLUMN_PHOTOS + " TEXT NOT NULL, "
             + COLUMN_ETAG + " TEXT NOT NULL, "
             + String.format("PRIMARY KEY (%s)", COLUMN_PAGE)
@@ -74,10 +76,11 @@ class PhotoTable {
         }
     }
 
-    public void insertOrReplacePhotos(String jsonStringPhotoQueryResult, int page, String eTag) {
+    public void insertOrReplacePhotos(String jsonStringPhotoQueryResult, int page, int photoPageSize, String eTag) {
         ContentValues cv = new ContentValues();
         cv.put(PhotoTable.COLUMN_PAGE, page);
         cv.put(PhotoTable.COLUMN_ETAG, eTag);
+        cv.put(PhotoTable.COLUMN_PAGE_SIZE, photoPageSize);
         cv.put(PhotoTable.COLUMN_PHOTOS, jsonStringPhotoQueryResult);
         try{
             database.insertOrThrow(TABLE_NAME, null, cv);
@@ -87,11 +90,11 @@ class PhotoTable {
 
     }
 
-    public String loadEtagFor(int page) {
+    public String loadEtagFor(int page, int photoPageSize) {
         Cursor cursor = database.query(TABLE_NAME,
                 new String[]{PhotoTable.COLUMN_ETAG},
-                PhotoTable.COLUMN_PAGE + " = ?",
-                new String[]{String.valueOf(page)},
+                PhotoTable.COLUMN_PAGE + " = ? AND " + PhotoTable.COLUMN_PAGE_SIZE + " = ?",
+                new String[]{String.valueOf(page), String.valueOf(photoPageSize)},
                 null,null,null);
 
         String eTag = null;
@@ -102,11 +105,11 @@ class PhotoTable {
         return eTag;
     }
 
-    public PhotoQueryResult getCachedPhotoQueryResult(int page) {
+    public PhotoQueryResult getCachedPhotoQueryResult(int page, int photoPageSize) {
         Cursor cursor = database.query(TABLE_NAME,
                 new String[]{PhotoTable.COLUMN_PHOTOS},
-                PhotoTable.COLUMN_PAGE + " = ?",
-                new String[]{String.valueOf(page)},
+                PhotoTable.COLUMN_PAGE + " = ? AND " + PhotoTable.COLUMN_PAGE_SIZE + " = ?",
+                new String[]{String.valueOf(page), String.valueOf(photoPageSize)},
                 null,null,null);
 
         PhotoQueryResult photos = null;

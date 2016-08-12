@@ -35,21 +35,28 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Kommunikationsschnittstelle zu dem PhotoStream Server
  */
-public final class PhotoStreamService extends Service {
+public final class PhotoStreamService extends Service implements PhotoStreamCallbackContainer.OnNoActivitesRemainingListener {
 
     private static final String TAG = PhotoStreamService.class.getName();
     private static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";
-
+    private static final String PAGE_SIZE_MANIFEST_KEY = "PAGE_SIZE";
+    private static final int DEFAULT_PAGE_SIZE = 5;
     private IBinder photoStreamServiceBinder = new PhotoStreamServiceBinder();
-    private PhotoStreamClient photoStreamClient;
+    private PhotoStreamClientImpl photoStreamClientImpl;
+
+    @Override
+    public void onNoActivitesRegistered() {
+        stopSelf();
+    }
 
     public class PhotoStreamServiceBinder extends Binder {
-        public PhotoStreamClient getClient() {
-            return photoStreamClient;
+        public PhotoStreamClientImpl getClient() {
+            return photoStreamClientImpl;
         }
     }
 
@@ -58,20 +65,39 @@ public final class PhotoStreamService extends Service {
         super.onCreate();
 
         final String photoStreamUrl = loadPhotoStreamUrlFromManifest();
+        final int photoPageSize = loadPhotoPageSizeFromManifest();
         final Context context = getApplicationContext();
         final String uniqueAndroidId = getUniqueAndroidId();
 
-        UrlBuilder urlBuilder = new UrlBuilder(photoStreamUrl);
+        UrlBuilder urlBuilder = new UrlBuilder(photoStreamUrl, photoPageSize);
         String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
-        HttpImageLoader imageLoader = new HttpImageLoader(formatPhotoContentApiUrl);
+        HttpImageLoaderFactory imageLoaderFactory = new HttpImageLoaderFactory(formatPhotoContentApiUrl);
+        ImageCacherFactory imageCacherFactory = new ImageCacherFactory(context);
         DbConnection db = DbConnection.getInstance(context);
-        WebSocketClient wsClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId);
+        WebSocketClient wsClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId, new ImageCacher(getApplicationContext()), new HttpImageLoader(formatPhotoContentApiUrl));
         HttpExecutorFactory httpFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
-        ImageCacher imageCacher = new ImageCacher(context);
 
-        photoStreamClient = new PhotoStreamClient(context, urlBuilder, imageLoader, imageCacher, db, wsClient, httpFactory);
-        photoStreamClient.bootstrap();
+        photoStreamClientImpl = new PhotoStreamClientImpl(context, urlBuilder, imageLoaderFactory, imageCacherFactory, db, wsClient, httpFactory);
+        photoStreamClientImpl.setOnNoActivitiesRemainingListener(this);
+        photoStreamClientImpl.bootstrap();
 
+        Log.d(PhotoStreamService.class.getName(), "service created");
+
+    }
+
+    private int loadPhotoPageSizeFromManifest() {
+        try {
+            Bundle bundle = loadMetaDataFromManifest();
+            int pageSize = bundle.getInt(PAGE_SIZE_MANIFEST_KEY, DEFAULT_PAGE_SIZE);
+            if (pageSize <= 1)
+                pageSize = DEFAULT_PAGE_SIZE;
+            return pageSize;
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.log(TAG, LogLevel.ERROR, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+        } catch (NullPointerException e) {
+            Logger.log(TAG, LogLevel.ERROR, "Failed to load meta-data, NullPointer: " + e.getMessage());
+        }
+        return DEFAULT_PAGE_SIZE;
     }
 
     @NonNull
@@ -85,8 +111,7 @@ public final class PhotoStreamService extends Service {
 
     private String readUrlFromManifest() {
         try {
-            ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
+            Bundle bundle = loadMetaDataFromManifest();
             String url = bundle.getString(PHOTOSTREAM_URL_MANIFEST_KEY);
             return url;
         } catch (PackageManager.NameNotFoundException e) {
@@ -97,9 +122,14 @@ public final class PhotoStreamService extends Service {
         return null;
     }
 
+    private Bundle loadMetaDataFromManifest() throws PackageManager.NameNotFoundException {
+        ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+        return ai.metaData;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private String getUniqueAndroidId(){
@@ -108,7 +138,8 @@ public final class PhotoStreamService extends Service {
 
     @Override
     public void onDestroy() {
-        photoStreamClient.destroy();
+        Log.d(PhotoStreamService.class.getName(), "service destroyed");
+        photoStreamClientImpl.destroy();
         super.onDestroy();
     }
 

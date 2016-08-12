@@ -24,11 +24,16 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 public class HttpImageLoaderStub extends HttpImageLoader {
+
+    private Photo photo;
+    private byte[] bytes = ByteBuffer.allocate(4).putInt(0xffd8ffe0).array();;
+    private boolean isRunning = true;
 
     public HttpImageLoaderStub() {
         super(null);
@@ -36,21 +41,22 @@ public class HttpImageLoaderStub extends HttpImageLoader {
 
     @Override
     public void execute(List<Photo> photos) {
-        super.execute(photos);
+        photo = photos.get(0);
     }
 
     @Override
     public boolean isRunning() {
-        return super.isRunning();
+        return isRunning;
     }
 
     @Override
     public HttpImage take() {
-        return super.take();
+        isRunning = false;
+        return new HttpImage(photo, bytes);
     }
 
     @Override
-    public void onResponse(byte[] imageData, Photo photo) {
-        super.onResponse(imageData, photo);
+    public void onResponse(byte[] imageData, Photo photo, boolean fileNotFound) {
+        super.onResponse(imageData, photo, fileNotFound);
     }
 }

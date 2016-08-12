@@ -32,12 +32,14 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -57,17 +59,19 @@ class AndroidSocket {
     private static final String COMMENT_DELETED = "comment_deleted";
     private static final String PHOTO_DELETED = "photo_deleted";
     private static final String NEW_COMMENT_COUNT = "new_comment_count";
-
+    private static final Handler handler = new Handler(Looper.getMainLooper());
+    private final HttpImageLoader imageLoader;
+    private final ImageCacher imageCacher;
     private IO.Options options;
     private Socket socket;
     private URI uri;
     private OnMessageListener onMessageListener;
 
-    private static final Handler handler = new Handler(Looper.getMainLooper());
-
-    public AndroidSocket(IO.Options options, URI uri,OnMessageListener onMessageListener) throws NoSuchAlgorithmException, KeyManagementException {
+    public AndroidSocket(IO.Options options, URI uri, HttpImageLoader imageLoader, ImageCacher imageCacher, OnMessageListener onMessageListener) throws NoSuchAlgorithmException, KeyManagementException {
         this.options = options;
         this.uri = uri;
+        this.imageLoader = imageLoader;
+        this.imageCacher = imageCacher;
         this.onMessageListener = onMessageListener;
     }
 
@@ -94,24 +98,24 @@ class AndroidSocket {
     }
 
     public boolean connect() throws URISyntaxException {
-        if (socket != null){
+        if (socket != null) {
             socket.off();
             socket.close();
         }
-        socket = IO.socket(uri,options);
+        socket = IO.socket(uri, options);
         initializeSocket();
         socket.connect();
         return socket.connected();
     }
 
-    public boolean disconnect(){
-        if (socket != null && socket.connected()){
+    public boolean disconnect() {
+        if (socket != null && socket.connected()) {
             socket.disconnect();
         }
         return socket == null || !socket.connected();
     }
 
-    private void initializeSocket(){
+    private void initializeSocket() {
 
         socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
             @Override
@@ -123,41 +127,53 @@ class AndroidSocket {
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-               onMessageListener.onConnect();
+                onMessageListener.onConnect();
             }
         });
 
         socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-               // onMessageListener.onConnectError(uri);
+                // onMessageListener.onConnectError(uri);
             }
         });
 
         socket.on(Socket.EVENT_RECONNECT_FAILED, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-               // onMessageListener.onConnectError(uri);
+                // onMessageListener.onConnectError(uri);
             }
         });
 
         socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-              onMessageListener.onDisconnect();
+                onMessageListener.onDisconnect();
             }
         });
 
-        socket.on(NEW_PHOTO,new Emitter.Listener() {
+        socket.on(NEW_PHOTO, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 final Photo photo = new Gson().fromJson(args[0].toString(), Photo.class);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onMessageListener.onNewPhoto(photo);
+                ArrayList<Photo> list = new ArrayList<>(1);
+                list.add(photo);
+                imageLoader.execute(list);
+                HttpImageLoader.HttpImage httpImage = imageLoader.take();
+                if (httpImage != null) {
+                    try {
+                        imageCacher.cacheImage(httpImage.getPhoto(), httpImage.getImageData());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onMessageListener.onNewPhoto(photo);
+                        }
+                    });
+                }
+                list.clear();
             }
         });
 
@@ -227,13 +243,19 @@ class AndroidSocket {
         return socket != null && socket.connected();
     }
 
-    interface OnMessageListener{
+    interface OnMessageListener {
         void onNewPhoto(Photo photo);
+
         void onNewComment(Comment comment);
+
         void onCommentDeleted(int commentId);
+
         void onPhotoDeleted(int photoId);
+
         void onConnect();
+
         void onDisconnect();
+
         void onCommentCountChanged(int photoId, int comment_count);
     }
 }

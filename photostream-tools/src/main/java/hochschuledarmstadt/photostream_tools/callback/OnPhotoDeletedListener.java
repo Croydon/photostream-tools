@@ -33,7 +33,7 @@ import hochschuledarmstadt.photostream_tools.model.HttpError;
  * Wird aufgerufen wenn ein Photo aufgrund eines Fehlers nicht gelöscht werden konnte. <br> <br>
  * entspricht der id des Photos das nicht gelöscht werden konnte.
  */
-public interface OnPhotoDeletedListener extends OnRequestListener {
+public interface OnPhotoDeletedListener {
     /**
      * Wird aufgerufen wenn ein Photo gelöscht wurde
      * @param photoId entspricht der id des Photos das gelöscht wurde.

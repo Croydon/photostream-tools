@@ -52,6 +52,7 @@ class HttpPostExecutor extends HttpExecutor {
         urlConnection.setRequestMethod("POST");
         urlConnection.setDoOutput(true);
         urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.setReadTimeout(CONNECT_TIMEOUT);
         urlConnection.addRequestProperty("installation_id", getInstallationId());
         urlConnection.addRequestProperty("Content-Type", "application/json");
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), getEncoding()));

@@ -24,9 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-/**
- * Created by Andreas Schattney on 04.04.2016.
- */
 public class WebSocketClientStub implements WebSocketClient {
 
     private AndroidSocket.OnMessageListener messageListener;

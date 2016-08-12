@@ -33,7 +33,7 @@ import android.view.View;
 import hochschuledarmstadt.photostream_tools.R;
 import hochschuledarmstadt.photostream_tools.model.BaseItem;
 
-public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
+abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
 
     @IdRes
     protected int viewId = View.NO_ID;
@@ -74,10 +74,14 @@ public abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseIt
      */
     protected abstract boolean shouldExecute(H viewHolder, View v, T item);
     abstract void trigger(H ViewHolder, View v, T item);
-    abstract boolean onBindViewHolder(H viewHolder, int position);
+    abstract void onBindViewHolder(H viewHolder, int position);
     abstract void saveInstanceState(Bundle bundle);
     abstract void restoreInstanceState(Bundle bundle);
     void setAdapter(BaseAdapter<H, T> adapter){
         this.adapter = adapter;
+    }
+
+    public void destroy() {
+        adapter = null;
     }
 }

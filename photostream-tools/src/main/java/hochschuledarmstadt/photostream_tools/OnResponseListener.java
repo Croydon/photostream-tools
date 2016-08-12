@@ -27,6 +27,6 @@ package hochschuledarmstadt.photostream_tools;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 interface OnResponseListener {
-    void onResponse(byte[] imageData, Photo photo);
+    void onResponse(byte[] imageData, Photo photo, boolean fileNotFound);
 }
 

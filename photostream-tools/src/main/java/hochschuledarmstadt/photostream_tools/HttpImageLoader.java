@@ -29,6 +29,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,9 +82,9 @@ class HttpImageLoader implements OnResponseListener {
     }
 
     @Override
-    public void onResponse(byte[] imageData, Photo photo) {
+    public void onResponse(byte[] imageData, Photo photo, boolean fileNotFound) {
         try {
-            blockingQueue.put(new HttpImage(photo, imageData));
+            blockingQueue.put(fileNotFound ? null : new HttpImage(photo, imageData));
             remainingExecutors.decrementAndGet();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -129,12 +130,18 @@ class HttpImageLoader implements OnResponseListener {
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
                 byte[] data = os.toByteArray();
                 os.close();
-                onResponseListener.onResponse(data, photo);
+                onResponseListener.onResponse(data, photo, false);
                 onResponseListener = null;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                onResponseListener.onResponse(null, photo, true);
             } catch (IOException e) {
                 e.printStackTrace();
+                onResponseListener.onResponse(null, photo, false);
+            }finally{
+                onResponseListener = null;
             }
         }
 
@@ -166,8 +173,8 @@ class HttpImageLoader implements OnResponseListener {
         }
 
         @Override
-        public void onResponse(byte[] imageData, Photo photo) {
-            onResponseListenerDelegate.onResponse(imageData, photo);
+        public void onResponse(byte[] imageData, Photo photo, boolean fileNotFound) {
+            onResponseListenerDelegate.onResponse(imageData, photo, fileNotFound);
         }
     }
 

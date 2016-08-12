@@ -29,10 +29,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
@@ -54,6 +56,8 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 class PhotoStreamCallbackContainer {
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
+    private static final int ONE_MINUTE_IN_MILLIS = 60000;
+    public static final String TAG = PhotoStreamCallbackContainer.class.getName();
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
 
@@ -68,40 +72,50 @@ class PhotoStreamCallbackContainer {
     private List<OnCommentUploadFailedListener> onCommentUploadFailedListeners = new ArrayList<>();
     private List<OnNewCommentReceivedListener> onNewCommentReceivedListeners = new ArrayList<>();
     private List<OnCommentCountChangedListener> onCommentCountChangedListeners = new ArrayList<>();
+    private List<OnRequestListener> onRequestListeners = new ArrayList<>();
 
-    private final HashMap<RequestType, List<? extends OnRequestListener>> requestListenerMap = new HashMap<>();
-    private List<PhotoStreamActivity> activities = new ArrayList<>();
+    private final HashMap<RequestType, List<OnRequestListener>> requestListenerMap = new HashMap<>();
+    private List<PhotoStreamActivity> activitiesInForeground = new ArrayList<>();
+    private List<PhotoStreamActivity> activitiesInBackground = new ArrayList<>();
+
+    private OnNoActivitesRemainingListener noActivitesRemainingListener;
+    private Runnable noActivitiesRemainingRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (noActivitesRemainingListener != null)
+                noActivitesRemainingListener.onNoActivitesRegistered();
+        }
+    };
 
     public PhotoStreamCallbackContainer(){
         addListenerToMap();
     }
 
     private void addListenerToMap() {
-        requestListenerMap.put(RequestType.UPLOAD_PHOTO, onPhotoUploadListeners);
-        requestListenerMap.put(RequestType.LOAD_PHOTOS, onPhotosReceivedListeners);
-        requestListenerMap.put(RequestType.DELETE_PHOTO, onPhotoDeletedListeners);
-        requestListenerMap.put(RequestType.LIKE_PHOTO, onPhotoLikeListeners);
-        requestListenerMap.put(RequestType.SEARCH_PHOTOS, onSearchPhotosListeners);
-        requestListenerMap.put(RequestType.LOAD_COMMENTS, onCommentsReceivedListeners);
-        requestListenerMap.put(RequestType.UPLOAD_COMMENT, onCommentUploadFailedListeners);
-        requestListenerMap.put(RequestType.DELETE_COMMENT, onCommentDeletedListeners);
+        requestListenerMap.put(RequestType.UPLOAD_PHOTO, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.LOAD_PHOTOS, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.DELETE_PHOTO, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.LIKE_PHOTO, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.SEARCH_PHOTOS, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.LOAD_COMMENTS, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.UPLOAD_COMMENT, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.DELETE_COMMENT, new ArrayList<OnRequestListener>());
     }
 
     public void clear(){
         openRequests.clear();
         requestListenerMap.clear();
-        activities.clear();
+        activitiesInBackground.clear();
+        activitiesInForeground.clear();
     }
 
     public boolean hasOpenRequestsOfType(RequestType requestType) {
         return openRequests.containsKey(requestType) && openRequests.get(requestType) > 0;
     }
 
-    private <T> void addListener(List<T> listeners, T listener, RequestType requestType){
+    private <T> void addListener(List<T> listeners, T listener){
         if (!listeners.contains(listener))
             listeners.add(listener);
-        if (listener instanceof OnRequestListener && hasOpenRequestsOfType(requestType))
-            ((OnRequestListener)listener).onRequestStarted();
     }
 
     private <T> void removeListener(List<T> listeners, T listener){
@@ -109,8 +123,31 @@ class PhotoStreamCallbackContainer {
             listeners.remove(listener);
     }
 
+    public void addOnRequestListener(OnRequestListener onRequestListener, RequestType... requestTypes){
+        addListener(onRequestListeners, onRequestListener);
+        boolean notified = false;
+        for (RequestType r : requestTypes) {
+            List<OnRequestListener> listeners = requestListenerMap.get(r);
+            if (!listeners.contains(onRequestListener))
+                listeners.add(onRequestListener);
+            if (!notified && hasOpenRequestsOfType(r)) {
+                notified = true;
+                onRequestListener.onRequestStarted();
+            }
+        }
+    }
+
+    public void removeOnRequestListener(OnRequestListener onRequestListener){
+        removeListener(onRequestListeners, onRequestListener);
+        for (Map.Entry<RequestType, List<OnRequestListener>> onRequestListenerEntry : requestListenerMap.entrySet()){
+            List<OnRequestListener> list = onRequestListenerEntry.getValue();
+            if (list.contains(onRequestListener))
+                list.remove(onRequestListener);
+        }
+    }
+
     public void addOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener){
-        addListener(onCommentCountChangedListeners, onCommentCountChangedListener, null);
+        addListener(onCommentCountChangedListeners, onCommentCountChangedListener);
     }
 
     public void removeOnCommentCountChangedListener(OnCommentCountChangedListener onCommentCountChangedListener){
@@ -118,7 +155,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
-        addListener(onPhotoUploadListeners, onPhotoUploadListener, RequestType.UPLOAD_PHOTO);
+        addListener(onPhotoUploadListeners, onPhotoUploadListener);
     }
 
     public void removeOnPhotoUploadListener(OnPhotoUploadListener onPhotoUploadListener) {
@@ -126,7 +163,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnPhotoDeletedListener(OnPhotoDeletedListener onPhotoDeletedListener) {
-        addListener(onPhotoDeletedListeners, onPhotoDeletedListener, RequestType.DELETE_PHOTO);
+        addListener(onPhotoDeletedListeners, onPhotoDeletedListener);
     }
 
     public void removeOnPhotoDeletedListener(OnPhotoDeletedListener onPhotoDeletedListener){
@@ -134,7 +171,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnNewPhotoReceivedListener(OnNewPhotoReceivedListener onNewPhotoReceivedListener) {
-        addListener(onNewPhotoReceivedListeners, onNewPhotoReceivedListener, null);
+        addListener(onNewPhotoReceivedListeners, onNewPhotoReceivedListener);
     }
 
     public void removeOnNewPhotoReceivedListener(OnNewPhotoReceivedListener onNewPhotoReceivedListener){
@@ -142,7 +179,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnNewCommentReceivedListener(OnNewCommentReceivedListener onNewCommentReceivedListener) {
-        addListener(onNewCommentReceivedListeners, onNewCommentReceivedListener, null);
+        addListener(onNewCommentReceivedListeners, onNewCommentReceivedListener);
     }
 
     public void removeOnNewCommentReceivedListener(OnNewCommentReceivedListener onNewCommentReceivedListener){
@@ -150,7 +187,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnUploadCommentListener(OnCommentUploadFailedListener onCommentUploadFailedListener) {
-        addListener(onCommentUploadFailedListeners, onCommentUploadFailedListener, RequestType.UPLOAD_COMMENT);
+        addListener(onCommentUploadFailedListeners, onCommentUploadFailedListener);
     }
 
     public void removeOnUploadCommentListener(OnCommentUploadFailedListener onCommentUploadFailedListener){
@@ -158,7 +195,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener) {
-        addListener(onCommentDeletedListeners, onCommentDeletedListener, RequestType.DELETE_COMMENT);
+        addListener(onCommentDeletedListeners, onCommentDeletedListener);
     }
 
     public void removeOnCommentDeletedListener(OnCommentDeletedListener onCommentDeletedListener){
@@ -166,7 +203,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
-        addListener(onPhotoLikeListeners, onPhotoLikeListener, RequestType.LIKE_PHOTO);
+        addListener(onPhotoLikeListeners, onPhotoLikeListener);
     }
 
     public void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
@@ -174,7 +211,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnCommentsReceivedListener(OnCommentsReceivedListener onCommentsReceivedListener) {
-        addListener(onCommentsReceivedListeners, onCommentsReceivedListener, RequestType.LOAD_COMMENTS);
+        addListener(onCommentsReceivedListeners, onCommentsReceivedListener);
     }
 
     public void removeOnCommentsReceivedListener(OnCommentsReceivedListener onCommentsReceivedListener) {
@@ -182,7 +219,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnPhotosReceivedListener(OnPhotosReceivedListener onPhotosReceivedListener) {
-        addListener(onPhotosReceivedListeners, onPhotosReceivedListener, RequestType.LOAD_PHOTOS);
+        addListener(onPhotosReceivedListeners, onPhotosReceivedListener);
     }
 
     public void removeOnPhotosReceivedListener(OnPhotosReceivedListener onPhotosReceivedListener) {
@@ -190,7 +227,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public void addOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener) {
-        addListener(onSearchPhotosListeners, onSearchedPhotosReceivedListener, RequestType.SEARCH_PHOTOS);
+        addListener(onSearchPhotosListeners, onSearchedPhotosReceivedListener);
     }
 
     public void removeOnSearchPhotosResultListener(OnSearchedPhotosReceivedListener onSearchedPhotosReceivedListener) {
@@ -259,7 +296,7 @@ class PhotoStreamCallbackContainer {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                List<? extends OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
+                List<OnRequestListener> onRequestListeners = requestListenerMap.get(requestType);
                 for (OnRequestListener onRequestListener : onRequestListeners){
                     onRequestListener.onRequestStarted();
                 }
@@ -349,7 +386,7 @@ class PhotoStreamCallbackContainer {
     }
 
     public boolean appIsInBackground() {
-        return !activities.isEmpty();
+        return !activitiesInBackground.isEmpty() && activitiesInForeground.isEmpty();
     }
 
     public void notifyOnPhotosFailed(HttpError httpError) {
@@ -393,14 +430,20 @@ class PhotoStreamCallbackContainer {
             onPhotoUploadListener.onPhotoUploaded(photo);
     }
 
-    public void registerActivity(PhotoStreamActivity activity) {
-        if (!activities.contains(activity))
-            activities.add(activity);
+    public void addActivityMovedToBackground(PhotoStreamActivity activity) {
+        if (!activitiesInBackground.contains(activity)) {
+            stopPostingStopServiceCommand();
+            activitiesInBackground.add(activity);
+            Log.d(TAG, String.format("%d activities in background", activitiesInBackground.size()));
+        }
     }
 
-    public void unregisterActivity(PhotoStreamActivity activity) {
-        if (activities.contains(activity))
-            activities.remove(activity);
+    public void removeActivityMovedToBackground(PhotoStreamActivity activity) {
+        if (activitiesInBackground.contains(activity)) {
+            activitiesInBackground.remove(activity);
+            postDelayedStopServiceCommandIfNoActivitesAvailable();
+            Log.d(TAG, String.format("%d activities in background", activitiesInBackground.size()));
+        }
     }
 
     public void notifyOnCommentCountChanged(int photoId, int commentCount) {
@@ -408,4 +451,46 @@ class PhotoStreamCallbackContainer {
             listener.onCommentCountChanged(photoId, commentCount);
         }
     }
+
+    public void setNoActivitesRemainingListener(OnNoActivitesRemainingListener noActivitesRemainingListener) {
+        this.noActivitesRemainingListener = noActivitesRemainingListener;
+    }
+
+    public void addActivityVisible(PhotoStreamActivity activity) {
+        if (!activitiesInForeground.contains(activity)) {
+            stopPostingStopServiceCommand();
+            activitiesInForeground.add(activity);
+            Log.d(TAG, String.format("%d activities in foreground", activitiesInForeground.size()));
+        }
+    }
+
+    public void removeActivityVisible(PhotoStreamActivity activity) {
+        if (activitiesInForeground.contains(activity)) {
+            activitiesInForeground.remove(activity);
+            postDelayedStopServiceCommandIfNoActivitesAvailable();
+            Log.d(TAG, String.format("%d activities in foreground", activitiesInForeground.size()));
+        }
+    }
+
+    private void postDelayedStopServiceCommandIfNoActivitesAvailable() {
+        if (activitiesInBackground.isEmpty() && activitiesInForeground.isEmpty()) {
+            handler.removeCallbacks(noActivitiesRemainingRunnable);
+            handler.postDelayed(noActivitiesRemainingRunnable, ONE_MINUTE_IN_MILLIS);
+            Log.d(
+                    TAG,
+                    String.format("service will be stopped in %d seconds",
+                    Math.round(ONE_MINUTE_IN_MILLIS / 1000.0))
+            );
+        }
+    }
+
+    private void stopPostingStopServiceCommand() {
+        handler.removeCallbacks(noActivitiesRemainingRunnable);
+        Log.d(TAG, "canceled stop command for service");
+    }
+
+    interface OnNoActivitesRemainingListener {
+        void onNoActivitesRegistered();
+    }
+
 }

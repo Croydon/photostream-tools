@@ -36,7 +36,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 /**
  * Fragmente erhalten durch Erben von dieser Klasse Zugriff auf das Interface {@link IPhotoStreamClient}
  */
-public abstract class PhotoStreamFragment extends Fragment implements OnServiceStateChangedListener {
+public abstract class PhotoStreamFragment extends Fragment implements OnServiceStateChangedListener , PhotoStreamFragmentActivity.OnBackPressedListener{
 
     private boolean serviceDisconnectCalled;
     private Bundle refSavedInstanceState;
@@ -44,7 +44,7 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
     protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient service, Bundle savedInstanceState);
     protected abstract void onPhotoStreamServiceDisconnected(IPhotoStreamClient service);
 
-    private PhotoStreamClient photoStreamClient;
+    private PhotoStreamClientDelegate photoStreamClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,11 +56,13 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((ServiceStateChangedNotifier)getActivity()).addOnServiceStateChangedListener(this);
+        ((OnBackPressedNotifier)getActivity()).addOnBackPressedListener(this);
     }
 
     @Override
     public void onDestroy() {
         ((ServiceStateChangedNotifier)getActivity()).removeOnServiceStateChangedListener(this);
+        ((OnBackPressedNotifier)getActivity()).removeOnBackPressedListener(this);
         super.onDestroy();
     }
 
@@ -82,7 +84,7 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
 
     @Override
     public void onServiceConnected(IPhotoStreamClient client) {
-        photoStreamClient = (PhotoStreamClient) client;
+        photoStreamClient = (PhotoStreamClientDelegate) client;
         onPhotoStreamServiceConnected(client, refSavedInstanceState);
     }
 
@@ -90,15 +92,21 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
     public void onStop() {
         super.onStop();
         if (isConnectedToService()){
-            if (getActivity().isFinishing() && this instanceof OnPhotosReceivedListener) {
-                photoStreamClient.resetEtag();
-            }
+            if (getActivity().isChangingConfigurations() && photoStreamClient.hasOnPhotosReceivedListenerRegistered()) {
+                photoStreamClient.setShouldReloadFirstPageOfPhotosFromCache(Boolean.FALSE);
+            }else if(getActivity().isFinishing())
+                photoStreamClient.clearShouldReloadFirstPageOfPhotosFromCache();
         }
     }
 
     @Override
     public void onServiceDisconnected(IPhotoStreamClient client) {
         internalNotifyDisconnectFromService(client);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     @Override

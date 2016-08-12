@@ -25,4 +25,5 @@
 
 <resources>
     <item name="should_animate" type="id"/>
+    <item name="adapter_test_view_id" type="id">test_view_id</item>
 </resources>
