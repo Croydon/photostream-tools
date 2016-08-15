@@ -154,6 +154,8 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
     }
 
     public void addOnRequestListener(OnRequestListener onRequestListener, RequestType... requestTypes) {
+        if (requestTypes.length == 0)
+            throw new IllegalStateException("Mindestens ein Wert muss für den zweiten Parameter angegegen werden!");
         callbackContainer.addOnRequestListener(onRequestListener, requestTypes);
     }
 
@@ -199,7 +201,7 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (webSocketClient != null) {
-                    if (isOnline())
+                    if (isOnline() && !webSocketClient.isConnected())
                         webSocketClient.connect();
                     else if (!isOnline()) {
                         webSocketClient.disconnect();
@@ -725,6 +727,8 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
     }
 
     public void addActivityVisible(PhotoStreamActivity activity) {
+        if (!webSocketClient.isConnected())
+            webSocketClient.connect();
         callbackContainer.addActivityVisible(activity);
     }
 

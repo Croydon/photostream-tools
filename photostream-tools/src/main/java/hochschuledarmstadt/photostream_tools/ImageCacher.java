@@ -27,6 +27,8 @@ package hochschuledarmstadt.photostream_tools;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.support.v4.os.EnvironmentCompat;
 import android.util.Base64;
 
 import java.io.File;
@@ -46,12 +48,16 @@ class ImageCacher {
 
     private static final String FILENAME_FORMAT = "%s.jpg";
 
-    private static String getImageFileName(int id){
+    private String getImageFileName(int id){
         return String.format(FILENAME_FORMAT, id);
     }
 
-    private static File concatImageFilePath(Context context, String imageFileName){
-        return new File(context.getFilesDir(), imageFileName);
+    private File concatImageFilePath(Context context, String imageFileName){
+        File file = new File(context.getFilesDir(), imageFileName);
+        if (!file.exists() && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), imageFileName);
+        }
+        return file;
     }
 
     boolean cacheImage(Photo photo)throws IOException {
@@ -73,11 +79,11 @@ class ImageCacher {
         boolean inCache = false;
         boolean error = false;
         String filename = getImageFileName(photoId);
-        String imageFilePath = concatImageFilePath(context, filename).getAbsolutePath();
+        File imageFilePath = concatImageFilePath(context, filename);
         if (!imageExistsOnFileSystem(filename)) {
             FileOutputStream outputStream = null;
             try {
-                outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream = new FileOutputStream(imageFilePath, false);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                 bitmap.recycle();
@@ -97,7 +103,7 @@ class ImageCacher {
             inCache = true;
         }
 
-        injectImageFilePath(photo, imageFilePath);
+        injectImageFilePath(photo, imageFilePath.getAbsolutePath());
 
         return inCache;
 
@@ -116,8 +122,8 @@ class ImageCacher {
     }
 
     private boolean imageExistsOnFileSystem(String filename) {
-        File file = context.getFileStreamPath(filename);
-        return !(file == null || !file.exists());
+        File file = concatImageFilePath(context, filename);
+        return file.exists();
     }
 
     File getImageFilePathForPhotoId(int photoId) {

@@ -27,7 +27,7 @@ package hochschuledarmstadt.photostream_tools;
 
 import android.content.Context;
 
-public class ImageCacherFactory {
+class ImageCacherFactory {
 
     private final Context context;
 

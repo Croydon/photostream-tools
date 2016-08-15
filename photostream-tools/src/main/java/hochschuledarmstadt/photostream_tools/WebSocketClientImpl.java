@@ -31,6 +31,9 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import io.socket.client.IO;
 import io.socket.engineio.client.transports.WebSocket;
 
@@ -59,18 +62,19 @@ class WebSocketClientImpl implements WebSocketClient {
 
     @Override
     public boolean connect() {
-        IO.Options options = new IO.Options();
         try {
-            options.reconnectionDelay = RECONNECTION_DELAY_IN_MILLIS;
-            options.reconnection = true;
-            options.transports = new String[]{WebSocket.NAME};
-            options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
-            options.forceNew = true;
-            options.rememberUpgrade = true;
-            String endpoint = String.format("%s/?token=%s", this.url, installationId);
-            URI uri = URI.create(endpoint);
-            if (androidSocket == null)
+            if (androidSocket == null){
+                IO.Options options = new IO.Options();
+                options.reconnectionDelay = RECONNECTION_DELAY_IN_MILLIS;
+                options.reconnection = true;
+                options.transports = new String[]{WebSocket.NAME};
+                options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
+                options.forceNew = true;
+                options.rememberUpgrade = true;
+                String endpoint = String.format("%s/?token=%s", this.url, installationId);
+                URI uri = URI.create(endpoint);
                 androidSocket = new AndroidSocket(options, uri, imageLoader, imageCacher, messageListener);
+            }
             return androidSocket.connect();
         } catch (KeyManagementException e) {
             Log.e(PhotoStreamService.class.getName(), e.toString());

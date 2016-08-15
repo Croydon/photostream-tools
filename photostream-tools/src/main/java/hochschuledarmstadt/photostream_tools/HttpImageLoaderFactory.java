@@ -25,7 +25,7 @@
 package hochschuledarmstadt.photostream_tools;
 
 
-public class HttpImageLoaderFactory {
+class HttpImageLoaderFactory {
 
     private final String formatPhotoContentUrl;
 
