@@ -103,8 +103,13 @@ public class ContextualActionBarPluginActivity extends PhotoStreamActivity imple
             }
 
             @Override
+            protected void onActionModeFinished() {
+
+            }
+
+            @Override
             protected boolean shouldExecute(PhotoAdapter.PhotoViewHolder viewHolder, View v, Photo item) {
-                return getAmountSelectedItems() < 1;  // <-- es darf immer nur ein Photo markiert sein
+                return getAmountSelectedItems() == 0;  // <-- es darf immer nur ein Photo markiert sein
                 // return item.isDeleteable()           <-- nur Photos, die löschbar sind, können markiert werden
                 // return true; //                      <-- alle Photos können markiert werden
             }

@@ -39,7 +39,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         if (isNewPhotoIntent(intent)){
-            // Das empfangene Photo aus dem Intent referenzieren
+            // Das empfangene Photo aus dem Intent referenzieren (ist in diesem Beispiel aber nicht vorhanden)
             Photo receivedPhoto = intent.getParcelableExtra(IPhotoStreamClient.INTENT_KEY_PHOTO);
             Toast.makeText(context, "Intent erhalten im BroadcastReceiver!", Toast.LENGTH_SHORT).show();
         }

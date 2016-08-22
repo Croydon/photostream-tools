@@ -83,9 +83,9 @@ public final class BitmapUtils {
      * @return byte[]
      */
     public static byte[] bitmapToBytes(Bitmap bitmap) {
+        if (bitmap == null) throw new NullPointerException("bitmap ist null!");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, bos);
-        bitmap.recycle();
         return bos.toByteArray();
     }
 

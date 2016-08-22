@@ -477,7 +477,7 @@ public class PhotoStreamClientTest {
         OnNewPhotoReceivedListener callback = mock(OnNewPhotoReceivedListener.class);
         OnRequestListener requestCallback = mock(OnRequestListener.class);
         photoStreamClient.addOnNewPhotoReceivedListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.UPLOAD_PHOTO);
         Photo photo = mock(Photo.class);
         webSocketClient.getMessageListener().onNewPhoto(photo);
         photoStreamClient.removeOnNewPhotoReceivedListener(callback);
@@ -491,7 +491,7 @@ public class PhotoStreamClientTest {
         OnPhotoDeletedListener callback = mock(OnPhotoDeletedListener.class);
         OnRequestListener requestCallback = mock(OnRequestListener.class);
         photoStreamClient.addOnPhotoDeletedListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.DELETE_PHOTO);
         webSocketClient.getMessageListener().onPhotoDeleted(1);
         photoStreamClient.removeOnPhotoDeletedListener(callback);
         verify(requestCallback, times(0)).onRequestStarted();
@@ -516,7 +516,7 @@ public class PhotoStreamClientTest {
         OnNewCommentReceivedListener callback = mock(OnNewCommentReceivedListener.class);
         OnRequestListener requestCallback = mock(OnRequestListener.class);
         photoStreamClient.addOnNewCommentReceivedListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.UPLOAD_COMMENT);
         Comment comment = mock(Comment.class);
         webSocketClient.getMessageListener().onNewComment(comment);
         photoStreamClient.removeOnNewCommentReceivedListener(callback);

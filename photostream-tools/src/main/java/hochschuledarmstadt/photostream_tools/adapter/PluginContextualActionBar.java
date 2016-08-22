@@ -24,6 +24,7 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -196,6 +197,8 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
      */
     protected abstract void onUpdateContextualActionBar(ActionMode actionMode, Context context, List<T> items, int selectedItemsCount);
 
+    protected abstract void onActionModeFinished();
+
     private class Listener implements ActionMode.Callback {
 
         @Override
@@ -224,6 +227,7 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
         public void onDestroyActionMode(ActionMode mode) {
             reset();
             actionMode = null;
+            onActionModeFinished();
         }
     }
 

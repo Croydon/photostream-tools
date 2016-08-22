@@ -50,7 +50,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 import android.content.Intent;
 
 /**
- * Über dieses Interface kann mit dem PhotoStream Server kommuniziert werden.
+ * Über dieses Interface kann mit dem Server kommuniziert werden.
  */
 public interface IPhotoStreamClient {
 

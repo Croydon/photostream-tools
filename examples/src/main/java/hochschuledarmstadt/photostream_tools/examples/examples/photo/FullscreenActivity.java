@@ -45,7 +45,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 public class FullscreenActivity extends FullscreenPhotoActivity {
 
     // Diese Activity erhält ein Photo über den empfangenen Intent.
-    // Diese Variable dient zum referenzieren des Photos aus dem Intent.
+    // Variable dient zum referenzieren des Photos aus dem Intent.
     public static final String KEY_PHOTO = "KEY_PHOTO";
 
     // Für die Anzeige des Photos

@@ -5,7 +5,7 @@ apply plugin: "net.saliman.cobertura"
 apply plugin: 'com.github.kt3k.coveralls'
 
 group = 'hochschuledarmstadt.photostream_tools'
-version = '0.0.79'
+version = '0.0.82'
 
 android {
     compileSdkVersion 24
@@ -120,6 +120,12 @@ cobertura {
                         '.*Http.*',
                         '.*ImageCacher.*',
                         '.*FullscreenPhotoActivity.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.LruBitmapCache.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.BitmapLoaderTask.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.Plugin.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.PluginAlertDialog.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.PluginContextualActionBar.*',
+                        '.*hochschuledarmstadt\\.photostream_tools\\.adapter\\.AsyncDrawable.*',
                         '.*PhotoStreamClientDelegate.*',
                         '.*PhotoStreamActivity.*',
                         '.*BaseFragmentPagerAdapter.*',
@@ -127,7 +133,7 @@ cobertura {
                         '.*BitmapUtils.*',
                         '.*Plugin.*',
                         '.*PhotoStreamService.*',
-                        '.*PhotoStreamClient',
+                        '.*PhotoStreamClientImpl.*',
                         '.*WebSocket.*',
                         '.*hochschuledarmstadt\\.photostream_tools\\.widget.*',
                         '.*AndroidSocket.*',
@@ -140,7 +146,7 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.0'
     testCompile 'org.mockito:mockito-core:2.0.43-beta'
     compile 'com.google.code.gson:gson:2.4'
-    compile ('io.socket:socket.io-client:0.6.3') {
+    compile ('io.socket:socket.io-client:0.6.1') {
         exclude group: 'org.json', module: 'json'
     }
     compile 'com.github.chrisbanes:PhotoView:1.3.0'
