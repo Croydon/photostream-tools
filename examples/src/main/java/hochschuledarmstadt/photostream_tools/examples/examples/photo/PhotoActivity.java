@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,11 +60,6 @@ public class PhotoActivity extends PhotoStreamActivity implements OnRequestListe
      * Anzahl von Spalten in der RecyclerView
      */
     private static final int COLUMNS_PER_ROW = 2;
-
-    /**
-     * Größe für Bitmapcache im PhotoAdapter
-     */
-    private static final int PHOTO_CACHE_SIZE_IN_MB = 15;
 
     /**
      * Key für das Zwischenspeichern der Photos in der Methode {@link PhotoActivity#onSaveInstanceState(Bundle)}"
@@ -134,7 +130,6 @@ public class PhotoActivity extends PhotoStreamActivity implements OnRequestListe
         // GridLayoutManager setzen. Anzahl der Spalten definiert durch COLUMNS_PER_ROW
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
 
-
         // Optional: Eine Element in der Liste animieren,
         // wenn es hinzugefügt, gelöscht, geändert oder verschoben wurde
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -157,8 +152,8 @@ public class PhotoActivity extends PhotoStreamActivity implements OnRequestListe
             }
         });
 
-        // Photoadapter erzeugen, mit angepasster Cachegröße für die Photos
-        adapter = new PhotoAdapter(PHOTO_CACHE_SIZE_IN_MB);
+        // Photoadapter erzeugen
+        adapter = new PhotoAdapter();
 
         // OnItemClickListener für die ImageView mit der id "imageView" setzen.
         adapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener<PhotoAdapter.PhotoViewHolder>() {

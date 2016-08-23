@@ -35,6 +35,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,7 +53,7 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
     private static final int LIKE = -10;
     private static final int DISLIKE = -11;
 
-    private static final int DEFAULT_CACHE_SIZE_IN_MB = 10;
+    private static final int DEFAULT_CACHE_SIZE_IN_MB = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024 / 5);
 
     private List<BitmapLoaderTask> tasks = new ArrayList<>();
     private LruBitmapCache lruBitmapCache;
@@ -60,7 +61,8 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
 
     private BasePhotoAdapter(ArrayList<Photo> photos, int cacheSizeInMegaByte){
         super(photos);
-        lruBitmapCache = new LruBitmapCache(1000 * 1000 * cacheSizeInMegaByte);
+        Log.d(BasePhotoAdapter.class.getName(), String.format("Using %d MB for the lru photo cache", cacheSizeInMegaByte));
+        lruBitmapCache = new LruBitmapCache(1024 * cacheSizeInMegaByte);
     }
 
     public BasePhotoAdapter(int cacheSizeInMegaByte){
@@ -151,6 +153,9 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         for (BitmapLoaderTask task : tasks) {
             Log.d(BasePhotoAdapter.class.getSimpleName(), "cancelled task");
             task.cancel(true);
+            WeakReference<ImageView> imageViewReference = task.getImageViewReference();
+            if (imageViewReference != null && imageViewReference.get() != null)
+                imageViewReference.get().setImageBitmap(null);
         }
         tasks.clear();
         lruBitmapCache.destroy();

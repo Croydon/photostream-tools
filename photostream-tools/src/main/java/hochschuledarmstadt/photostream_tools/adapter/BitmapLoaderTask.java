@@ -262,4 +262,7 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
         return result;
     }
 
+    public WeakReference<ImageView> getImageViewReference() {
+        return imageViewReference;
+    }
 }

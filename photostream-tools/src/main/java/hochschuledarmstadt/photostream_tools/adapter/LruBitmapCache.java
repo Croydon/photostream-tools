@@ -87,9 +87,9 @@ class LruBitmapCache extends android.support.v4.util.LruCache<Integer, Bitmap> {
     @Override
     protected int sizeOf(Integer key, Bitmap value) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return value.getAllocationByteCount();
+            return value.getAllocationByteCount() / 1024;
         } else {
-            return value.getByteCount();
+            return value.getByteCount() / 1024;
         }
     }
 
