@@ -32,7 +32,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 public class HttpImageLoaderStub extends HttpImageLoader {
 
     private Photo photo;
-    private byte[] bytes = ByteBuffer.allocate(4).putInt(0xffd8ffe0).array();;
+    private byte[] bytes = ByteBuffer.allocate(4).putInt(0xffd8ffe0).array();
     private boolean isRunning = true;
 
     public HttpImageLoaderStub() {

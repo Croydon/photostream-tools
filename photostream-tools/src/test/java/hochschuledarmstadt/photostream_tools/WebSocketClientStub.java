@@ -45,12 +45,12 @@ public class WebSocketClientStub implements WebSocketClient {
     }
 
     @Override
-    public void disconnect() {
-        connected = false;
+    public boolean isConnected() {
+        return connected;
     }
 
     @Override
-    public boolean isConnected() {
-        return connected;
+    public void destroy() {
+        connected = false;
     }
 }

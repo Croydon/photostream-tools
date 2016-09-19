@@ -93,7 +93,7 @@ public class ImageCacherTest {
     @Test
     public void cacheNewImage() {
         photo = buildPhotoForImageCacher();
-        educateMock(String.format(photo.getId() + ".jpg"));
+        educateMock(String.format("%s.jpg", photo.getId()));
         try {
             assertTrue(imageCacher.cacheImage(photo));
             assertTrue(imageCacher.isCached(photo.getId()));
@@ -106,7 +106,7 @@ public class ImageCacherTest {
     @Test
     public void detectImageAlreadyCached() {
         photo = buildPhotoForImageCacher();
-        educateMock(String.format(photo.getId() + ".jpg"));
+        educateMock(String.format("%s.jpg", photo.getId()));
         try {
             assertTrue(imageCacher.cacheImage(photo));
             assertTrue(imageCacher.cacheImage(photo));
@@ -119,7 +119,7 @@ public class ImageCacherTest {
     public void cacheImageWithBytes() {
         Gson gson = new Gson();
         photo = gson.fromJson(Fakes.PHOTO_RESULT, Photo.class);
-        educateMock(String.format(photo.getId() + ".jpg"));
+        educateMock(String.format("%s.jpg", photo.getId()));
         String base64Bytes = photo.getImageFilePath();
         byte[] data = Base64.decode(base64Bytes, Base64.DEFAULT);
         try {
