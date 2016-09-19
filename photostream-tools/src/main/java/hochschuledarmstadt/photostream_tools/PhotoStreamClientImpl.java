@@ -30,6 +30,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 
 import com.google.gson.Gson;
@@ -204,16 +206,21 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
                     if (isOnline() && !webSocketClient.isConnected())
                         webSocketClient.connect();
                     else if (!isOnline()) {
-                        webSocketClient.disconnect();
+                        webSocketClient.destroy();
                     }
                 }
             }
         };
-        registerInternetAvailableBroadcastReceiver();
         if (webSocketClient != null) {
             webSocketClient.setMessageListener(this);
             webSocketClient.connect();
         }
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                registerInternetAvailableBroadcastReceiver();
+            }
+        }, 2000);
     }
 
     public void loadPhotos(){
@@ -230,7 +237,7 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         internetAvailableBroadcastReceiver = null;
         if (webSocketClient != null) {
             webSocketClient.setMessageListener(null);
-            webSocketClient.disconnect();
+            webSocketClient.destroy();
         }
 
     }

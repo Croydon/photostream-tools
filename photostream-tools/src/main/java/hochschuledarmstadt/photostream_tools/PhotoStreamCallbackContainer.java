@@ -56,7 +56,7 @@ import hochschuledarmstadt.photostream_tools.model.PhotoQueryResult;
 class PhotoStreamCallbackContainer {
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
-    private static final int ONE_MINUTE_IN_MILLIS = 60000;
+    private static final int FIVE_SECONDS = 5000;
     public static final String TAG = PhotoStreamCallbackContainer.class.getName();
 
     private final HashMap<RequestType, Integer> openRequests = new HashMap<>();
@@ -475,11 +475,11 @@ class PhotoStreamCallbackContainer {
     private void postDelayedStopServiceCommandIfNoActivitesAvailable() {
         if (activitiesInBackground.isEmpty() && activitiesInForeground.isEmpty()) {
             handler.removeCallbacks(noActivitiesRemainingRunnable);
-            handler.postDelayed(noActivitiesRemainingRunnable, ONE_MINUTE_IN_MILLIS);
+            handler.postDelayed(noActivitiesRemainingRunnable, FIVE_SECONDS);
             Log.d(
                     TAG,
                     String.format("service will be stopped in %d seconds",
-                    Math.round(ONE_MINUTE_IN_MILLIS / 1000.0))
+                    Math.round(FIVE_SECONDS / 1000.0))
             );
         }
     }

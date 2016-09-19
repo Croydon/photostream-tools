@@ -69,7 +69,6 @@ class WebSocketClientImpl implements WebSocketClient {
                 options.reconnection = true;
                 options.transports = new String[]{WebSocket.NAME};
                 options.reconnectionAttempts = COUNT_OF_RECONNECTION_ATTEMPTS;
-                options.forceNew = true;
                 options.rememberUpgrade = true;
                 String endpoint = String.format("%s/?token=%s", this.url, installationId);
                 URI uri = URI.create(endpoint);
@@ -87,12 +86,12 @@ class WebSocketClientImpl implements WebSocketClient {
     }
 
     @Override
-    public void disconnect() {
-        androidSocket.disconnect();
+    public boolean isConnected() {
+        return androidSocket.isConnected();
     }
 
     @Override
-    public boolean isConnected() {
-        return androidSocket.isConnected();
+    public void destroy() {
+        androidSocket.destroy();
     }
 }

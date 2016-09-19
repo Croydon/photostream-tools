@@ -27,6 +27,6 @@ package hochschuledarmstadt.photostream_tools;
 interface WebSocketClient {
     void setMessageListener(AndroidSocket.OnMessageListener messageListener);
     boolean connect();
-    void disconnect();
     boolean isConnected();
+    void destroy();
 }

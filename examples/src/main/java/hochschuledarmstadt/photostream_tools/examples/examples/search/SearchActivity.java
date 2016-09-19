@@ -71,26 +71,36 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        // RecyclerView referenzieren
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        // LayoutManager setzen
         recyclerView.setLayoutManager(new GridLayoutManager(this, COLUMNS_PER_ROW));
+        // Standard Animator setzen
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        // PhotoAdapter erzeugen
         photoAdapter = new PhotoAdapter();
 
+        // Wenn auf die ImageView "geklickt" wird,
         photoAdapter.setOnItemClickListener(R.id.imageView, new BasePhotoAdapter.OnItemClickListener<PhotoAdapter.PhotoViewHolder>() {
             @Override
             public void onItemClicked(PhotoAdapter.PhotoViewHolder viewHolder, View v, Photo photo) {
+                // Dann die Id des Photos in einem Toast anzeigen
                 Toast.makeText(SearchActivity.this, String.format("Photo Id: %s", photo.getId()), Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Den Adapter der RecyclerView als Datenquelle zuweisen
         recyclerView.setAdapter(photoAdapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Das Menü erzeugen
         getMenuInflater().inflate(R.menu.menu_search_example, menu);
+        // MenuItem mit der SearchView referenzieren
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        // Das MenuItem in dem SearchViewDelegate Objekt setzen
         searchViewDelegate.setSearchViewMenuItem(searchMenuItem);
         searchViewDelegate.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -117,25 +127,31 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // Photos im Adapter zwischenspeichern
         outState.putBundle(KEY_PHOTOS, photoAdapter.saveInstanceState());
+        // Status der SearchView zwischenspeichern
         outState.putParcelable(KEY_SEARCHVIEW, searchViewDelegate.saveInstanceState());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        // Zwischengespeicherte Photos dem Adapter wieder zuweisen
         photoAdapter.restoreInstanceState(savedInstanceState.getBundle(KEY_PHOTOS));
+        // Status der SearchView wiederherstellen
         searchViewDelegate.restoreInstanceState(savedInstanceState.getParcelable(KEY_SEARCHVIEW));
     }
 
     @Override
     protected void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState) {
+        // Listener registrieren
         photoStreamClient.addOnRequestListener(this, RequestType.SEARCH_PHOTOS);
         photoStreamClient.addOnSearchPhotosResultListener(this);
     }
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
+        // Listener entfernen
         photoStreamClient.removeOnRequestListener(this);
         photoStreamClient.removeOnSearchPhotosResultListener(this);
     }
@@ -143,6 +159,7 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
     @Override
     public void onSearchedPhotosReceived(PhotoQueryResult result) {
         List<Photo> photos = result.getPhotos();
+        // Erhaltene Photos an den Adapter übergeben
         photoAdapter.set(photos);
     }
 
@@ -154,11 +171,13 @@ public class SearchActivity extends PhotoStreamActivity implements OnSearchedPho
 
     @Override
     public void onRequestStarted() {
+        // Wenn ein HTTP Request gestartet wurde, dann die ProgressBar anzeigen
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
     public void onRequestFinished() {
+        // Wenn ein HTTP Request beendet wurde, dann die ProgressBar unsichtbar setzen
         findViewById(R.id.progressCircle).setVisibility(ProgressBar.GONE);
     }
 }

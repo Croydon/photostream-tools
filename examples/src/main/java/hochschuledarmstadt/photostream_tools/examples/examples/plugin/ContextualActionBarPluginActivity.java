@@ -62,14 +62,20 @@ public class ContextualActionBarPluginActivity extends PhotoStreamActivity imple
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plugin_example);
 
+        // "Mehr Laden" - Button referenzieren
         button = (Button) findViewById(R.id.button);
 
+        // Wenn auf den Button gedrückt wurde,
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                button.setEnabled(false);
-                if(!getPhotoStreamClient().hasOpenRequestOfType(RequestType.LOAD_PHOTOS))
+                // und nicht bereits ein Request für Photos läuft,
+                if(!getPhotoStreamClient().hasOpenRequestOfType(RequestType.LOAD_PHOTOS)) {
+                    // dann zunächst den Button deaktivieren
+                    button.setEnabled(false);
+                    // und anschließend die nächste Seite von Photos aus dem Stream laden
                     getPhotoStreamClient().loadMorePhotos();
+                }
             }
         });
 

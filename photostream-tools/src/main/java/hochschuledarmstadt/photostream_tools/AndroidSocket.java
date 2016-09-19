@@ -50,6 +50,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.thread.EventThread;
 
 class AndroidSocket {
 
@@ -98,38 +99,38 @@ class AndroidSocket {
     }
 
     public boolean connect() throws URISyntaxException {
-        if (socket != null) {
-            socket.off();
-            socket.close();
-        }
+        destroy();
         socket = IO.socket(uri, options);
         initializeSocket();
         socket.connect();
         return socket.connected();
     }
 
-    public boolean disconnect() {
+    private boolean disconnect() {
         if (socket != null && socket.connected()) {
             socket.disconnect();
         }
         return socket == null || !socket.connected();
     }
 
+    public void destroy(){
+        disconnect();
+        if (socket != null) {
+            socket.off();
+            socket.close();
+            socket = null;
+        }
+    }
+
     private void initializeSocket() {
 
-        socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
+        /*socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 // onMessageListener.onError();
             }
         });
 
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                onMessageListener.onConnect();
-            }
-        });
 
         socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
             @Override
@@ -149,6 +150,13 @@ class AndroidSocket {
             @Override
             public void call(Object... args) {
                 onMessageListener.onDisconnect();
+            }
+        });*/
+
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                onMessageListener.onConnect();
             }
         });
 

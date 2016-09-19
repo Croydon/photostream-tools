@@ -64,6 +64,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     private Bundle refSavedInstanceState;
     private List<AsyncBitmapLoader<?>> asyncBitmapLoaders = new ArrayList<>();
     private String activityId;
+    private boolean isPaused = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     @Override
     protected void onPause() {
         super.onPause();
+        isPaused = true;
         if (!isFinishing() && isConnectedToService()) {
             photoStreamClient.removeActivityVisible(this);
             photoStreamClient.addActivityMovedToBackground(this);
@@ -107,6 +109,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     @Override
     protected void onResume() {
         super.onResume();
+        isPaused = false;
         if (!bound)
             bindService(new Intent(this, PhotoStreamService.class), this, Context.BIND_AUTO_CREATE);
         if (isConnectedToService()) {
@@ -244,6 +247,13 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         PhotoStreamClientImpl client = ((PhotoStreamService.PhotoStreamServiceBinder) service).getClient();
         photoStreamClient = new PhotoStreamClientDelegate(activityId, client);
         bound = true;
+        if (!isPaused) {
+            photoStreamClient.removeActivityMovedToBackground(this);
+            photoStreamClient.addActivityVisible(this);
+        }else{
+            photoStreamClient.removeActivityVisible(this);
+            photoStreamClient.addActivityMovedToBackground(this);
+        }
         onPhotoStreamServiceConnected(photoStreamClient, refSavedInstanceState);
     }
 
