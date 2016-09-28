@@ -32,7 +32,9 @@ import android.support.v4.os.EnvironmentCompat;
 import android.util.Base64;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
@@ -54,8 +56,10 @@ class ImageCacher {
 
     private File concatImageFilePath(Context context, String imageFileName){
         File file = new File(context.getFilesDir(), imageFileName);
-        if (!file.exists() && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), imageFileName);
+        if (!file.exists() && isExternalStorageAccessible()){
+            File pictureDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            if (!pictureDirectory.exists()) pictureDirectory.mkdir();
+            file = new File(pictureDirectory, imageFileName);
         }
         return file;
     }
@@ -134,4 +138,28 @@ class ImageCacher {
         return imageExistsOnFileSystem(getImageFileName(photoId));
     }
 
+    static void deleteAllCachedImages(Context context) {
+        File file = context.getFilesDir();
+        internalDeleteAllCachedImages(file);
+        if (isExternalStorageAccessible()){
+            File pictureDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            internalDeleteAllCachedImages(pictureDirectory);
+        }
+    }
+
+    private static boolean isExternalStorageAccessible() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+
+    private static void internalDeleteAllCachedImages(File dir){
+        File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".jpg");
+            }
+        });
+        for (File file : files){
+            file.delete();
+        }
+    }
 }

@@ -45,6 +45,10 @@ class DbConnection extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createTables(db);
+    }
+
+    private void createTables(SQLiteDatabase db) {
         db.execSQL(CommentTable.TABLE_CREATE);
         db.execSQL(PhotoTable.TABLE_CREATE);
     }
@@ -89,5 +93,17 @@ class DbConnection extends SQLiteOpenHelper{
         if (instance == null)
             instance = new DbConnection(context, DATABASE_NAME, null, DATABASE_VERSION);
         return instance;
+    }
+
+    public void recreateDatabase() {
+        openDatabase();
+        dropTables(database);
+        createTables(database);
+        closeDatabase();
+    }
+
+    private void dropTables(SQLiteDatabase database) {
+        database.execSQL(PhotoTable.TABLE_DROP);
+        database.execSQL(CommentTable.TABLE_DROP);
     }
 }

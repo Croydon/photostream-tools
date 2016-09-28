@@ -27,11 +27,13 @@ package hochschuledarmstadt.photostream_tools;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,6 +48,7 @@ public final class PhotoStreamService extends Service implements PhotoStreamCall
     private static final String PHOTOSTREAM_URL_MANIFEST_KEY = "PHOTOSTREAM_URL";
     private static final String PAGE_SIZE_MANIFEST_KEY = "PAGE_SIZE";
     private static final int DEFAULT_PAGE_SIZE = 5;
+    private static final String LAST_USED_PHOTOSTREAM_URL_KEY = "LAST_USED_PHOTOSTREAM_URL";
     private IBinder photoStreamServiceBinder = new PhotoStreamServiceBinder();
     private PhotoStreamClientImpl photoStreamClientImpl;
 
@@ -64,16 +67,25 @@ public final class PhotoStreamService extends Service implements PhotoStreamCall
     public void onCreate() {
         super.onCreate();
 
-        final String photoStreamUrl = loadPhotoStreamUrlFromManifest();
-        final int photoPageSize = loadPhotoPageSizeFromManifest();
         final Context context = getApplicationContext();
+        DbConnection db = DbConnection.getInstance(context);
+
+        final String photoStreamUrl = loadPhotoStreamUrlFromManifest();
+        final String lastUsedPhotoStreamUrl = loadLastUsedPhotoStreamUrl();
+
+        if (!lastUsedPhotoStreamUrl.equals(photoStreamUrl)){
+            ImageCacher.deleteAllCachedImages(getApplicationContext());
+            db.recreateDatabase();
+            saveLastUsedPhotoStreamUrl(photoStreamUrl);
+        }
+
+        final int photoPageSize = loadPhotoPageSizeFromManifest();
         final String uniqueAndroidId = getUniqueAndroidId();
 
         UrlBuilder urlBuilder = new UrlBuilder(photoStreamUrl, photoPageSize);
         String formatPhotoContentApiUrl = urlBuilder.getFormatPhotoContentApiUrl();
         HttpImageLoaderFactory imageLoaderFactory = new HttpImageLoaderFactory(formatPhotoContentApiUrl);
         ImageCacherFactory imageCacherFactory = new ImageCacherFactory(context);
-        DbConnection db = DbConnection.getInstance(context);
         WebSocketClient wsClient = new WebSocketClientImpl(photoStreamUrl, uniqueAndroidId, new ImageCacher(getApplicationContext()), new HttpImageLoader(formatPhotoContentApiUrl));
         HttpExecutorFactory httpFactory = new HttpExecutorFactoryImpl(uniqueAndroidId);
 
@@ -83,6 +95,16 @@ public final class PhotoStreamService extends Service implements PhotoStreamCall
 
         Log.d(PhotoStreamService.class.getName(), "service created");
 
+    }
+
+    private void saveLastUsedPhotoStreamUrl(String photoStreamUrl) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        sharedPreferences.edit().putString(LAST_USED_PHOTOSTREAM_URL_KEY, photoStreamUrl).apply();
+    }
+
+    private String loadLastUsedPhotoStreamUrl() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        return sharedPreferences.getString(LAST_USED_PHOTOSTREAM_URL_KEY, "");
     }
 
     private int loadPhotoPageSizeFromManifest() {
