@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -63,12 +64,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class PhotoStreamClientTest {
 
-    public static final String PHOTO_STREAM_URL = "http://doesnt-matter-because-httpconnection-will-be-mocked.com";
-    public static final int PHOTO_ID = 1;
+    static final String PHOTO_STREAM_URL = "http://doesnt-matter-because-httpconnection-will-be-mocked.com";
+    static final int PHOTO_ID = 1;
     private Context context;
     private PhotoStreamClientDelegate photoStreamClient;
     private DbTestConnectionDelegate dbDelegate;
