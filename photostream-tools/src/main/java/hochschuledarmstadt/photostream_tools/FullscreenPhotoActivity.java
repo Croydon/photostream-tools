@@ -263,7 +263,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     }
 
     /**
-     * Liefert zurück, ob Statusbar und Navigationbar sichtbar sind oder nicht
+     * Liefert zurück, ob Statusbar und Navigationbar zum aktuellen Zeitpunkt sichtbar sind oder nicht
      * @return {@code true, wenn beide Bars sichtbar sind, ansonsten {@code false}}
      */
     public boolean isSystemUiVisible() {

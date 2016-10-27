@@ -26,7 +26,6 @@ package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.widget.ImageView;
 
-
 interface OnImageLoadedListener {
     void onTaskStarted(BitmapLoaderTask bitmapLoaderTask);
     void onTaskFinishedOrCanceled(BitmapLoaderTask bitmapLoaderTask, ImageView imageView);

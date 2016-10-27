@@ -28,5 +28,9 @@ public abstract class BaseItem {
 
     public BaseItem() { }
 
+    /**
+     * Liefert die Id für dieses Objekt zurück
+     * @return {@code int} id
+     */
     public abstract int getId();
 }

@@ -55,6 +55,11 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
 
     private Listener listener = new Listener();
 
+    /**
+     *
+     * @param activity Die Activity
+     * @param menuResource Die Menu Ressource, die in der Contextual ActionBar angezeigt werden soll
+     */
     public PluginContextualActionBar(AppCompatActivity activity, @MenuRes int menuResource){
         this.activity = activity;
         this.menuRes = menuResource;
@@ -176,6 +181,10 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
         selectedIds.clear();
     }
 
+    /**
+     * Liefert die Anzahl der markierten Views zurück
+     * @return {@code int} Anzahl der markierten Views
+     */
     public int getAmountSelectedItems() {
         return selectedIds.size();
     }
@@ -197,6 +206,9 @@ public abstract class PluginContextualActionBar<T extends BaseItem & Parcelable,
      */
     protected abstract void onUpdateContextualActionBar(ActionMode actionMode, Context context, List<T> items, int selectedItemsCount);
 
+    /**
+     * Diese Methode wird aufgerufen, wenn die Contextual ActionBar zerstört wird
+     */
     protected abstract void onActionModeFinished();
 
     private class Listener implements ActionMode.Callback {

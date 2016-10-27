@@ -66,7 +66,7 @@ public class Comment extends BaseItem implements Parcelable {
     }
 
     /**
-     * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist diesen Kommentar zu löschen.
+     * Über diese Funktion kann bestimmt werden, ob das aktuelle Gerät berechtigt ist, diesen Kommentar zu löschen.
      * @return {@code true}, wenn der Kommentar von dem aktuellen Gerät veröffentlicht wurde, ansonsten {@code false}
      */
     public boolean isDeleteable() {

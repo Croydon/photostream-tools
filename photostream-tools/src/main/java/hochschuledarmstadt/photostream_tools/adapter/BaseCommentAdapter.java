@@ -51,7 +51,7 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Hängt einen Kommentar {@code comment} an den <b>Anfang</b> der Liste an
+     * Fügt einen Kommentar {@code comment} an den <b>Anfang</b> der Liste hinzu
      * @param comment Kommentar, der an den <b>Anfang</b> der Liste hinzugefügt werden soll
      */
     @Override
@@ -87,7 +87,7 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Entfernt einen Kommentar aus der Liste mit der übergebenen {@code id}
+     * Entfernt einen Kommentar aus der Liste anhand der übergebenen {@code id}
      * @param id id des Kommentars
      */
     @Override
@@ -104,11 +104,23 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
         return super.getItemCount();
     }
 
+    /**
+     * Fügt eine Erweiterung für den Adapter hinzu, <br>
+     * {@link PluginContextualActionBar} or {@link PluginAlertDialog}
+     * @param viewId die id der View, welche die Erweiterung bei einem "Long Click" triggern soll
+     * @param plugin Die Erweiterung
+     */
     @Override
     public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
         super.addOnLongClickPlugin(viewId, plugin);
     }
 
+    /**
+     * Fügt eine Erweiterung für den Adapter hinzu, <br>
+     * {@link PluginContextualActionBar} or {@link PluginAlertDialog}
+     * @param viewId die id der View, welche die Erweiterung bei einem "Click" triggern soll
+     * @param plugin Die Erweiterung
+     */
     @Override
     public void addOnClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
         super.addOnClickPlugin(viewId, plugin);
