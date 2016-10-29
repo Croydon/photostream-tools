@@ -27,6 +27,7 @@ package hochschuledarmstadt.photostream_tools;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.callback.OnCommentCountChangedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnCommentDeletedListener;
@@ -40,6 +41,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
 import hochschuledarmstadt.photostream_tools.callback.OnSearchedPhotosReceivedListener;
+import hochschuledarmstadt.photostream_tools.model.Photo;
 
 
 class PhotoStreamClientDelegate implements IPhotoStreamClient {
@@ -188,6 +190,11 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
     @Override
     public void loadPhotos() {
         photoStreamClientImpl.loadPhotos(activityId);
+    }
+
+    @Override
+    public void loadFavoritePhotos() {
+        photoStreamClientImpl.loadFavoritePhotos();
     }
 
     @Override

@@ -45,6 +45,10 @@ class UrlBuilder {
         return  String.format("%s/photostream/api/image", baseUrl);
     }
 
+    public String getLoadFavoritePhotosApiUrl(){
+        return String.format("%s/photostream/api/favorites", baseUrl);
+    }
+
     public String getLoadPhotosApiUrl(boolean initialLoad){
         int initial = initialLoad ? 1 : 0;
         return String.format("%s/photostream/api/stream?page_size=%d&initial_load=%d", baseUrl, photoPageSize, initial);

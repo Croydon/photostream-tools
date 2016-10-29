@@ -242,6 +242,42 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
 
     }
 
+    public void loadFavoritePhotos() {
+        String url = urlBuilder.getLoadFavoritePhotosApiUrl();
+        HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
+        final RequestType requestType = RequestType.LOAD_FAVORITE_PHOTOS;
+
+        final HttpImageLoader imageLoader = imageLoaderFactory.create();
+        final ImageCacher imageCacher = imageCacherFactory.create();
+        LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, imageLoader, imageCacher, new LoadPhotosAsyncTask.GetPhotosCallback() {
+
+            @Override
+            public void onPhotosResult(PhotoQueryResult photoQueryResult) {
+                removeOpenRequest(requestType);
+                callbackContainer.notifyOnPhotos(photoQueryResult);
+            }
+
+            @Override
+            public void onPhotosError(HttpError httpError) {
+                removeOpenRequest(requestType);
+                callbackContainer.notifyOnPhotosFailed(httpError);
+            }
+
+            @Override
+            public void onNewETag(String eTag, int page, String jsonStringPhotoQueryResult) {
+
+            }
+
+            @Override
+            public PhotoQueryResult onNoNewPhotosAvailable(int page) {
+                return null;
+            }
+        });
+        addOpenRequest(requestType);
+        task.execute();
+
+    }
+
     public void loadPhotos(final String activityId){
         String url = urlBuilder.getLoadPhotosApiUrl(lastRequestedPage <= 1);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);

@@ -33,6 +33,10 @@ public enum RequestType {
      */
     LOAD_PHOTOS,
     /**
+     * {@link IPhotoStreamClient#loadFavoritePhotos()}}
+     */
+    LOAD_FAVORITE_PHOTOS,
+    /**
      * {@link IPhotoStreamClient#uploadPhoto(byte[], String)}
      */
     UPLOAD_PHOTO,
