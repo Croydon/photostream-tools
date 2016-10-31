@@ -483,7 +483,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
 
     @Override
     public void startActivity(Intent intent) {
-        if (photoStreamClient.hasOnPhotosReceivedListenerRegistered())
+        if (photoStreamClient != null && photoStreamClient.hasOnPhotosReceivedListenerRegistered())
             intent.putExtra("parent", activityId);
         super.startActivity(intent);
     }
