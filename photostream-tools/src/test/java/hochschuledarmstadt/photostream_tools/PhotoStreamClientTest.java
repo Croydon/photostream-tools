@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -47,7 +46,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoFavoredListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
@@ -241,14 +240,14 @@ public class PhotoStreamClientTest {
     @Test
     public void likePhoto(){
         OnRequestListener requestCallback = mock(OnRequestListener.class);
-        OnPhotoLikeListener callback = mock(OnPhotoLikeListener.class);
-        photoStreamClient.addOnPhotoLikeListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback, RequestType.LIKE_PHOTO);
-        photoStreamClient.likePhoto(1);
+        OnPhotoFavoredListener callback = mock(OnPhotoFavoredListener.class);
+        photoStreamClient.addOnPhotoFavoriteListener(callback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.FAVORITE_PHOTO);
+        photoStreamClient.favoritePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
-        photoStreamClient.removeOnPhotoLikeListener(callback);
+        photoStreamClient.removeOnPhotoFavoriteListener(callback);
         verify(requestCallback, times(1)).onRequestStarted();
-        verify(callback, times(1)).onPhotoLiked(eq(1));
+        verify(callback, times(1)).onPhotoFavored(eq(1));
         verify(requestCallback, times(1)).onRequestFinished();
     }
 
@@ -256,28 +255,28 @@ public class PhotoStreamClientTest {
     public void likePhotoError(){
         createPhotoStreamClient(new HttpErrorExecutorFactoryStub());
         OnRequestListener requestCallback = mock(OnRequestListener.class);
-        OnPhotoLikeListener callback = mock(OnPhotoLikeListener.class);
-        photoStreamClient.addOnPhotoLikeListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback, RequestType.LIKE_PHOTO);
-        photoStreamClient.likePhoto(1);
+        OnPhotoFavoredListener callback = mock(OnPhotoFavoredListener.class);
+        photoStreamClient.addOnPhotoFavoriteListener(callback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.FAVORITE_PHOTO);
+        photoStreamClient.favoritePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
-        photoStreamClient.removeOnPhotoLikeListener(callback);
+        photoStreamClient.removeOnPhotoFavoriteListener(callback);
         verify(requestCallback, times(1)).onRequestStarted();
-        verify(callback, times(1)).onPhotoLikeFailed(eq(1), isNotNull(HttpError.class));
+        verify(callback, times(1)).onFavoringPhotoFailed(eq(1), isNotNull(HttpError.class));
         verify(requestCallback, times(1)).onRequestFinished();
     }
 
     @Test
     public void resetLikeForPhoto(){
-        OnPhotoLikeListener callback = mock(OnPhotoLikeListener.class);
+        OnPhotoFavoredListener callback = mock(OnPhotoFavoredListener.class);
         OnRequestListener requestCallback = mock(OnRequestListener.class);
-        photoStreamClient.addOnPhotoLikeListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback, RequestType.LIKE_PHOTO);
-        photoStreamClient.resetLikeForPhoto(1);
+        photoStreamClient.addOnPhotoFavoriteListener(callback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.FAVORITE_PHOTO);
+        photoStreamClient.unfavoritePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
-        photoStreamClient.removeOnPhotoLikeListener(callback);
+        photoStreamClient.removeOnPhotoFavoriteListener(callback);
         verify(requestCallback, times(1)).onRequestStarted();
-        verify(callback, times(1)).onPhotoDisliked(eq(1));
+        verify(callback, times(1)).onPhotoUnfavored(eq(1));
         verify(requestCallback, times(1)).onRequestFinished();
     }
 
@@ -285,14 +284,14 @@ public class PhotoStreamClientTest {
     public void resetLikeForPhotoError(){
         createPhotoStreamClient(new HttpErrorExecutorFactoryStub());
         OnRequestListener requestCallback = mock(OnRequestListener.class);
-        OnPhotoLikeListener callback = mock(OnPhotoLikeListener.class);
-        photoStreamClient.addOnPhotoLikeListener(callback);
-        photoStreamClient.addOnRequestListener(requestCallback, RequestType.LIKE_PHOTO);
-        photoStreamClient.resetLikeForPhoto(1);
+        OnPhotoFavoredListener callback = mock(OnPhotoFavoredListener.class);
+        photoStreamClient.addOnPhotoFavoriteListener(callback);
+        photoStreamClient.addOnRequestListener(requestCallback, RequestType.FAVORITE_PHOTO);
+        photoStreamClient.unfavoritePhoto(1);
         Robolectric.flushBackgroundThreadScheduler();
-        photoStreamClient.removeOnPhotoLikeListener(callback);
+        photoStreamClient.removeOnPhotoFavoriteListener(callback);
         verify(requestCallback, times(1)).onRequestStarted();
-        verify(callback, times(1)).onPhotoLikeFailed(eq(1), any(HttpError.class));
+        verify(callback, times(1)).onFavoringPhotoFailed(eq(1), any(HttpError.class));
         verify(requestCallback, times(1)).onRequestFinished();
     }
 

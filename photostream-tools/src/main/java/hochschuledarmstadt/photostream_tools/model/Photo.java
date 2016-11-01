@@ -24,20 +24,14 @@
 
 package hochschuledarmstadt.photostream_tools.model;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Base64;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Repräsentiert ein Photo aus dem Photo Stream
@@ -54,7 +48,7 @@ public class Photo extends BaseItem implements Parcelable{
     private String description;
     @SerializedName("favorite")
     @Expose
-    private int liked;
+    private int favorite;
     @SerializedName("photo_id")
     @Expose
     private int id;
@@ -90,11 +84,11 @@ public class Photo extends BaseItem implements Parcelable{
     }
 
     /**
-     * Liefert zurück ob das Photo über das aktuelle Gerät geliked wurde.
-     * @return {@code true}, wenn das Photo geliked ist, ansonsten {@code false}
+     * Liefert zurück ob das Photo über das aktuelle Gerät favorisiert ist.
+     * @return {@code true}, wenn das Photo favorisiert ist, ansonsten {@code false}
      */
-    public boolean isLiked() {
-        return liked == 1;
+    public boolean isFavorite() {
+        return favorite == 1;
     }
 
     /**
@@ -113,8 +107,8 @@ public class Photo extends BaseItem implements Parcelable{
         return commentCount;
     }
 
-    public void setLiked(boolean liked) {
-        this.liked = liked ? 1 : 0;
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite ? 1 : 0;
     }
 
     /**
@@ -129,7 +123,7 @@ public class Photo extends BaseItem implements Parcelable{
         id = in.readInt();
         imageFilePath = in.readString();
         description = in.readString();
-        liked = in.readInt();
+        favorite = in.readInt();
         deleteable = in.readInt() == 1;
         commentCount = in.readInt();
     }
@@ -144,7 +138,7 @@ public class Photo extends BaseItem implements Parcelable{
         dest.writeInt(id);
         dest.writeString(imageFilePath);
         dest.writeString(description);
-        dest.writeInt(liked);
+        dest.writeInt(favorite);
         dest.writeInt(deleteable ? 1 : 0);
         dest.writeInt(commentCount);
     }

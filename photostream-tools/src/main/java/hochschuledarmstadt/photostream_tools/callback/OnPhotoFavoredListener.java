@@ -27,30 +27,30 @@ package hochschuledarmstadt.photostream_tools.callback;
 import hochschuledarmstadt.photostream_tools.model.HttpError;
 
 /**
- * {@link OnPhotoLikeListener#onPhotoLiked(int)}<br>
- * Wird aufgerufen wenn ein Photo geliked wurde <br><br>
- * {@link OnPhotoLikeListener#onPhotoDisliked(int)}<br>
- * Wird aufgerufen wenn ein Like von einem Photo entfernt wurde. <br><br>
- * {@link OnPhotoLikeListener#onPhotoLikeFailed(int, HttpError)} <br>
- * Wird aufgerufen wenn beim Liken oder Disliken eines Photos ein Fehler aufgetreten ist
+ * {@link OnPhotoFavoredListener#onPhotoFavored(int)}<br>
+ * Wird aufgerufen wenn ein Photo favorisiert wurde <br><br>
+ * {@link OnPhotoFavoredListener#onPhotoUnfavored(int)}<br>
+ * Wird aufgerufen wenn ein favorisiertes Photo wieder entfavorisiert wurde. <br><br>
+ * {@link OnPhotoFavoredListener#onFavoringPhotoFailed(int, HttpError)} <br>
+ * Wird aufgerufen wenn beim Favorisieren oder Defavorisieren eines Photos ein Fehler aufgetreten ist.
  *
  */
-public interface OnPhotoLikeListener {
+public interface OnPhotoFavoredListener {
     /**
-     * Wird aufgerufen wenn ein Photo geliked wurde
+     * Wird aufgerufen wenn ein Photo favorisiert wurde
      * @param photoId id des Photos
      */
-    void onPhotoLiked(int photoId);
+    void onPhotoFavored(int photoId);
     /**
-     * Wird aufgerufen wenn ein Like von einem Photo entfernt wurde
+     * Wird aufgerufen wenn ein Photo entfavorisiert wurde
      * @param photoId id des Photos
      */
-    void onPhotoDisliked(int photoId);
+    void onPhotoUnfavored(int photoId);
 
     /**
-     * Wird aufgerufen wenn beim Liken oder Disliken eines Photos ein Fehler aufgetreten ist
+     * Wird aufgerufen wenn beim Favorisieren oder Entfavorisieren eines Photos ein Fehler aufgetreten ist
      * @param photoId id des Photos
      * @param httpError enthält HTTP Status Code sowie die Fehlernachricht
      */
-    void onPhotoLikeFailed(int photoId, HttpError httpError);
+    void onFavoringPhotoFailed(int photoId, HttpError httpError);
 }

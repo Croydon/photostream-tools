@@ -70,11 +70,11 @@ class UrlBuilder {
         return String.format("%s/photostream/api/comment/%s", baseUrl, commentId);
     }
 
-    public String getLikePhotoApiUrl(int photoId){
+    public String getFavoritePhotoApiUrl(int photoId){
         return String.format("%s/photostream/api/image/%s/like", baseUrl, photoId);
     }
 
-    public String getResetLikeForPhotoApiUrl(int photoId){
+    public String getUnfavoritePhotoApiUrl(int photoId){
         return String.format("%s/photostream/api/image/%s/dislike", baseUrl, photoId);
     }
 

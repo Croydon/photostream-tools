@@ -35,7 +35,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoFavoredListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
@@ -65,13 +65,13 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
     }
 
     @Override
-    public void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
-        photoStreamClientImpl.addOnPhotoLikeListener(onPhotoLikeListener);
+    public void addOnPhotoFavoriteListener(OnPhotoFavoredListener onPhotoFavoredListener) {
+        photoStreamClientImpl.addOnPhotoLikeListener(onPhotoFavoredListener);
     }
 
     @Override
-    public void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
-        photoStreamClientImpl.removeOnPhotoLikeListener(onPhotoLikeListener);
+    public void removeOnPhotoFavoriteListener(OnPhotoFavoredListener onPhotoFavoredListener) {
+        photoStreamClientImpl.removeOnPhotoLikeListener(onPhotoFavoredListener);
     }
 
     @Override
@@ -211,12 +211,12 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
     }
 
     @Override
-    public void likePhoto(int photoId) {
+    public void favoritePhoto(int photoId) {
         photoStreamClientImpl.likePhoto(photoId);
     }
 
     @Override
-    public void resetLikeForPhoto(int photoId) {
+    public void unfavoritePhoto(int photoId) {
         photoStreamClientImpl.resetLikeForPhoto(photoId);
     }
 

@@ -24,13 +24,9 @@
 
 package hochschuledarmstadt.photostream_tools;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,18 +37,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import hochschuledarmstadt.photostream_tools.adapter.BasePhotoAdapter;
-import hochschuledarmstadt.photostream_tools.adapter.PluginContextualActionBar;
-import hochschuledarmstadt.photostream_tools.model.BaseItem;
 import hochschuledarmstadt.photostream_tools.model.Photo;
 
 import static org.junit.Assert.assertEquals;
@@ -61,7 +53,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -199,10 +190,10 @@ public class PhotoAdapterTest {
         final boolean deleteable = true;
         final int commentCount = 1;
         Photo photo = Fakes.buildFakePhoto(photoId, null, null, isPhotoLiked, deleteable, commentCount);
-        assertFalse(photo.isLiked());
+        assertFalse(photo.isFavorite());
         simplePhotoAdapter.add(photo);
-        if (simplePhotoAdapter.setLikeForPhoto(photoId)){
-            assertTrue(photo.isLiked());
+        if (simplePhotoAdapter.favorPhoto(photoId)){
+            assertTrue(photo.isFavorite());
         }else{
             fail("photo should be liked after method call");
         }
@@ -215,10 +206,10 @@ public class PhotoAdapterTest {
         final boolean deleteable = true;
         final int commentCount = 1;
         Photo photo = Fakes.buildFakePhoto(photoId, null, null, isPhotoLiked, deleteable, commentCount);
-        assertTrue(photo.isLiked());
+        assertTrue(photo.isFavorite());
         simplePhotoAdapter.add(photo);
-        if (simplePhotoAdapter.resetLikeForPhoto(photoId)){
-            assertFalse(photo.isLiked());
+        if (simplePhotoAdapter.unfavorPhoto(photoId)){
+            assertFalse(photo.isFavorite());
         }else{
             fail("photo should be unliked after method call");
         }

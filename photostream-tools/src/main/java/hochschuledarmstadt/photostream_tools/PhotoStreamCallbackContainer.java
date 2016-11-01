@@ -43,7 +43,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoFavoredListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
@@ -65,7 +65,7 @@ class PhotoStreamCallbackContainer {
     private List<OnPhotosReceivedListener> onPhotosReceivedListeners = new ArrayList<>();
     private List<OnNewPhotoReceivedListener> onNewPhotoReceivedListeners = new ArrayList<>();
     private List<OnPhotoDeletedListener> onPhotoDeletedListeners = new ArrayList<>();
-    private List<OnPhotoLikeListener> onPhotoLikeListeners = new ArrayList<>();
+    private List<OnPhotoFavoredListener> onPhotoLikeListeners = new ArrayList<>();
     private List<OnSearchedPhotosReceivedListener> onSearchPhotosListeners = new ArrayList<>();
     private List<OnCommentsReceivedListener> onCommentsReceivedListeners = new ArrayList<>();
     private List<OnCommentDeletedListener> onCommentDeletedListeners = new ArrayList<>();
@@ -95,7 +95,7 @@ class PhotoStreamCallbackContainer {
         requestListenerMap.put(RequestType.UPLOAD_PHOTO, new ArrayList<OnRequestListener>());
         requestListenerMap.put(RequestType.LOAD_PHOTOS, new ArrayList<OnRequestListener>());
         requestListenerMap.put(RequestType.DELETE_PHOTO, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.LIKE_PHOTO, new ArrayList<OnRequestListener>());
+        requestListenerMap.put(RequestType.FAVORITE_PHOTO, new ArrayList<OnRequestListener>());
         requestListenerMap.put(RequestType.SEARCH_PHOTOS, new ArrayList<OnRequestListener>());
         requestListenerMap.put(RequestType.LOAD_COMMENTS, new ArrayList<OnRequestListener>());
         requestListenerMap.put(RequestType.UPLOAD_COMMENT, new ArrayList<OnRequestListener>());
@@ -202,11 +202,11 @@ class PhotoStreamCallbackContainer {
         removeListener(onCommentDeletedListeners, onCommentDeletedListener);
     }
 
-    public void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
+    public void addOnPhotoLikeListener(OnPhotoFavoredListener onPhotoLikeListener) {
         addListener(onPhotoLikeListeners, onPhotoLikeListener);
     }
 
-    public void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
+    public void removeOnPhotoLikeListener(OnPhotoFavoredListener onPhotoLikeListener) {
         removeListener(onPhotoLikeListeners, onPhotoLikeListener);
     }
 
@@ -337,19 +337,19 @@ class PhotoStreamCallbackContainer {
     }
 
     public void notifyOnPhotoLikeFailed(int photoId, HttpError httpError) {
-        for (OnPhotoLikeListener listener : onPhotoLikeListeners)
-            listener.onPhotoLikeFailed(photoId, httpError);
+        for (OnPhotoFavoredListener listener : onPhotoLikeListeners)
+            listener.onFavoringPhotoFailed(photoId, httpError);
     }
 
     public void notifyOnPhotoLiked(int photoId) {
-        for (OnPhotoLikeListener onPhotoLikeListener : onPhotoLikeListeners){
-            onPhotoLikeListener.onPhotoLiked(photoId);
+        for (OnPhotoFavoredListener onPhotoLikeListener : onPhotoLikeListeners){
+            onPhotoLikeListener.onPhotoFavored(photoId);
         }
     }
 
     public void notifyOnPhotoDisliked(int photoId) {
-        for (OnPhotoLikeListener onPhotoLikeListener : onPhotoLikeListeners){
-            onPhotoLikeListener.onPhotoDisliked(photoId);
+        for (OnPhotoFavoredListener onPhotoLikeListener : onPhotoLikeListeners){
+            onPhotoLikeListener.onPhotoUnfavored(photoId);
         }
     }
 

@@ -52,7 +52,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoFavoredListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
@@ -165,12 +165,12 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         callbackContainer.removeOnRequestListener(onRequestListener);
     }
 
-    public void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
-        callbackContainer.addOnPhotoLikeListener(onPhotoLikeListener);
+    public void addOnPhotoLikeListener(OnPhotoFavoredListener onPhotoFavoredListener) {
+        callbackContainer.addOnPhotoLikeListener(onPhotoFavoredListener);
     }
 
-    public void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener) {
-        callbackContainer.removeOnPhotoLikeListener(onPhotoLikeListener);
+    public void removeOnPhotoLikeListener(OnPhotoFavoredListener onPhotoFavoredListener) {
+        callbackContainer.removeOnPhotoLikeListener(onPhotoFavoredListener);
     }
 
     public void addOnCommentsReceivedListener(OnCommentsReceivedListener onCommentsReceivedListener){
@@ -372,9 +372,9 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
 
 
     public void likePhoto(int photoId) {
-        String url = urlBuilder.getLikePhotoApiUrl(photoId);
+        String url = urlBuilder.getFavoritePhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
-        final RequestType requestType = RequestType.LIKE_PHOTO;
+        final RequestType requestType = RequestType.FAVORITE_PHOTO;
         LikeOrDislikePhotoAsyncTask task = new LikePhotoAsyncTask(executor, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
 
             @Override
@@ -450,9 +450,9 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
     }
 
     public void resetLikeForPhoto(int photoId) {
-        String url = urlBuilder.getResetLikeForPhotoApiUrl(photoId);
+        String url = urlBuilder.getUnfavoritePhotoApiUrl(photoId);
         HttpPutExecutor executor = httpExecutorFactory.createHttpPutExecutor(url);
-        final RequestType requestType = RequestType.LIKE_PHOTO;
+        final RequestType requestType = RequestType.FAVORITE_PHOTO;
         LikeOrDislikePhotoAsyncTask task = new DislikePhotoAsyncTask(executor, photoId, new LikeOrDislikePhotoAsyncTask.OnVotePhotoResultListener() {
             @Override
             public void onPhotoLiked(int photoId) {

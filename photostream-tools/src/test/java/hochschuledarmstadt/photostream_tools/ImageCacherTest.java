@@ -30,11 +30,9 @@ import android.util.Base64;
 import com.google.gson.Gson;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -137,7 +135,7 @@ public class ImageCacherTest {
         File imageFile = new File(CURRENT_DIR, fileName);
         String imageFilePath = imageFile.getAbsolutePath();
         educateMock(fileName);
-        photo = Fakes.buildFakePhoto(photo.getId(), imageFilePath, photo.getDescription(), photo.isLiked(), photo.isDeleteable(), photo.getCommentCount());
+        photo = Fakes.buildFakePhoto(photo.getId(), imageFilePath, photo.getDescription(), photo.isFavorite(), photo.isDeleteable(), photo.getCommentCount());
         return photo;
     }
 

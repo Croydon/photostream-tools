@@ -24,7 +24,6 @@
 
 package hochschuledarmstadt.photostream_tools.adapter;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,8 +49,8 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
  */
 public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Photo> {
 
-    private static final int LIKE = -10;
-    private static final int DISLIKE = -11;
+    private static final int FAVORED = -10;
+    private static final int UNFAVORED = -11;
 
     private static final int DEFAULT_CACHE_SIZE_IN_MB = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024 / 5);
 
@@ -172,29 +171,29 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
     }
 
     /**
-     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>geliked</b>
+     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>favorisiert</b>
      * @param photoId id des Photos
      * @return {@code true}, wenn das Photo innerhalb die Liste vorhanden ist, ansonsten {@code false}
      */
-    public boolean setLikeForPhoto(int photoId) {
-        return internalSetOrResetLike(photoId, LIKE);
+    public boolean favorPhoto(int photoId) {
+        return internalFavorOrUnfavorPhoto(photoId, FAVORED);
     }
 
     /**
-     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>nicht geliked</b>
+     * Aktualisiert ein Photo mit der id {@code photoId} auf den Status <b>nicht favorisiert</b>
      * @param photoId id des Photos
      * @return {@code true}, wenn das Photo innerhalb die Liste vorhanden ist, ansonsten {@code false}
      */
-    public boolean resetLikeForPhoto(int photoId) {
-        return internalSetOrResetLike(photoId, DISLIKE);
+    public boolean unfavorPhoto(int photoId) {
+        return internalFavorOrUnfavorPhoto(photoId, UNFAVORED);
     }
 
-    private boolean internalSetOrResetLike(int photoId, int likeConstant) {
+    private boolean internalFavorOrUnfavorPhoto(int photoId, int favoriteConstant) {
         int itemCount = getItemCount();
         for (int position = 0; position < itemCount; position++) {
             Photo photo = getItemAtPosition(position);
             if (itemHasEqualId(photoId, photo)) {
-                photo.setLiked(likeConstant == LIKE);
+                photo.setFavorite(favoriteConstant == FAVORED);
                 notifyItemChanged(position);
                 return true;
             }

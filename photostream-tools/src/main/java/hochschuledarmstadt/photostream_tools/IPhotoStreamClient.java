@@ -38,7 +38,7 @@ import hochschuledarmstadt.photostream_tools.callback.OnCommentsReceivedListener
 import hochschuledarmstadt.photostream_tools.callback.OnNewCommentReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnNewPhotoReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoDeletedListener;
-import hochschuledarmstadt.photostream_tools.callback.OnPhotoLikeListener;
+import hochschuledarmstadt.photostream_tools.callback.OnPhotoFavoredListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotoUploadListener;
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 import hochschuledarmstadt.photostream_tools.callback.OnRequestListener;
@@ -71,18 +71,18 @@ public interface IPhotoStreamClient {
     void removeOnRequestListener(OnRequestListener onRequestListener);
 
     /**
-     * Registriert einen Listener des Typs {@link OnPhotoLikeListener}. <br>
-     * Die Ergebnisse von den Methodenaufrufen {@link IPhotoStreamClient#likePhoto(int)} und {@link IPhotoStreamClient#resetLikeForPhoto(int)} <br>
-     * werden über die Methoden des Interfaces {@link OnPhotoLikeListener} zurück geliefert
-     * @param onPhotoLikeListener listener
+     * Registriert einen Listener des Typs {@link OnPhotoFavoredListener}. <br>
+     * Die Ergebnisse von den Methodenaufrufen {@link IPhotoStreamClient#favoritePhoto(int)} und {@link IPhotoStreamClient#unfavoritePhoto(int)} <br>
+     * werden über die Methoden des Interfaces {@link OnPhotoFavoredListener} zurück geliefert
+     * @param onPhotoFavoredListener listener
      */
-    void addOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
+    void addOnPhotoFavoriteListener(OnPhotoFavoredListener onPhotoFavoredListener);
 
     /**
-     * Entfernt den Listener {@code onPhotoLikeListener}
-     * @param onPhotoLikeListener listener
+     * Entfernt den Listener {@code onPhotoFavoredListener}
+     * @param onPhotoFavoredListener listener
      */
-    void removeOnPhotoLikeListener(OnPhotoLikeListener onPhotoLikeListener);
+    void removeOnPhotoFavoriteListener(OnPhotoFavoredListener onPhotoFavoredListener);
 
     /**
      * Registriert einen Listener des Typs {@link OnCommentsReceivedListener}. <br>
@@ -285,21 +285,21 @@ public interface IPhotoStreamClient {
 
     /**
      * Asynchroner Aufruf. <br>
-     * Liked ein Photo mit der id {@code photoId} <br>
-     * Wenn das Photo geliked wurde, wird die Methode {@link OnPhotoLikeListener#onPhotoLiked(int)} aufgerufen. <br>
-     * Wenn das Photo nicht geliked werden konnte, wird die Methode {@link OnPhotoLikeListener#onPhotoLikeFailed(int, HttpError)} aufgerufen. <br>
+     * Favorisiert ein Photo mit der id {@code photoId} <br>
+     * Wenn das Photo favorisiert wurde, wird die Methode {@link OnPhotoFavoredListener#onPhotoFavored(int)} aufgerufen. <br>
+     * Trat bei der Aktion jedoch ein Fehler auf, wird die Methode {@link OnPhotoFavoredListener#onFavoringPhotoFailed(int, HttpError)} aufgerufen. <br>
      * @param photoId id des Photos
      */
-    void likePhoto(int photoId);
+    void favoritePhoto(int photoId);
 
     /**
      * Asynchroner Aufruf. <br>
-     * Entfernt einen Like von einem Photo mit der id {@code photoId} <br>
-     * Wenn ein Like von dem Photo entfernt werden konnte, wird die Methode {@link OnPhotoLikeListener#onPhotoDisliked(int)} aufgerufen. <br>
-     * Wenn das nicht funktioniert hat, wird die Methode {@link OnPhotoLikeListener#onPhotoLikeFailed(int, HttpError)} aufgerufen. <br>
+     * Entfavorisiert ein Photo mit der id {@code photoId} <br>
+     * Wenn ein Photo entfavorisiert wurde, wird die Methode {@link OnPhotoFavoredListener#onPhotoUnfavored(int)} aufgerufen. <br>
+     * Trat bei der Aktion jedoch ein Fehler auf, wird die Methode {@link OnPhotoFavoredListener#onFavoringPhotoFailed(int, HttpError)} aufgerufen. <br>
      * @param photoId id des Photos
      */
-    void resetLikeForPhoto(int photoId);
+    void unfavoritePhoto(int photoId);
 
     /**
      * Asynchroner Aufruf. <br>

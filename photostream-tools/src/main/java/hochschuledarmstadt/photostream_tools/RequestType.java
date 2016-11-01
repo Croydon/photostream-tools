@@ -41,9 +41,9 @@ public enum RequestType {
      */
     DELETE_PHOTO,
     /**
-     * {@link IPhotoStreamClient#likePhoto(int)} und {@link IPhotoStreamClient#resetLikeForPhoto(int)}
+     * {@link IPhotoStreamClient#favoritePhoto(int)} und {@link IPhotoStreamClient#unfavoritePhoto(int)}
      */
-    LIKE_PHOTO,
+    FAVORITE_PHOTO,
     /**
      * {@link IPhotoStreamClient#searchPhotos(String)} und {@link IPhotoStreamClient#searchMorePhotos()}
      */
