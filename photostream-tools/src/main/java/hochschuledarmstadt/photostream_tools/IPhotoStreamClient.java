@@ -71,7 +71,7 @@ public interface IPhotoStreamClient {
      * Beispiel für eine Activity:<br><br>photoStreamClient.addOnRequestListener(this, {@link RequestType#DELETE_PHOTO}, {@link RequestType#DELETE_COMMENT}); <br>
      * Hierfür muss die Activity das Interface {@link OnRequestListener} implementieren.
      * @param onRequestListener die Instanz vom Typ {@link OnRequestListener}
-     * @param requestTypes {@link RequestType} Array als varargs Parameter => http://stackoverflow.com/questions/3158730/java-3-dots-in-parameters
+     * @param requestTypes {@link RequestType} Array als varargs Parameter: http://stackoverflow.com/questions/3158730/java-3-dots-in-parameters
      */
     void addOnRequestListener(OnRequestListener onRequestListener, RequestType... requestTypes);
 
