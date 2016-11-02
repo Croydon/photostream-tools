@@ -2,7 +2,7 @@
 
 ## Verwendung
 
-<a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-tools/tree/master/examples">Beispielprojekt</a> ansehen
+<a href="https://github.com/aschattney/photostream-tools/wiki/">Wiki</a> lesen und <a href="https://github.com/aschattney/photostream-example">Beispielprojekt</a> ansehen
 
 ## License
 
