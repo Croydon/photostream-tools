@@ -88,10 +88,24 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
         setHasStableIds(true);
     }
 
+    /**
+     * Fügt eine Erweiterung für den Adapter hinzu. Die Variable {@code plugin} kann entweder vom
+     * Typ {@link PluginContextualActionBar} oder vom Typ {@link PluginAlertDialog} sein.<br>
+     * Bei einem LongClick auf die View mit der id {@code viewId}, wird die Erweiterung ausgelöst.
+     * @param viewId
+     * @param plugin
+     */
     public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, T> plugin) {
         internalAddPlugin(viewId, plugin, PLUGIN_EVENT_TYPE_LONG_CLICK);
     }
 
+    /**
+     * Fügt eine Erweiterung für den Adapter hinzu. Die Variable {@code plugin} kann entweder vom
+     * Typ {@link PluginContextualActionBar} oder vom Typ {@link PluginAlertDialog} sein.<br>
+     * Bei einem Click auf die View mit der id {@code viewId}, wird die Erweiterung ausgelöst.
+     * @param viewId
+     * @param plugin
+     */
     public void addOnClickPlugin(@IdRes int viewId, Plugin<H, T> plugin) {
         internalAddPlugin(viewId, plugin, PLUGIN_EVENT_TYPE_CLICK);
     }
@@ -245,7 +259,7 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
 
     /**
      * Fügt einen {@code itemClickListener} für eine View mit der id {@code viewId} hinzu.
-     * Wenn für diese View bereits ein {@link OnItemClickListener} existiert, wird dieser zuerst entfernt.
+     * Wenn für diese View bereits ein {@link OnItemClickListener} existiert, wird dieser ersetzt.
      *
      * @param viewId
      * @param itemClickListener
@@ -261,6 +275,12 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
             notifyDataSetChanged();
     }
 
+    /**
+     * Fügt einen {@code itemLongClickListener} für eine View mit der id {@code viewId} hinzu.
+     * Wenn für diese View bereits ein {@link OnItemLongClickListener} existiert, wird dieser ersetzt.
+     * @param viewId
+     * @param itemLongClickListener
+     */
     public void setOnItemLongClickListener(@IdRes int viewId, OnItemLongClickListener<H, T> itemLongClickListener) {
         boolean shouldRepopulateViews = false;
         if (itemLongClickListenersMap.containsKey(viewId)) {
@@ -292,7 +312,7 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
     }
 
     protected interface OnItemTouchListener<H extends RecyclerView.ViewHolder, T extends BaseItem & Parcelable> {
-        boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvenH, T item);
+        boolean onItemTouched(H viewHolder, View v, MotionEvent motionEvent, T item);
     }
 
     private boolean destroyed = false;

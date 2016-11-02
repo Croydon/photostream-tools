@@ -66,9 +66,9 @@ abstract class Plugin<H extends RecyclerView.ViewHolder, T extends BaseItem & Pa
     }
 
     /**
-     *  Diese Methode soll als Ergebnis liefern, ob das Event für das übergebene {@code item} verarbeiten soll
-     * @param viewHolder Enthält das View Element, welches das Plugin ausgelöst hat
-     * @param v die View, welche das Plugin ausgelöst hat
+     *  Diese Methode soll als Ergebnis liefern, ob das Event für das übergebene {@code item} verarbeitet werden soll.
+     * @param viewHolder Enthält das View Element, welches die Erweiterung ausgelöst hat
+     * @param v die View, welche die Erweiterung ausgelöst hat
      * @param item
      * @return Es muss {@code true} zurückgegeben werden, wenn das Plugin das Event verarbeiten soll, ansonsten {@code false}
      */

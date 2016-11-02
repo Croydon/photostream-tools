@@ -36,13 +36,14 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Bietet Unterstützung bei der Vollbildanzeige von Photos.
  * Bei Berührung des Bildschirms werden die NavigationBar und die StatusBar versteckt bzw. angezeigt.
  */
-public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
+public abstract class FullscreenPhotoActivity extends PhotoStreamActivity {
 
     private static final float TOUCH_OFFSET = 10.f;
     private static final String KEY_SYSTEM_UI_VISIBLE = "KEY_SYSTEM_UI_VISIBLE";
@@ -103,9 +104,17 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
      */
     protected abstract void onSystemUiHidden();
 
-    protected void setImageViewZoomable(ImageView imageView, OnImageViewZoomChangedListener zoomChangedListener){
+    /**
+     * Über diese Methode kann eine ImageView 'zoombar' gemacht werden. Wird in die ImageView gezoomt, wird
+     * die Methode {@link OnImageViewZoomChangedListener#onImageViewZoomedIn()} aufgerufen. Ist das Bild nicht gezoomt,
+     * wird die Methode {@link OnImageViewZoomChangedListener#onImageViewZoomReset()} aufgerufen.
+     *
+     * @param imageView           die ImageView, die 'zoombar' gemacht werden soll
+     * @param zoomChangedListener listener für Zustandsänderungen am Zoom
+     */
+    protected void setImageViewZoomable(ImageView imageView, OnImageViewZoomChangedListener zoomChangedListener) {
 
-        if (imageViewAttacher != null){
+        if (imageViewAttacher != null) {
             imageViewAttacher.setOnDoubleTapListener(null);
             imageViewAttacher.setOnScaleChangeListener(null);
             imageViewAttacher.cleanup();
@@ -136,9 +145,9 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             public void onScaleChange(float scaleFactor, float focusX, float focusY) {
                 handler.removeCallbacks(runnableZoomedIn);
                 handler.removeCallbacks(runnableZoomReset);
-                if (Math.abs(1.0f - scaleFactor) < 0.001){
+                if (Math.abs(1.0f - scaleFactor) < 0.001) {
                     handler.postDelayed(runnableZoomReset, 150);
-                }else {
+                } else {
                     handler.postDelayed(runnableZoomedIn, 150);
                 }
             }
@@ -154,14 +163,14 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
             handler.removeCallbacks(runnableZoomedIn);
             handler.removeCallbacks(runnableZoomReset);
             runnableZoomReset.run();
-        }else
+        } else
             super.onBackPressed();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             isFirstStart = false;
             systemUiVisible = savedInstanceState.getBoolean(KEY_SYSTEM_UI_VISIBLE);
             scale = savedInstanceState.getFloat(KEY_SCALE);
@@ -177,7 +186,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                         onSystemUiVisible();
                     else
                         onSystemUiHidden();
-                }else{
+                } else {
                     uiVisibilitySelfTriggered = false;
                 }
             }
@@ -199,11 +208,11 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
     }
 
     private void handleSystemUi() {
-        if (isFirstStart){
+        if (isFirstStart) {
             hideSystemUI();
-        }else if (!systemUiVisible){
+        } else if (!systemUiVisible) {
             hideSystemUI();
-        }else{
+        } else {
             showSystemUI();
         }
     }
@@ -246,7 +255,8 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
             return handled;
 
-        }catch(Exception e){}
+        } catch (Exception e) {
+        }
 
         return false;
     }
@@ -264,6 +274,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
     /**
      * Liefert zurück, ob Statusbar und Navigationbar zum aktuellen Zeitpunkt sichtbar sind oder nicht
+     *
      * @return {@code true, wenn beide Bars sichtbar sind, ansonsten {@code false}}
      */
     public boolean isSystemUiVisible() {
@@ -273,14 +284,14 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
             return currentSystemUiVisibility == isVisible;
-        }else if (currentSystemUiVisibility == 0){
+        } else if (currentSystemUiVisibility == 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private void watchForExitTransition(){
+    private void watchForExitTransition() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getSharedElementExitTransition().addListener(new Transition.TransitionListener() {
 
@@ -371,7 +382,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
         if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 19) {
             getWindow().getDecorView().getRootView().setSystemUiVisibility(
-                              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -379,7 +390,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
 
         } else if (Build.VERSION.SDK_INT >= 19) {
             getWindow().getDecorView().getRootView().setSystemUiVisibility(
-                              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -415,6 +426,7 @@ public abstract class FullscreenPhotoActivity extends PhotoStreamActivity{
          * Diese Methode wird aufgerufen, sobald das Bild nicht mehr gezoomt ist
          */
         void onImageViewZoomReset();
+
         /**
          * Diese Methode wird aufgerufen, wenn das Bild gezoomt wurde
          */

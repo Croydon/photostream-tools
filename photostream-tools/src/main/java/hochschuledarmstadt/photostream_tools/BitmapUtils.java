@@ -45,8 +45,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Über die Methoden dieser Klasse können Bitmaps geladen werden, die direkt für den Photo Upload skaliert werden.
- * Zusätzlich sind Methoden für das Recyclen von Bitmaps und konvertieren von Bitmaps in Byte Arrays vorhanden.
+ * Über die statischen Methoden dieser Klasse, können Bitmaps direkt über
+ * die Methode {@link BitmapUtils#recycleBitmap(Bitmap)} oder aus der ImageView heraus
+ * über die Methode {@link BitmapUtils#recycleBitmapFromImageView(ImageView)}
+ * recycled, also aus dem Speicher entfernt werden.<br> Das Bitmap Objekt kann anschließend
+ * nicht mehr verwendet werden!
+ * Die Methode {@link BitmapUtils#bitmapToBytes(Bitmap)} erzeugt aus einem Bitmap Objekt
+ * ein Byte Array.
  */
 public final class BitmapUtils {
 
@@ -69,7 +74,7 @@ public final class BitmapUtils {
     }
 
     /**
-     * Entfernt ein Bitmap aus dem Speicher
+     * Entfernt das übergebene {@link Bitmap} {@code bitmap} Objekt aus dem Speicher.
      * @param bitmap das Bitmap
      */
     public static void recycleBitmap(Bitmap bitmap){
@@ -78,9 +83,11 @@ public final class BitmapUtils {
     }
 
     /**
-     * Konvertiert ein Bitmap {@code bitmap} in ein Byte Array
-     * @param bitmap
-     * @return byte[]
+     * Konvertiert das übergebene {@code bitmap} in ein Byte Array. Dieses Byte Array kann anschließend
+     * für den Upload des Photos über die Methode {@link IPhotoStreamClient#uploadPhoto(byte[], String)}
+     * verwendet werden.
+     * @param bitmap das {@link Bitmap} Objekt
+     * @return byte[] liefert das Bild als byte[] zurück.
      */
     public static byte[] bitmapToBytes(Bitmap bitmap) {
         if (bitmap == null) throw new NullPointerException("bitmap ist null!");
@@ -89,11 +96,11 @@ public final class BitmapUtils {
         return bos.toByteArray();
     }
 
-    public static boolean isJPEG(byte[] data) throws IOException {
+    static boolean isJPEG(byte[] data) throws IOException {
         return internalIsJPEG(new DataInputStream(new ByteArrayInputStream(data)));
     }
 
-    public static boolean isJPEG(File file) throws IOException {
+    static boolean isJPEG(File file) throws IOException {
         return internalIsJPEG(new DataInputStream(new BufferedInputStream(new FileInputStream(file))));
     }
 

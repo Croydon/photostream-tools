@@ -105,28 +105,6 @@ public abstract class BaseCommentAdapter<H extends RecyclerView.ViewHolder> exte
     }
 
     /**
-     * Fügt eine Erweiterung für den Adapter hinzu, <br>
-     * {@link PluginContextualActionBar} or {@link PluginAlertDialog}
-     * @param viewId die id der View, welche die Erweiterung bei einem "Long Click" triggern soll
-     * @param plugin Die Erweiterung
-     */
-    @Override
-    public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
-        super.addOnLongClickPlugin(viewId, plugin);
-    }
-
-    /**
-     * Fügt eine Erweiterung für den Adapter hinzu, <br>
-     * {@link PluginContextualActionBar} or {@link PluginAlertDialog}
-     * @param viewId die id der View, welche die Erweiterung bei einem "Click" triggern soll
-     * @param plugin Die Erweiterung
-     */
-    @Override
-    public void addOnClickPlugin(@IdRes int viewId, Plugin<H, Comment> plugin) {
-        super.addOnClickPlugin(viewId, plugin);
-    }
-
-    /**
      * Speichert die aktuelle Liste von Kommentaren in ein Bundle
      * @return bundle
      */

@@ -83,9 +83,12 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     }
 
     /**
-     * Wird aufgerufen, wenn die Activity die Verbindung zu dem Service hergestellt hat
-     * @param photoStreamClient Das Client Objekt
-     * @param savedInstanceState Wenn die Activity reinitialisiert wird (z.B. Wechsel von Portrait in den Landscape Modus), dann enthält diese Variable die gespeicherten Variablen
+     * Wird aufgerufen, wenn die Activity die Verbindung zu dem Service hergestellt hat. <br>
+     * Wenn die Activity reinitialisiert wird (z.B. Wechsel von Portrait in den Landscape Modus),<br>
+     * dann enthält die Variable {@code savedInstanceState} die zwischengespeicherten Variablen aus der Methode
+     * {@link android.app.Activity#onSaveInstanceState(Bundle)}
+     * @param photoStreamClient Das Client Objekt, über das mit dem Server kommuniziert werden kann
+     * @param savedInstanceState ist null, wenn die Activity zum ersten Mal erzeugt wurde.
      */
     protected abstract void onPhotoStreamServiceConnected(IPhotoStreamClient photoStreamClient, Bundle savedInstanceState);
 
@@ -100,7 +103,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     }
 
     /**
-     * Wird aufgerufen, <b>kurz bevor</b> die Activity die Verbindung zu dem Service trennt <br>
+     * Wird aufgerufen, <b>kurz bevor</b> die Activity die Verbindung zu dem Service trennt.<br>
      * Nach dieser Methode ist die Verbindung zum Service getrennt.
      * @param photoStreamClient
      */
@@ -161,6 +164,13 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         asyncBitmapLoaders.clear();
     }
 
+    /**
+     * Mit dieser Methode kann ein Photo vom Dateisystem asynchron geladen werden. Wenn das Photo
+     * geladen wurde, wird die Methode {@link OnBitmapLoadedListener#onBitmapLoaded(Bitmap)} aufgerufen
+     * und das, beim Laden erzeugte, {@link Bitmap} Objekt als Parameter übergeben.
+     * @param file Die Datei, welche das Photo enthält
+     * @param listener
+     */
     public void loadBitmapAsync(File file, final OnBitmapLoadedListener listener){
         StreamDecoderFileStrategy strategy = new StreamDecoderFileStrategy();
         AsyncBitmapLoader<File> task = new AsyncBitmapLoader<>(strategy);
@@ -168,6 +178,13 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         task.execute(file);
     }
 
+    /**
+     * Mit dieser Methode kann ein Photo über ein Uri Objekt asynchron geladen werden. Wenn das Photo
+     * geladen wurde, wird die Methode {@link OnBitmapLoadedListener#onBitmapLoaded(Bitmap)} aufgerufen
+     * und das, beim Laden erzeugte, {@link Bitmap} Objekt als Parameter übergeben.
+     * @param uri Das {@link Uri} Objekt
+     * @param listener
+     */
     public void loadBitmapAsync(Uri uri, final OnBitmapLoadedListener listener){
         if (uri.toString().startsWith("assets://")){
             String assetFileName = uri.toString().replace("assets://", "");

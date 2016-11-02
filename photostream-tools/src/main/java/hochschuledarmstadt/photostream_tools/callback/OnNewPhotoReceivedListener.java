@@ -33,7 +33,7 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 public interface OnNewPhotoReceivedListener {
     /**
      * Wird aufgerufen wenn ein neues Photo veröffentlicht wurde
-     * {@code photo} kann ein eigenes Photo sein oder ein Photo von einem anderen Gerät
+     * {@code photo} kann hierbei ein eigenes Photo sein oder ein Photo von einem anderen Gerät
      * @param photo das Photo
      */
     void onNewPhotoReceived(Photo photo);

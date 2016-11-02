@@ -137,16 +137,6 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
     }
 
     @Override
-    public void addOnLongClickPlugin(@IdRes int viewId, Plugin<H, Photo> plugin) {
-        super.addOnLongClickPlugin(viewId, plugin);
-    }
-
-    @Override
-    public void addOnClickPlugin(@IdRes int viewId, Plugin<H, Photo> plugin) {
-        super.addOnClickPlugin(viewId, plugin);
-    }
-
-    @Override
     protected void destroyReferences() {
         super.destroyReferences();
         for (BitmapLoaderTask task : tasks) {
@@ -201,6 +191,13 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         return false;
     }
 
+    /**
+     * Über diese Methode kann die aktuelle Anzahl der
+     * Kommentare {@code comment_count} für das {@link Photo}
+     * Objekt mit der Id {@code photoId} gesetzt werden
+     * @param photoId Die Id zu dem Photo
+     * @param comment_count Anzahl der Kommentare zu dem Photo mit der id {@code photoId}
+     */
     public void updateCommentCount(int photoId, int comment_count) {
         int itemCount = getItemCount();
         for (int position = 0; position < itemCount; position++) {
@@ -220,6 +217,14 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         }
     }
 
+    /**
+     * Über diese Methode kann ein Photo asynchron geladen werden. Wenn das Photo geladen werden konnte,
+     * wird die Methode {@link BasePhotoAdapter#onBitmapLoadedIntoImageView(ImageView)} aufgerufen und die
+     * ImageView hier als Parameter mit übergeben.
+     * @param viewHolder das ViewHolder Objekt
+     * @param imageView die ImageView, in der das geladene Photo angezeigt werden soll
+     * @param photo das Photo, das geladen werden soll
+     */
     protected void loadBitmapIntoImageViewAsync(H viewHolder, final ImageView imageView, final Photo photo){
         imageView.setImageBitmap(null);
         Integer prevKey = -1;
@@ -263,6 +268,12 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
         return true;
     }
 
+    /**
+     * In dieser Methode wird die ImageView zurückgeliefert, nachdem das Photo asynchron geladen und als
+     * Bildquelle für die ImageView gesetzt wurde. In dieser Methode könnte theoretisch noch eine
+     * kurze Animation durchgeführt werden. Ansonsten kann diese Methode theoretisch leer bleiben.
+     * @param imageView
+     */
     protected abstract void onBitmapLoadedIntoImageView(ImageView imageView);
 
     public interface OnItemClickListener<H extends RecyclerView.ViewHolder> extends BaseAdapter.OnItemClickListener<H, Photo>{
