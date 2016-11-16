@@ -25,9 +25,10 @@
 package hochschuledarmstadt.photostream_tools.adapter;
 
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -39,6 +40,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import hochschuledarmstadt.photostream_tools.R;
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -49,19 +53,26 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
  */
 public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extends BaseAdapter<H, Photo> {
 
+
+    private  ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            5, 25, 30, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<Runnable>(100, true));
+
+    {
+        threadPoolExecutor.allowCoreThreadTimeOut(true);
+    }
+
     private static final int FAVORED = -10;
     private static final int UNFAVORED = -11;
 
     private static final int DEFAULT_CACHE_SIZE_IN_MB = (int) (Runtime.getRuntime().maxMemory() / 1024 / 1024 / 5);
 
     private List<BitmapLoaderTask> tasks = new ArrayList<>();
-    private LruBitmapCache lruBitmapCache;
     private OnImageLoadedListener listener = new InternalBitmapLoaderListener();
 
     private BasePhotoAdapter(ArrayList<Photo> photos, int cacheSizeInMegaByte){
         super(photos);
         Log.d(BasePhotoAdapter.class.getName(), String.format("Using %d MB for the lru photo cache", cacheSizeInMegaByte));
-        lruBitmapCache = new LruBitmapCache(1024 * cacheSizeInMegaByte);
     }
 
     public BasePhotoAdapter(int cacheSizeInMegaByte){
@@ -147,8 +158,8 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
                 imageViewReference.get().setImageBitmap(null);
         }
         tasks.clear();
-        lruBitmapCache.destroy();
         listener = null;
+        threadPoolExecutor.shutdown();
     }
 
     /**
@@ -226,28 +237,44 @@ public abstract class BasePhotoAdapter<H extends RecyclerView.ViewHolder> extend
      * @param photo das Photo, das geladen werden soll
      */
     protected void loadBitmapIntoImageViewAsync(H viewHolder, final ImageView imageView, final Photo photo){
+        if (imageView.getDrawable() instanceof AsyncDrawable) {
+            AsyncDrawable drawable = (AsyncDrawable) imageView.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            if (bitmap != null && !bitmap.isRecycled())
+                bitmap.recycle();
+        }
         imageView.setImageBitmap(null);
-        Integer prevKey = -1;
+
+/*        Integer prevKey = -1;
         try{
             prevKey = Integer.valueOf(imageView.getTag().toString());
-        }catch(Exception e){}
+        }catch(Exception e){}*/
 
         if (cancelPotentialWork(photo.getId(), imageView)) {
-            if (prevKey != -1){
+
+            /*if (prevKey != -1){
                 lruBitmapCache.referenceDecrease(prevKey);
-            }
+            }*/
 
             Object tag = viewHolder.itemView.getTag(R.id.should_animate);
             boolean shouldAnimate = tag == null || !tag.equals(Boolean.FALSE);
             if (!shouldAnimate)
                 viewHolder.itemView.setTag(R.id.should_animate, Boolean.TRUE);
 
-            BitmapLoaderTask task = new BitmapLoaderTask(lruBitmapCache, imageView, photo.getId(), photo.getImageFile(), listener);
+            BitmapLoaderTask task = new BitmapLoaderTask(imageView, photo.getId(), photo.getImageFile(), listener);
             task.setShouldAnimate(shouldAnimate);
-            Bitmap placeHolderBitmap = lruBitmapCache.get(photo.getId());
-            AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), placeHolderBitmap, task);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(photo.getImageFilePath(), options);
+            int imageHeight = options.outHeight;
+            int imageWidth = options.outWidth;
+            Bitmap placeHolder = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ALPHA_8);
+            Canvas canvas = new Canvas(placeHolder);
+            canvas.drawColor(Color.BLACK);
+            AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), placeHolder, task);
             imageView.setImageDrawable(asyncDrawable);
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            task.executeOnExecutor(threadPoolExecutor);
         }
     }
 

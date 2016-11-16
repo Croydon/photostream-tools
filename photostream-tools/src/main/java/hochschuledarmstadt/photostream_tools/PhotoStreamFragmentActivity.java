@@ -96,22 +96,25 @@ public abstract class PhotoStreamFragmentActivity extends PhotoStreamActivity im
 
     @Override
     protected void onPhotoStreamServiceDisconnected(IPhotoStreamClient photoStreamClient) {
-        notifyOnServiceDisconnected(photoStreamClient);
+        notifyOnServiceDisconnected();
     }
 
     private void notifyOnServiceConnected(IPhotoStreamClient photoStreamClient){
         if (!serviceStateChangedListeners.isEmpty()) {
             if (!alreadyNotified) {
+                PhotoStreamClientImpl impl = ((PhotoStreamClientDelegate)photoStreamClient).getPhotoStreamClientImpl();
                 alreadyNotified = true;
-                for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
-                    onServiceStateChangedListener.onServiceConnected(photoStreamClient);
+                for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners) {
+                    String fragmentId = onServiceStateChangedListener.getPhotoStreamFragmentId();
+                    onServiceStateChangedListener.onServiceConnected(new PhotoStreamClientDelegate(fragmentId, impl));
+                }
             }
         }
     }
 
-    private void notifyOnServiceDisconnected(IPhotoStreamClient photoStreamClient){
+    private void notifyOnServiceDisconnected(){
         for (OnServiceStateChangedListener onServiceStateChangedListener : serviceStateChangedListeners)
-            onServiceStateChangedListener.onServiceDisconnected(photoStreamClient);
+            onServiceStateChangedListener.onServiceDisconnected();
         alreadyNotified = false;
     }
 

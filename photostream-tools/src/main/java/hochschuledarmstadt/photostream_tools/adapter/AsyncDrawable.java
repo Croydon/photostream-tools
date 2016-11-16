@@ -42,4 +42,7 @@ class AsyncDrawable extends BitmapDrawable{
     public BitmapLoaderTask getBitmapLoaderTask() {
         return bitmapLoaderTaskReference.get();
     }
+
+
+
 }

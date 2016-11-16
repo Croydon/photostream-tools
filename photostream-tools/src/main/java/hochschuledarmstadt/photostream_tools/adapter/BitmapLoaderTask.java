@@ -53,7 +53,6 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
     private static final int TYPE_FILE = -2;
     private static final int TYPE_OTHER = -3;
 
-    private LruBitmapCache lruBitmapCache;
     private WeakReference<ImageView> imageViewReference;
     private final int photoId;
     private OnImageLoadedListener listener;
@@ -74,8 +73,7 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
         return photoId;
     }
 
-    public BitmapLoaderTask(LruBitmapCache lruBitmapCache, ImageView imageView, int photoId, File imageFile, OnImageLoadedListener listener) {
-        this.lruBitmapCache = lruBitmapCache;
+    public BitmapLoaderTask(ImageView imageView, int photoId, File imageFile, OnImageLoadedListener listener) {
         this.imageViewReference = new WeakReference<>(imageView);
         this.photoId = photoId;
         this.listener = listener;
@@ -91,17 +89,20 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected Bitmap doInBackground(Void... params) {
         Bitmap bitmap = null;
-        try {
-            Integer key = Integer.valueOf(photoId);
-            bitmap = lruBitmapCache.get(key);
-            if (bitmap == null) {
-                bitmap = decodeBitmapFromFile(imageFile);
-                lruBitmapCache.put(key, bitmap);
-            } else
-                Log.d(BasePhotoAdapter.class.getName(), "Bitmap reused for photo id: " + photoId);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        if (!imageFile.exists()){
+            return null;
         }
+
+        boolean retry = false;
+        do{
+            try {
+                return decodeBitmapFromFile(imageFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+                retry = true;
+            }
+        }while(retry);
+
         return bitmap;
     }
 
@@ -118,7 +119,6 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
             imageViewReference.clear();
         imageFile = null;
         listener = null;
-        lruBitmapCache = null;
     }
 
     @Override
@@ -133,14 +133,14 @@ class BitmapLoaderTask extends AsyncTask<Void, Void, Bitmap> {
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
 
-        boolean ok = !isCancelled();
+        boolean ok = !isCancelled() && (bitmap == null || !bitmap.isRecycled());
 
         if (ok && imageViewReference != null) {
             final ImageView imageView = imageViewReference.get();
             if (imageView != null) {
                 final BitmapLoaderTask bitmapWorkerTask = getBitmapLoaderTaskRefFrom(imageView);
                 if (this == bitmapWorkerTask && imageView != null) {
-                    lruBitmapCache.referenceIncrease(photoId);
+                    //lruBitmapCache.referenceIncrease(photoId);
                     imageView.setImageBitmap(bitmap);
                     imageView.setTag(photoId);
                     listener.onTaskFinishedOrCanceled(this, imageView);

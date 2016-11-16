@@ -26,5 +26,6 @@ package hochschuledarmstadt.photostream_tools;
 
 interface OnServiceStateChangedListener {
     void onServiceConnected(IPhotoStreamClient client);
-    void onServiceDisconnected(IPhotoStreamClient client);
+    void onServiceDisconnected();
+    String getPhotoStreamFragmentId();
 }

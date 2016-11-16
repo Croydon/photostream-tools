@@ -259,10 +259,14 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
         return photoStreamClient;
     }
 
+    protected PhotoStreamClientDelegate providePhotoStreamClientDelegate(PhotoStreamClientImpl client){
+        return new PhotoStreamClientDelegate(activityId, client);
+    }
+
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         PhotoStreamClientImpl client = ((PhotoStreamService.PhotoStreamServiceBinder) service).getClient();
-        photoStreamClient = new PhotoStreamClientDelegate(activityId, client);
+        photoStreamClient = providePhotoStreamClientDelegate(client);
         bound = true;
         if (!isPaused) {
             photoStreamClient.removeActivityMovedToBackground(this);
