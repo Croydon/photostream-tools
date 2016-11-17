@@ -378,7 +378,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_ORIENTATION}. They can be interpreted as
+     * Constants for {@link ExifInterface#TAG_ORIENTATION}. They can be interpreted as
      * follows:
      * <ul>
      * <li>TOP_LEFT is the normal orientation.</li>
@@ -403,31 +403,25 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_Y_CB_CR_POSITIONING}
+     * Constants for {@link ExifInterface#TAG_Y_CB_CR_POSITIONING}
      */
     public static interface YCbCrPositioning {
         public static final short CENTERED = 1;
         public static final short CO_SITED = 2;
     }
 
-    /**
-     * Constants for {@link TAG_COMPRESSION}
-     */
     public static interface Compression {
         public static final short UNCOMPRESSION = 1;
         public static final short JPEG = 6;
     }
 
-    /**
-     * Constants for {@link TAG_RESOLUTION_UNIT}
-     */
     public static interface ResolutionUnit {
         public static final short INCHES = 2;
         public static final short CENTIMETERS = 3;
     }
 
     /**
-     * Constants for {@link TAG_PHOTOMETRIC_INTERPRETATION}
+     * Constants for {@link ExifInterface#TAG_PHOTOMETRIC_INTERPRETATION}
      */
     public static interface PhotometricInterpretation {
         public static final short RGB = 2;
@@ -435,7 +429,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_PLANAR_CONFIGURATION}
+     * Constants for {@link ExifInterface#TAG_PLANAR_CONFIGURATION}
      */
     public static interface PlanarConfiguration {
         public static final short CHUNKY = 1;
@@ -443,7 +437,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_EXPOSURE_PROGRAM}
+     * Constants for {@link ExifInterface#TAG_EXPOSURE_PROGRAM}
      */
     public static interface ExposureProgram {
         public static final short NOT_DEFINED = 0;
@@ -458,7 +452,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_METERING_MODE}
+     * Constants for {@link ExifInterface#TAG_METERING_MODE}
      */
     public static interface MeteringMode {
         public static final short UNKNOWN = 0;
@@ -472,7 +466,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_FLASH} As the definition in Jeita EXIF 2.2
+     * Constants for {@link ExifInterface#TAG_FLASH} As the definition in Jeita EXIF 2.2
      * standard, we can treat this constant as bitwise flag.
      * <p>
      * e.g.
@@ -502,7 +496,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_COLOR_SPACE}
+     * Constants for {@link ExifInterface#TAG_COLOR_SPACE}
      */
     public static interface ColorSpace {
         public static final short SRGB = 1;
@@ -510,7 +504,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_EXPOSURE_MODE}
+     * Constants for {@link ExifInterface#TAG_EXPOSURE_MODE}
      */
     public static interface ExposureMode {
         public static final short AUTO_EXPOSURE = 0;
@@ -519,7 +513,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_WHITE_BALANCE}
+     * Constants for {@link ExifInterface#TAG_WHITE_BALANCE}
      */
     public static interface WhiteBalance {
         public static final short AUTO = 0;
@@ -527,7 +521,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_SCENE_CAPTURE_TYPE}
+     * Constants for {@link ExifInterface#TAG_SCENE_CAPTURE_TYPE}
      */
     public static interface SceneCapture {
         public static final short STANDARD = 0;
@@ -537,7 +531,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_COMPONENTS_CONFIGURATION}
+     * Constants for {@link ExifInterface#TAG_COMPONENTS_CONFIGURATION}
      */
     public static interface ComponentsConfiguration {
         public static final short NOT_EXIST = 0;
@@ -550,7 +544,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_LIGHT_SOURCE}
+     * Constants for {@link ExifInterface#TAG_LIGHT_SOURCE}
      */
     public static interface LightSource {
         public static final short UNKNOWN = 0;
@@ -577,7 +571,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_SENSING_METHOD}
+     * Constants for {@link ExifInterface#TAG_SENSING_METHOD}
      */
     public static interface SensingMethod {
         public static final short NOT_DEFINED = 1;
@@ -590,21 +584,21 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_FILE_SOURCE}
+     * Constants for {@link ExifInterface#TAG_FILE_SOURCE}
      */
     public static interface FileSource {
         public static final short DSC = 3;
     }
 
     /**
-     * Constants for {@link TAG_SCENE_TYPE}
+     * Constants for {@link ExifInterface#TAG_SCENE_TYPE}
      */
     public static interface SceneType {
         public static final short DIRECT_PHOTOGRAPHED = 1;
     }
 
     /**
-     * Constants for {@link TAG_GAIN_CONTROL}
+     * Constants for {@link ExifInterface#TAG_GAIN_CONTROL}
      */
     public static interface GainControl {
         public static final short NONE = 0;
@@ -615,7 +609,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_CONTRAST}
+     * Constants for {@link ExifInterface#TAG_CONTRAST}
      */
     public static interface Contrast {
         public static final short NORMAL = 0;
@@ -624,7 +618,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_SATURATION}
+     * Constants for {@link ExifInterface#TAG_SATURATION}
      */
     public static interface Saturation {
         public static final short NORMAL = 0;
@@ -633,7 +627,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_SHARPNESS}
+     * Constants for {@link ExifInterface#TAG_SHARPNESS}
      */
     public static interface Sharpness {
         public static final short NORMAL = 0;
@@ -642,7 +636,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_SUBJECT_DISTANCE}
+     * Constants for {@link ExifInterface#TAG_SUBJECT_DISTANCE}
      */
     public static interface SubjectDistance {
         public static final short UNKNOWN = 0;
@@ -652,8 +646,8 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_LATITUDE_REF},
-     * {@link TAG_GPS_DEST_LATITUDE_REF}
+     * Constants for {@link ExifInterface#TAG_GPS_LATITUDE_REF},
+     * {@link ExifInterface#TAG_GPS_DEST_LATITUDE_REF}
      */
     public static interface GpsLatitudeRef {
         public static final String NORTH = "N";
@@ -661,8 +655,8 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_LONGITUDE_REF},
-     * {@link TAG_GPS_DEST_LONGITUDE_REF}
+     * Constants for {@link ExifInterface#TAG_GPS_LONGITUDE_REF},
+     * {@link ExifInterface#TAG_GPS_DEST_LONGITUDE_REF}
      */
     public static interface GpsLongitudeRef {
         public static final String EAST = "E";
@@ -670,7 +664,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_ALTITUDE_REF}
+     * Constants for {@link ExifInterface#TAG_GPS_ALTITUDE_REF}
      */
     public static interface GpsAltitudeRef {
         public static final short SEA_LEVEL = 0;
@@ -678,7 +672,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_STATUS}
+     * Constants for {@link ExifInterface#TAG_GPS_STATUS}
      */
     public static interface GpsStatus {
         public static final String IN_PROGRESS = "A";
@@ -686,7 +680,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_MEASURE_MODE}
+     * Constants for {@link ExifInterface#TAG_GPS_MEASURE_MODE}
      */
     public static interface GpsMeasureMode {
         public static final String MODE_2_DIMENSIONAL = "2";
@@ -694,8 +688,8 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_SPEED_REF},
-     * {@link TAG_GPS_DEST_DISTANCE_REF}
+     * Constants for {@link ExifInterface#TAG_GPS_SPEED_REF},
+     * {@link ExifInterface#TAG_GPS_DEST_DISTANCE_REF}
      */
     public static interface GpsSpeedRef {
         public static final String KILOMETERS = "K";
@@ -704,8 +698,8 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_TRACK_REF},
-     * {@link TAG_GPS_IMG_DIRECTION_REF}, {@link TAG_GPS_DEST_BEARING_REF}
+     * Constants for {@link ExifInterface#TAG_GPS_TRACK_REF},
+     * {@link ExifInterface#TAG_GPS_IMG_DIRECTION_REF}, {@link ExifInterface#TAG_GPS_DEST_BEARING_REF}
      */
     public static interface GpsTrackRef {
         public static final String TRUE_DIRECTION = "T";
@@ -713,7 +707,7 @@ public class ExifInterface {
     }
 
     /**
-     * Constants for {@link TAG_GPS_DIFFERENTIAL}
+     * Constants for {@link ExifInterface#TAG_GPS_DIFFERENTIAL}
      */
     public static interface GpsDifferential {
         public static final short WITHOUT_DIFFERENTIAL_CORRECTION = 0;
@@ -1180,7 +1174,7 @@ public class ExifInterface {
 
     /**
      * Returns a list of ExifTags that share an IFD (which can be obtained by
-     * calling {@link #getTrueIFD} on a defined tag constant) or null if none
+     * calling {@link #getTrueIfd(int)} on a defined tag constant) or null if none
      * exist.
      *
      * @param ifdId an IFD as defined in the exif standard (or with
@@ -1492,9 +1486,9 @@ public class ExifInterface {
     }
 
     /**
-     * Returns true if tag TID is one of the following: {@link TAG_EXIF_IFD},
-     * {@link TAG_GPS_IFD}, {@link TAG_JPEG_INTERCHANGE_FORMAT},
-     * {@link TAG_STRIP_OFFSETS}, {@link TAG_INTEROPERABILITY_IFD}
+     * Returns true if tag TID is one of the following: {@link ExifInterface#TAG_EXIF_IFD},
+     * {@link ExifInterface#TAG_GPS_IFD}, {@link ExifInterface#TAG_JPEG_INTERCHANGE_FORMAT},
+     * {@link ExifInterface#TAG_STRIP_OFFSETS}, {@link ExifInterface#TAG_INTEROPERABILITY_IFD}
      * <p>
      * Note: defining tags with these TID's is disallowed.
      *
