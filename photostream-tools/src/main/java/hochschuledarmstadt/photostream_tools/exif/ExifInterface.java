@@ -52,7 +52,7 @@ import java.util.TimeZone;
  * updated by: reading new ones from a file, deleting or adding existing ones,
  * or building new ExifTags from a tag definition. These ExifTags can be written
  * to a valid jpeg image as exif metadata.
- * <p>
+ * 
  * Each ExifTag has a tag ID (TID) and is stored in a specific image file
  * directory (IFD) as specified by the exif standard. A tag definition can be
  * looked up with a constant that is a combination of TID and IFD. This
@@ -380,16 +380,16 @@ public class ExifInterface {
     /**
      * Constants for {@link ExifInterface#TAG_ORIENTATION}. They can be interpreted as
      * follows:
-     * <ul>
-     * <li>TOP_LEFT is the normal orientation.</li>
-     * <li>TOP_RIGHT is a left-right mirror.</li>
-     * <li>BOTTOM_LEFT is a 180 degree rotation.</li>
-     * <li>BOTTOM_RIGHT is a top-bottom mirror.</li>
-     * <li>LEFT_TOP is mirrored about the top-left<->bottom-right axis.</li>
-     * <li>RIGHT_TOP is a 90 degree clockwise rotation.</li>
-     * <li>LEFT_BOTTOM is mirrored about the top-right<->bottom-left axis.</li>
-     * <li>RIGHT_BOTTOM is a 270 degree clockwise rotation.</li>
-     * </ul>
+     *
+     * TOP_LEFT is the normal orientation.
+     * TOP_RIGHT is a left-right mirror.
+     * BOTTOM_LEFT is a 180 degree rotation.
+     * BOTTOM_RIGHT is a top-bottom mirror.
+     * LEFT_TOP is mirrored about the top-left bottom-right axis.
+     * RIGHT_TOP is a 90 degree clockwise rotation.
+     * LEFT_BOTTOM is mirrored about the top-right bottom-left axis.
+     * RIGHT_BOTTOM is a 270 degree clockwise rotation.
+     *
      */
     public static interface Orientation {
         public static final short TOP_LEFT = 1;
@@ -468,9 +468,9 @@ public class ExifInterface {
     /**
      * Constants for {@link ExifInterface#TAG_FLASH} As the definition in Jeita EXIF 2.2
      * standard, we can treat this constant as bitwise flag.
-     * <p>
+     * 
      * e.g.
-     * <p>
+     * 
      * short flash = FIRED | RETURN_STROBE_RETURN_LIGHT_DETECTED |
      * MODE_AUTO_MODE
      */
@@ -1489,7 +1489,7 @@ public class ExifInterface {
      * Returns true if tag TID is one of the following: {@link ExifInterface#TAG_EXIF_IFD},
      * {@link ExifInterface#TAG_GPS_IFD}, {@link ExifInterface#TAG_JPEG_INTERCHANGE_FORMAT},
      * {@link ExifInterface#TAG_STRIP_OFFSETS}, {@link ExifInterface#TAG_INTEROPERABILITY_IFD}
-     * <p>
+     * 
      * Note: defining tags with these TID's is disallowed.
      *
      * @param tag a tag's TID (can be obtained from a defined tag constant with
