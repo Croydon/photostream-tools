@@ -173,6 +173,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
      * @param listener
      */
     public void loadBitmapAsync(File file, final OnBitmapLoadedListener listener){
+        if (file == null) throw new NullPointerException("Das Photo kann nicht geladen werden, weil der File Parameter null ist!");
         StreamDecoderFileStrategy strategy = new StreamDecoderFileStrategy();
         AsyncBitmapLoader<File> task = new AsyncBitmapLoader<>(strategy);
         task.setListener(new OnBitmapLoadedWrapper<File>(listener));
@@ -187,6 +188,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
      * @param listener
      */
     public void loadBitmapAsync(Uri uri, final OnBitmapLoadedListener listener){
+        if (uri == null) throw new NullPointerException("Das Photo kann nicht geladen werden, weil der Uri Parameter null ist!");
         if (uri.toString().startsWith("assets://")){
             String assetFileName = uri.toString().replace("assets://", "");
             loadBitmapAsync(assetFileName, listener);
@@ -199,6 +201,7 @@ public abstract class PhotoStreamActivity extends AppCompatActivity implements S
     }
 
     void loadBitmapAsync(String assetFileName, final OnBitmapLoadedListener listener){
+        if (assetFileName == null) throw new NullPointerException("Das Photo kann nicht geladen werden, weil der String Parameter null ist!");
         AssetDecoderStrategy strategy = new AssetDecoderStrategy(getApplicationContext());
         AsyncBitmapLoader<String> task = new AsyncBitmapLoader<>(strategy);
         task.setListener(new OnBitmapLoadedWrapper<String>(listener));
