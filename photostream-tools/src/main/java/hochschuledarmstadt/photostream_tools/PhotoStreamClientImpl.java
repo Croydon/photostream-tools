@@ -80,7 +80,7 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
     private final UrlBuilder urlBuilder;
     private WebSocketClient webSocketClient;
     private PhotoStreamCallbackContainer callbackContainer = new PhotoStreamCallbackContainer();
-    private int lastRequestedPage = 0;
+    private Map<String, Integer> lastRequestedPageMap = new HashMap<>();
 
     private Map<String, Boolean> shouldReloadFirstPageOfPhotosFromCache = new HashMap<>();
 
@@ -278,7 +278,10 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
 
     }
 
-    public void loadPhotos(final String activityId){
+    public void loadPhotos(final String instanceId){
+
+        int lastRequestedPage = lastRequestedPageMap.containsKey(instanceId) ? lastRequestedPageMap.get(instanceId) : 1;
+
         String url = urlBuilder.getLoadPhotosApiUrl(lastRequestedPage <= 1);
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
 
@@ -299,8 +302,8 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         LoadPhotosAsyncTask task = new LoadPhotosAsyncTask(executor, imageLoader, imageCacher, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
-                setShouldReloadFirstPageOfPhotosFromCache(activityId, Boolean.FALSE);
-                resetLastRequestedPage();
+                setShouldReloadFirstPageOfPhotosFromCache(instanceId, Boolean.FALSE);
+                resetLastRequestedPage(instanceId);
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotos(queryResult);
             }
@@ -322,7 +325,7 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
             @Override
             public PhotoQueryResult onNoNewPhotosAvailable(int page) {
                 removeOpenRequest(requestType);
-                if (!shouldReloadFirstPageOfPhotosFromCache.containsKey(activityId) || shouldReloadFirstPageOfPhotosFromCache.get(activityId).equals(Boolean.TRUE)) {
+                if (!shouldReloadFirstPageOfPhotosFromCache.containsKey(instanceId) || shouldReloadFirstPageOfPhotosFromCache.get(instanceId).equals(Boolean.TRUE)) {
                     photoTable.openDatabase();
                     int photoPageSize = urlBuilder.getPhotoPageSize();
                     PhotoQueryResult photoQueryResult = photoTable.getCachedPhotoQueryResult(page, photoPageSize);
@@ -339,11 +342,12 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         task.execute();
     }
 
-    public void loadMorePhotos(){
+    public void loadMorePhotos(final String instanceId){
         String url = urlBuilder.getLoadMorePhotosApiUrl();
         HttpGetExecutor executor = httpExecutorFactory.createHttpGetExecutor(url);
         final RequestType requestType = RequestType.LOAD_PHOTOS;
 
+        int lastRequestedPage = lastRequestedPageMap.containsKey(instanceId) ? lastRequestedPageMap.get(instanceId) : 1;
         photoTable.openDatabase();
         int nextPage = lastRequestedPage + 1;
         String eTag = photoTable.loadEtagFor(nextPage, urlBuilder.getPhotoPageSize());
@@ -358,7 +362,7 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         LoadMorePhotosAsyncTask task = new LoadMorePhotosAsyncTask(executor, imageLoader, imageCacher, new LoadPhotosAsyncTask.GetPhotosCallback() {
             @Override
             public void onPhotosResult(PhotoQueryResult queryResult) {
-                incrementLastRequestedPage();
+                incrementLastRequestedPage(instanceId);
                 removeOpenRequest(requestType);
                 callbackContainer.notifyOnPhotos(queryResult);
             }
@@ -392,8 +396,9 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
 
     }
 
-    private void resetLastRequestedPage() {
-        lastRequestedPage = 1;
+    private void resetLastRequestedPage(String instanceId) {
+        if (lastRequestedPageMap.containsKey(instanceId))
+            lastRequestedPageMap.remove(instanceId);
     }
 
     private void removeOpenRequest(RequestType requestType) {
@@ -402,8 +407,10 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
     }
 
 
-    private void incrementLastRequestedPage() {
-        lastRequestedPage += 1;
+    private void incrementLastRequestedPage(String instanceId) {
+        int lastRequestedPage = lastRequestedPageMap.containsKey(instanceId) ? lastRequestedPageMap.get(instanceId) : 1;
+        lastRequestedPageMap.remove(instanceId);
+        lastRequestedPageMap.put(instanceId, ++lastRequestedPage);
     }
 
 
@@ -763,10 +770,10 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         callbackContainer.removeActivityMovedToBackground(activity);
     }
 
-    void setShouldReloadFirstPageOfPhotosFromCache(String activityId, Boolean value) {
-        if (shouldReloadFirstPageOfPhotosFromCache.containsKey(activityId))
-            shouldReloadFirstPageOfPhotosFromCache.remove(activityId);
-        shouldReloadFirstPageOfPhotosFromCache.put(activityId, value);
+    void setShouldReloadFirstPageOfPhotosFromCache(String instanceId, Boolean value) {
+        if (shouldReloadFirstPageOfPhotosFromCache.containsKey(instanceId))
+            shouldReloadFirstPageOfPhotosFromCache.remove(instanceId);
+        shouldReloadFirstPageOfPhotosFromCache.put(instanceId, value);
     }
 
     public void addActivityVisible(PhotoStreamActivity activity) {
@@ -779,9 +786,10 @@ class PhotoStreamClientImpl implements AndroidSocket.OnMessageListener {
         callbackContainer.removeActivityVisible(activity);
     }
 
-    public void clearShouldReloadFirstPageOfPhotosFromCache(String activityId) {
-        if (shouldReloadFirstPageOfPhotosFromCache.containsKey(activityId))
-            shouldReloadFirstPageOfPhotosFromCache.remove(activityId);
-        lastRequestedPage = 0;
+    public void clearShouldReloadFirstPageOfPhotosFromCache(String instanceId) {
+        if (shouldReloadFirstPageOfPhotosFromCache.containsKey(instanceId))
+            shouldReloadFirstPageOfPhotosFromCache.remove(instanceId);
+        if (lastRequestedPageMap.containsKey(instanceId))
+            lastRequestedPageMap.remove(instanceId);
     }
 }

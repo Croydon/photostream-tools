@@ -46,13 +46,17 @@ import hochschuledarmstadt.photostream_tools.model.Photo;
 
 class PhotoStreamClientDelegate implements IPhotoStreamClient {
 
-    private final String activityId;
+    private final String instanceId;
     private PhotoStreamClientImpl photoStreamClientImpl;
 
     private boolean photosReceivedListenerRegistered = false;
 
-    public PhotoStreamClientDelegate(String activityId, PhotoStreamClientImpl photoStreamClientImpl) {
-        this.activityId = activityId;
+    PhotoStreamClientImpl getPhotoStreamClientImpl() {
+        return photoStreamClientImpl;
+    }
+
+    public PhotoStreamClientDelegate(String instanceId, PhotoStreamClientImpl photoStreamClientImpl) {
+        this.instanceId = instanceId;
         this.photoStreamClientImpl = photoStreamClientImpl;
     }
 
@@ -189,7 +193,7 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
 
     @Override
     public void loadPhotos() {
-        photoStreamClientImpl.loadPhotos(activityId);
+        photoStreamClientImpl.loadPhotos(instanceId);
     }
 
     @Override
@@ -199,7 +203,7 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
 
     @Override
     public void loadMorePhotos() {
-        photoStreamClientImpl.loadMorePhotos();
+        photoStreamClientImpl.loadMorePhotos(instanceId);
     }
 
     @Override
@@ -268,10 +272,10 @@ class PhotoStreamClientDelegate implements IPhotoStreamClient {
     }
 
     public void setShouldReloadFirstPageOfPhotosFromCache(Boolean value) {
-        photoStreamClientImpl.setShouldReloadFirstPageOfPhotosFromCache(activityId, value);
+        photoStreamClientImpl.setShouldReloadFirstPageOfPhotosFromCache(instanceId, value);
     }
 
     public void clearShouldReloadFirstPageOfPhotosFromCache() {
-        photoStreamClientImpl.clearShouldReloadFirstPageOfPhotosFromCache(activityId);
+        photoStreamClientImpl.clearShouldReloadFirstPageOfPhotosFromCache(instanceId);
     }
 }

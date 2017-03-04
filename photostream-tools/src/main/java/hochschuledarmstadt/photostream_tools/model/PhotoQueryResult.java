@@ -41,7 +41,7 @@ public class PhotoQueryResult {
 
     @SerializedName("page")
     @Expose
-    private Integer page;
+    private int page = 0;
 
     @SerializedName("photos")
     @Expose

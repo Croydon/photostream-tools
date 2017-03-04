@@ -231,11 +231,17 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
             Activity activity = this.activity.get();
             if (activity != null) {
                 if (activity.isFinishing() || activity.isChangingConfigurations()) {
-                    if (!destroyed) destroyReferences();
+                    //if (!destroyed) destroyReferences();
                 }
             }
         }
         return bundle;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        if (!destroyed) destroyReferences();
     }
 
     /**
@@ -356,8 +362,8 @@ abstract class BaseAdapter<H extends RecyclerView.ViewHolder, T extends BaseItem
                     @Override
                     public void onViewDetachedFromWindow(View view) {
                         if (activity.get().isFinishing()) {
-                            if (!destroyed)
-                                destroyReferences();
+                            //if (!destroyed)
+                              //  destroyReferences();
                         }
                         activity.get().getWindow().getDecorView().removeOnAttachStateChangeListener(this);
                         activity.clear();

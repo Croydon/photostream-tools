@@ -24,12 +24,14 @@
 
 package hochschuledarmstadt.photostream_tools;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import java.io.File;
+import java.util.UUID;
 
 import hochschuledarmstadt.photostream_tools.callback.OnPhotosReceivedListener;
 
@@ -46,10 +48,21 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
 
     private PhotoStreamClientDelegate photoStreamClient;
 
+    private static final String KEY_FRAGMENT_ID = "KEY_FRAGMENT_ID";
+
+    private String fragmentId;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.refSavedInstanceState = savedInstanceState;
+        fragmentId = savedInstanceState == null ? UUID.randomUUID().toString() : savedInstanceState.getString(KEY_FRAGMENT_ID);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_FRAGMENT_ID, fragmentId);
     }
 
     @Override
@@ -89,19 +102,24 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
     }
 
     @Override
+    public String getPhotoStreamFragmentId() {
+        return fragmentId;
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if (isConnectedToService()){
             if (getActivity().isChangingConfigurations() && photoStreamClient.hasOnPhotosReceivedListenerRegistered()) {
                 photoStreamClient.setShouldReloadFirstPageOfPhotosFromCache(Boolean.FALSE);
-            }else if(getActivity().isFinishing())
+            }else if(getActivity().isFinishing() || isRemoving())
                 photoStreamClient.clearShouldReloadFirstPageOfPhotosFromCache();
         }
     }
 
     @Override
-    public void onServiceDisconnected(IPhotoStreamClient client) {
-        internalNotifyDisconnectFromService(client);
+    public void onServiceDisconnected() {
+        internalNotifyDisconnectFromService(photoStreamClient);
     }
 
     @Override
@@ -134,6 +152,13 @@ public abstract class PhotoStreamFragment extends Fragment implements OnServiceS
 
     void loadBitmapAsync(String assetFileName, final PhotoStreamActivity.OnBitmapLoadedListener listener){
         ((PhotoStreamFragmentActivity)getActivity()).loadBitmapAsync(assetFileName, listener);
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        if (photoStreamClient != null && photoStreamClient.hasOnPhotosReceivedListenerRegistered())
+            intent.putExtra("parent", fragmentId);
+        super.startActivity(intent);
     }
 
 }
