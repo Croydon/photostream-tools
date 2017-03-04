@@ -261,6 +261,14 @@ public interface IPhotoStreamClient {
 
     /**
      * Asynchroner Aufruf. <br>
+     * Lädt alle favorisierten Photos des Nutzers.
+     * Konnten die Photos geladen werden, wird die Methode {@link OnPhotosReceivedListener#onPhotosReceived(PhotoQueryResult)} aufgerufen. <br>
+     * Schlägt das Laden der Photos fehl, wird die Methode {@link OnPhotosReceivedListener#onReceivePhotosFailed(HttpError)} aufgerufen. <br>
+     */
+    void loadFavoritePhotos();
+
+    /**
+     * Asynchroner Aufruf. <br>
      * Lädt eine weitere Seite von Photos aus dem Stream. <br>
      * Konnten die Photos geladen werden, wird die Methode {@link OnPhotosReceivedListener#onPhotosReceived(PhotoQueryResult)} aufgerufen. <br>
      * Schlägt das Laden der Photos fehl, wird die Methode {@link OnPhotosReceivedListener#onReceivePhotosFailed(HttpError)} aufgerufen. <br>

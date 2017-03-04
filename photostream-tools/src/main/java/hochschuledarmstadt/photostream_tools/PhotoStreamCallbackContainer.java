@@ -92,14 +92,10 @@ class PhotoStreamCallbackContainer {
     }
 
     private void addListenerToMap() {
-        requestListenerMap.put(RequestType.UPLOAD_PHOTO, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.LOAD_PHOTOS, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.DELETE_PHOTO, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.FAVORITE_PHOTO, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.SEARCH_PHOTOS, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.LOAD_COMMENTS, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.UPLOAD_COMMENT, new ArrayList<OnRequestListener>());
-        requestListenerMap.put(RequestType.DELETE_COMMENT, new ArrayList<OnRequestListener>());
+        RequestType[] requestTypes = RequestType.values();
+        for (RequestType requestType : requestTypes) {
+            requestListenerMap.put(requestType, new ArrayList<OnRequestListener>());
+        }
     }
 
     public void clear(){

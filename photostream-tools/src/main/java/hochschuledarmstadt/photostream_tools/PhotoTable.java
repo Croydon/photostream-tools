@@ -33,6 +33,7 @@ import android.provider.BaseColumns;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hochschuledarmstadt.photostream_tools.model.Photo;
@@ -122,4 +123,5 @@ class PhotoTable {
         cursor.close();
         return photos;
     }
+
 }
