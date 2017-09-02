@@ -1,0 +1,3 @@
+[submodule "photostream-example"]
+	path = photostream-example
+	url = https://github.com/aschattney/photostream-example
