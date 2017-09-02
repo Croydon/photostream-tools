@@ -1,1 +1,1 @@
-include ':photostream-tools', ':photostream-example', ':fragment-example'
+include ':photostream-tools', ':photostream-example:examples', ':fragment-example'
